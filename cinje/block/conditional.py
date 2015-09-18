@@ -32,7 +32,11 @@ class Conditional:
 			context.scope += 1
 			return  # We'll bounce back to the "if" Conditional instance.
 		
-		yield declaration.clone(line=declaration.stripped + ':')
+		yield declaration.clone(line=declaration.stripped + (':' if ':' not in declaration.stripped else ''))
+		
+		if ':' in declaration.stripped and declaration.stripped[-1] != ':':
+			if __debug__: dprint("\x1b[33m", "-", "Conditional", "\x1b[0m")
+			return
 		
 		context.scope += 1
 		

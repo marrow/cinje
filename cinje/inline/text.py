@@ -29,15 +29,20 @@ class Text:
 		
 		while line.kind == 'text' or ( line.kind == 'comment' and line.stripped.startswith('#{') ):
 			buffer.append(line.line.rstrip() + '\n')
-			line = input.next()
+			try:
+				line = input.next()
+			except StopIteration:
+				line = None
+				break
 		
-		input.push(line)  # Put the last line back, as it won't be a text line.
-		
-		if __debug__: dprint("\x1b[34m", "?", "Text", len(buffer), "\x1b[0m")
+		if line:
+			input.push(line)  # Put the last line back, as it won't be a text line.
 		
 		while buffer and not buffer[-1].strip():
 			del buffer[-1]
 			input.push(Line(0, ''))
+		
+		if __debug__: dprint("\x1b[34m", "?", "Text", len(buffer), "\x1b[0m")
 		
 		text = "".join(buffer)
 		
@@ -48,8 +53,16 @@ class Text:
 		
 		for token, text in chunk(text):
 			if token == 'text':
-				yield Line(0, self.PREFIX + pformat(text, width=120 - 4 * context.scope) + self.SUFFIX)
+				text = pformat(
+						text,
+						indent = 0,
+						width = 120 - 4 * (context.scope + 1),
+						compact = True
+					).replace("\n ", "\n" + "\t" * (context.scope + 1)).strip()
+				if text[0] == '(' and text[-1] == ')':
+					text = text[1:-1]
+				yield Line(0, self.PREFIX + text + self.SUFFIX)
 			elif token == 'format':
-				pass  # Need to think about that.
+				pass  # TODO: Need to think about that.
 			else:
 				yield Line(0, self.PREFIX + token + '(' + text + ')' + self.SUFFIX)

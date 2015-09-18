@@ -100,14 +100,14 @@ def xmlargs(source=None, **values):
 	if source: values.update(source)
 	
 	for k in sorted(values):
-		if not source[k]:  # We skip empty, None, False, and other falsy values.
+		if not values[k]:  # We skip empty, None, False, and other falsy values.
 			continue
 		
-		if source[k] is True:  # For explicitly True values, we don't have a value for the attribute.
+		if values[k] is True:  # For explicitly True values, we don't have a value for the attribute.
 			parts.append(k)
 			continue
 		
-		parts.append(k + "=" + quoteattr(source[k]))
+		parts.append(k + "=" + quoteattr(values[k]))
 	
 	return Markup(" " + " ".join(parts)) if parts else ''
 

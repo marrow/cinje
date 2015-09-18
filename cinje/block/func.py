@@ -100,6 +100,7 @@ class Function:
 		yield declaration.clone(line=line)
 		
 		context.scope += 1
+		
 		yield from context.stream  # Descend into the function's scope.
 		
 		if 'using' in context.flag:  # Clean up that we were using things.

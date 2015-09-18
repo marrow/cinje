@@ -1,10 +1,20 @@
 # encoding: cinje
 
-: def page title, *, metadata=None, styles=None, scripts=None, **attributes
+: def _sample
+	: using page "Hello world!"
+		
+		<p>This is, like, some content or something.</p>
+		
+	: end
+: end
+
+
+: def page title, *, metadata=[], styles=[], scripts=[], **attributes
 : """A general HTML page."""
 
-<!DOCTYPE html>
+: if not attributes: attributes = {}
 
+<!DOCTYPE html>
 <html&{lang=attributes.pop('lang', 'en')}>
 	<head>
 		<meta charset="utf-8">
@@ -12,13 +22,13 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		
 		: for name, value in metadata
-		<meta name="${name}" content="${value}" />
+		<meta&{name=name, content=value}>
 		: end
 		
 		<title>${title}</title>
 		
 		: for href in styles
-		<link rel="stylesheet" href="${href}">
+		<link&{href=href, rel="stylesheet"}>
 		: end
 		
 		<!--[if lt IE 9 ]>
@@ -52,7 +62,7 @@
 		</script>
 		
 		: for href in scripts
-		<script src="${href}"></script>
+		<script&{src=href}></script>
 		: end
 		
 	</body>
