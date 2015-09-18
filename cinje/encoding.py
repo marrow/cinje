@@ -23,17 +23,13 @@ def cinje_decode(input, errors='strict', final=True):
 
 class CinjeIncrementalDecoder(utf8.IncrementalDecoder):
 	def _buffer_decode(self, input, errors='strict', final=False):
-		print(">>> FINAL >>>", final)
-		print(">>>>>>>>>>>>>", len(input))
-		
 		if not final or len(input) == 0:
 			return '', 0
 		
 		output = transform(bytes(input).decode('utf8', errors))
 		
-		print("<<<<<<<<<<<<<", len(output))
 		return output, len(input)
-	
+
 
 class CinjeStreamReader(utf8.StreamReader):
 	def __init__(self, *args, **kw):

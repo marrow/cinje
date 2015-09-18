@@ -9,6 +9,14 @@
 : end
 
 
+: def _bench identifier
+	: identifier = str(identifier)
+	: using page "Hello " + identifier
+		<p>Page ${identifier} reporting for duty!</p>
+	: end
+: end
+
+
 : def page title, *, metadata=[], styles=[], scripts=[], **attributes
 : """A general HTML page."""
 

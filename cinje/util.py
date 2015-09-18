@@ -4,7 +4,7 @@
 
 # ## Imports
 
-import sys, traceback
+import sys
 
 from inspect import isfunction, isclass
 from collections import deque, namedtuple, Sized
@@ -19,7 +19,7 @@ def _ndp(*args, **kw):
 	return
 
 dprint = print  # Enable debugging.
-#dprint = _ndp  # Disable debugging.  Also run with -O.
+dprint = _ndp  # Disable debugging.  Also run with -O.
 
 
 # ## Type Definitions
@@ -270,8 +270,6 @@ class Context:
 		self.scope = 0
 		self.flag = set()
 		self._handler = []
-		
-		traceback.print_stack()
 	
 	def __repr__(self):
 		return "Context({!r}, {}, {})".format(self.input, self.scope, self.flag)
