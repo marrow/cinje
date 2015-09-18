@@ -1,0 +1,25 @@
+language: python
+sudo: false
+
+env:
+  - TOXENV=pypy
+  - TOXENV=pypy3
+  - TOXENV=py26
+  - TOXENV=py27
+  - TOXENV=py32
+  - TOXENV=py33
+  - TOXENV=py34
+
+install: travis_retry .travis/install.sh
+
+script: .travis/run.sh
+
+notifications:
+  irc:
+    channels:
+      - 'irc.freenode.org#webcore'
+    use_notice: true
+    skip_join: true
+
+after_success:
+  - coveralls
