@@ -10,33 +10,30 @@ from .util import Context
 
 
 def transform(input):
+	#__import__('pprint').pprint(input)
 	translator = Context(input)
 	return '\n'.join(str(i) for i in translator.stream)
 
 
-def cinje_decode(input, errors='strict'):
-	a = len(input)
-	
-	if hasattr(input, 'tobytes'):
-		input = input.tobytes()
-	
-	if hasattr(input, 'decode'):
-		input = input.decode('utf8', errors)
-	
-	return transform(input), a
+def cinje_decode(input, errors='strict', final=True):
+	if not final: return '', 0
+	output = transform(bytes(input).decode('utf8', errors))
+	return output, len(input)
 
 
 class CinjeIncrementalDecoder(utf8.IncrementalDecoder):
-	def decode(self, input, final=False):
-		self.buffer += input
+	def _buffer_decode(self, input, errors='strict', final=False):
+		print(">>> FINAL >>>", final)
+		print(">>>>>>>>>>>>>", len(input))
 		
-		if final:
-			buff = self.buffer
-			self.buffer = b''
-			return super(CinjeIncrementalDecoder, self).decode(transform(buff).encode('utf8'), final=True)
+		if not final or len(input) == 0:
+			return '', 0
 		
-		return ''
-
+		output = transform(bytes(input).decode('utf8', errors))
+		
+		print("<<<<<<<<<<<<<", len(output))
+		return output, len(input)
+	
 
 class CinjeStreamReader(utf8.StreamReader):
 	def __init__(self, *args, **kw):
@@ -52,8 +49,8 @@ def cinje_search_function(name):
 			name = 'cinje',
 			encode = utf8.encode,
 			decode = cinje_decode,
-			incrementalencoder = utf8.IncrementalEncoder,
-			incrementaldecoder = CinjeIncrementalDecoder,
+			incrementalencoder = None, # utf8.IncrementalEncoder,
+			incrementaldecoder = CinjeIncrementalDecoder, # utf8.IncrementalDecoder,
 			streamreader = CinjeStreamReader,
 			streamwriter = utf8.StreamWriter
 		)

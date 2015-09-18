@@ -37,8 +37,10 @@ class Function:
 			
 			if matches:
 				split = matches[-1].span()[1]  # Inject after, a la "*args>_<", as we're positional-only arguments.
-				if split == len(argspec) or argspec[split] not in ('\t', ' ', ','):
-					prefix = ', '
+				if split != len(argspec):
+					prefix = ' ' if argspec[split] in (',', ' ') else ', '
+					suffix = ','
+			
 			else:  # Ok, we can do this a different way…
 				matches = list(self.STARSTARARGS.finditer(argspec))
 				prefix = ', *, '

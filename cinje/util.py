@@ -4,7 +4,7 @@
 
 # ## Imports
 
-import sys
+import sys, traceback
 
 from inspect import isfunction, isclass
 from collections import deque, namedtuple, Sized
@@ -270,6 +270,8 @@ class Context:
 		self.scope = 0
 		self.flag = set()
 		self._handler = []
+		
+		traceback.print_stack()
 	
 	def __repr__(self):
 		return "Context({!r}, {}, {})".format(self.input, self.scope, self.flag)
