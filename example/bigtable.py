@@ -210,6 +210,10 @@ else:
             'to_str': tenjin.helpers.to_str,
             'escape': tenjin.helpers.escape
         }
+    nop_helpers = {
+            'to_str': str,
+            'escape': str
+        }
     tenjin_template = tenjin.Template(encoding='utf8')
     tenjin_template.convert(s("""\
 <table>
@@ -225,6 +229,9 @@ else:
 
     def test_tenjin():
         return tenjin_template.render(ctx, helpers)
+
+    def test_tenjin_unsafe():
+        return tenjin_template.render(ctx, nop_helpers)
 
 
 # region: web2py

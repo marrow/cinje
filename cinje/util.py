@@ -112,7 +112,7 @@ def xmlargs(source=None, **values):
 	return Markup(" " + " ".join(parts)) if parts else ''
 
 
-def chunk(text, delim=('', '${', '#{', '&{', '%{'), tag=('text', '_escape', '_bless', '_args', 'format')):
+def chunk(text, delim=('', '${', '#{', '&{', '%{'), tag=('text', '_escape', '', '_args', 'format')):
 	"""Chunkify and "tag" a block of text into plain text and code sections.
 	
 	The first delimeter is blank to represent text sections, and keep the indexes aligned with the tags.

@@ -64,5 +64,7 @@ class Text:
 				yield Line(0, self.PREFIX + text + self.SUFFIX)
 			elif token == 'format':
 				pass  # TODO: Need to think about that.
-			else:
+			elif token != '':
 				yield Line(0, self.PREFIX + token + '(' + text + ')' + self.SUFFIX)
+			else:
+				yield Line(0, self.PREFIX + text + self.SUFFIX)
