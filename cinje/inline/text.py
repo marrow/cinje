@@ -8,8 +8,8 @@ from ..util import dprint, chunk, Line, Context
 @Context.register
 class Text:
 	priority = -25
-	PREFIX = '__w('
-	SUFFIX = ')'
+	PREFIX = '__w(('
+	SUFFIX = '))'
 	
 	def match(self, context, line):
 		return line.kind == 'text'
@@ -23,7 +23,7 @@ class Text:
 		if 'text' not in context.flag:
 			yield Line(0, "")
 			yield Line(0, "_buffer = []")
-			yield Line(0, "__w = _buffer.append")
+			yield Line(0, "__w = _buffer.extend")
 			yield Line(0, "")
 			context.flag.add('text')
 		
@@ -51,6 +51,8 @@ class Text:
 		
 		# We now have a contiguous block of templated text.  Now we need to split it up.
 		
+		yield Line(0, self.PREFIX)
+		
 		for token, text in chunk(text):
 			if token == 'text':
 				text = pformat(
@@ -61,10 +63,12 @@ class Text:
 					).replace("\n ", "\n" + "\t" * (context.scope + 1)).strip()
 				if text[0] == '(' and text[-1] == ')':
 					text = text[1:-1]
-				yield Line(0, self.PREFIX + text + self.SUFFIX)
+				yield Line(0, text + ',', (context.scope + 1))
 			elif token == 'format':
 				pass  # TODO: Need to think about that.
 			elif token != '':
-				yield Line(0, self.PREFIX + token + '(' + text + ')' + self.SUFFIX)
+				yield Line(0, token + '(' + text + '),', (context.scope + 1))
 			else:
-				yield Line(0, self.PREFIX + text + self.SUFFIX)
+				yield Line(0, '_escape(' + text + '),', (context.scope + 1))
+		
+		yield Line(0, self.SUFFIX, (context.scope + 1))
