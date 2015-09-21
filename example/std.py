@@ -72,7 +72,7 @@
 	: """HTML5 inline abbreviation."""
 	<abbr title="${title}"&{kwargs}>${label}</abbr>
 : end
- 
+
 
 : def list context, obj, kind='auto', flush=10, **attributes
 	: """Generate an HTML5 list, defaulting to type auto-detection."""
