@@ -80,17 +80,19 @@ class Function:
 		# -> might be within a string…, making this code break the users!
 		
 		argspec = line
-		annotation = None
+		annotation = '' # "__Generator[yield_type, send_type, return_type]"
 		
 		if '->' in line:
-			if '->' in line and line.rfind('->') > line.rfind(','):  # TODO: This just makes the edge case slightly edgier.
-				argspec, _, annotation = line.rpartition('->')
+			argspec, _, flags = line.rpartition('->')
+			for flag in set(i.strip() for i in flags.split()):
+				if flag[0] == '!':
+					context.flag.remove(flag[1:])
+				else:
+					context.flag.add(flag)
 		
 		name = name.strip()
 		argspec = self._optimize(context, argspec)
 		
-		if annotation:
-			annotation = annotation.strip()
 		
 		# Reconstruct the line.
 		
