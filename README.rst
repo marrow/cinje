@@ -166,9 +166,9 @@ cinje                               Python                                  Resu
 ``&{somevar default=27}``           ``_args(somevar, default="hello")``     (depends on ``somevar``)
 =================================== ======================================= ================================
 
-A preceeding space will be emitted automatically if any values would be emitted.  The following would be correct:
+A preceeding space will be emitted automatically if any values would be emitted.  The following would be correct::
 
-	``<meta&{name=name, content=content}>``
+	<meta&{name=name, content=content}>
 
 Formatted Replacement
 ~~~~~~~~~~~~~~~~~~~~~
@@ -198,21 +198,106 @@ terminators to be elided away and omitted from most templates.
 Module Scope
 ~~~~~~~~~~~~
 
+This is an automatic transformer triggered by the start of a source file.  It automatically adds a few imports to the
+top of your file to import the required helpers from cinje.
 
 
 Declaring Functions
 ~~~~~~~~~~~~~~~~~~~
 
+Lines beginning with ``: def`` are used to declare functions within your template source::
+
+	: def somefunction
+		Hello world!
+	: end
+
+The above translates to, roughly, the following Python source::
+
+	def somefunction(*, _escape=_escape, _bless=_bless):
+		_buffer = []
+		__w = _buffer.extend
+		__w((_bless("\tHello world!\n"), ))
+		yield ''.join(_buffer)
+
+You do not need the extraneous trailing colon to denote the end of the declaration, nor do you need to provide
+parenthesis around the argument specification.  The optimization keyword-only arguments will be added automatically to
+the argument specification you give.  For example::
+
+	: def hello name
+		Hello ${name}!
+	: end
+
+Would translate to:
+
+	def hello(name, *, _escape=_escape, _bless=_bless):
+		_buffer = []
+		__w = _buffer.extend
+		__w((_bless("\tHello "), _escape(name), _bless("!\n")))
+		yield ''.join(_buffer)
 
 
 Conditional Flow
 ~~~~~~~~~~~~~~~~
 
+Conditional template generation is integral to any engine that could call itself complete.  To facilitate this cinje
+performs very light translation.  Similar to function declaration, trailing colons are unneeded::
+
+	: if name
+		Hello ${name}!
+	: elif name == "Bob Dole"
+		Mehp, ${name}!
+	: else
+		Hello world!
+	: end
+
+The translation is straightforward::
+
+	if name:
+		# …
+	elif name == "Bob Dole":
+		# …
+	else:
+		…
 
 
 Iteration
 ~~~~~~~~~
 
+Nearly identical to conditional flow, iteration is directly supported::
+
+	: for name in names
+		Hello ${name}!
+	: end
+
+Translates to:
+
+	for name in names:
+		# …
+
+A helper is provided called ``iterate`` which acts similarly to ``enumerate`` but can provide additional details.
+It's a generator that yields ``namedtuple``s of the form ``(first, last, index, total, value)``.  If the current loop
+iteration represents the first iteration, ``first`` will be True.  Similarly—and even for generators where a total
+number of values being iterated could not be calculated beforehand—on the final iteration ``last`` will be True.  The
+``index`` value is an atomic counter provided by ``enumerate``, and ``total`` will be the total number of elements
+being iterated if the object being iterated supports length determination.  You can loop over its results directly::
+
+	: for item in iterate(iterable)
+		: if item.first
+			…
+		: end
+	: end
+
+You can also unpack them::
+
+	: for first, last, index, total, value in iterate(iterable)
+		…
+	: end
+
+If you wish to unpack the values being iterated, you can wrap the additional unpacking in a tuple::
+
+	: for first, last, i, total, (foo, bar, baz) in iterate(iterable)
+		…
+	: end
 
 
 Inheritance
