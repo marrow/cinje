@@ -15,9 +15,9 @@ cinje
 1. What is cinje?
 =================
 
-cinje is a modern, elegant template engine constructed as a Python domain-specific-lanuage that integrates into your
-applications as any other Python code would: by importing them.  Your templates are translated from their source into
-clean, straightforward, and understandable Python source prior to the Python interpreter compiling it to bytecode.
+cinje is a modern, elegant template engine constructed as a Python domain specific language (DSL) that integrates into
+your applications as any other Python code would: by importing them.  Your templates are translated from their source
+into clean, straightforward, and understandable Python source prior to the Python interpreter compiling it to bytecode.
 
 1.1 Goals
 ---------
@@ -38,7 +38,7 @@ cinje from the competition:
 * Almost all require manual processing in the form of constructing Engine or Template classes, etc.  cinje requires,
   by comparison, a single import or the runtime of your application.  Using a template only involves using the
   template.
-* The _template to Python source_ conversion code must be extensible to allow for the easy addition of new directives.
+* The *template to Python source* conversion code must be extensible to allow for the easy addition of new directives.
 * Performance is less important than streaming functionality, but it should be at least "par" with similar engines
   such as ``mako`` or ``tenjin`` for complete rendering times.  Utilizing streaming functionality should not impose
   undue overhead.
@@ -93,8 +93,8 @@ and submit a pull request.  This process is beyond the scope of this documentati
 In order for imports of cinje template functions to correctly translate the source you must first import the ``cinje``
 module in order to register the file encoding.  Once this has been done you can import functions from cinje modules
 just like any other Python module.  Calling a cinje function is identical to calling a generator function, as all
-cinje functions are generators.  This generator can be directly used as the ``body_iter`` value returned by WSGI
-applications.
+cinje template functions—those containing text—are generators.  This generator *can* be directly used as the
+``body_iter`` value returned by WSGI applications.
 
 
 4. Basic Syntax
@@ -221,7 +221,8 @@ The above translates to, roughly, the following Python source::
 
 You do not need the extraneous trailing colon to denote the end of the declaration, nor do you need to provide
 parenthesis around the argument specification.  The optimization keyword-only arguments will be added automatically to
-the argument specification you give.  For example::
+the argument specification you give.  It will gracefully handle integration into your arglist even if your arglist
+already includes the keyword-only marker, or combinations of ``*args`` or ``**kw``.  For example::
 
 	: def hello name
 		Hello ${name}!
@@ -235,6 +236,7 @@ Would translate to:
 		__w((_bless("\tHello "), _escape(name), _bless("!\n")))
 		yield ''.join(_buffer)
 
+If your template file only contains one function, i.e. it's a full page template, you can omit the final ``: end``.
 
 Conditional Flow
 ~~~~~~~~~~~~~~~~
@@ -303,33 +305,112 @@ If you wish to unpack the values being iterated, you can wrap the additional unp
 Inheritance
 ~~~~~~~~~~~
 
+Due to the streaming and "native Python code" natures of cinje, template inheritance is generally handled through
+the standard definition of functions, and passing of those first-class objects around.  The most common case, where
+one template "wraps" another, is handled through the ``: using`` and ``: yield`` directives.
 
+An example "parent" template::
 
+	: def page **properties
+	<html>
+		<body&{properties}>
+			: yield
+		</body>
+	</html>
+	: end
+
+When called, functions that include a bare yield (and only one is allowed per function) will flush their buffers
+automatically prior to the yield, then flush automatically at the end of the function, just like any other.  This has
+the effect of extending the wrapped template's buffer by, at a minimum, two elements (prefix and suffix), though
+additional ``: flush`` statements within the wrapper are allowed.
+
+**Important note:** Because the bare yield will produce a value of ``None``, wrapping functions like these are **not**
+safe for use as a WSGI body iterable.
+
+Subsequently, to use this wrapper::
+
+	: using page
+		<p>Hello world!</p>
+	: end
+
+Execution of this would produce the following HTML::
+
+	<html>
+		<body>
+			<p>Hello world!</p>
+		</body>
+	</html>
+
+Because wrapping templates are just template functions like any other, you can pass arguments to them.  In the above
+example we're using arbitrary keyword arguments as a "HTML attribute" replacement.  The following::
+
+	: using page class_="hero"
+	: end
+
+Would produce the following::
+
+	<html>
+		<body class="hero">
+		</body>
+	</html>
+
+Similar to having a single-function file, if your whole template is wrapped you can omit the trailing ``: end`` as one
+will be added for you automatically at the end of the file if it is missing.
 
 4.3. Inline Transformations
 ---------------------------
 
-Inline transformations are special code lines that do not "start" a section that subsequently needs an "end".
+Inline transformations are code lines that do not "start" a section that subsequently needs an "end".
 
 Code
 ~~~~
 
+Lines prefixed with ``:`` that aren't matched by another transformation rule are treated as inline Python code in the
+generated module.  Within these bits of code you do have access to the helpers and buffer, and so can easily customize
+template rendering at runtime.
 
+The only lines acceptable at the module scope are code and comments.
 
 Comments
 ~~~~~~~~
 
-
+Comments are preserved in the final Python source.  Any line starting with the Python-standard line comment prefix,
+a ``#`` hash mark or "pound" symbol, that doesn't match another rule, will be preserved as a comment.  If the line is
+instead prefixed with a double hash mark ``##`` the comment will be stripped and *not* included in the final Python
+module.
 
 Flush
 ~~~~~
 
+The ``: flush`` statement triggers cinje to emit the Python code needed to yield the current contents of the template
+buffer and clear it.  The result, in Python, is roughly analogous to::
 
+	yield ''.join(_buffer)
+	_buffer.clear()
+
+A flush is automatically triggered when falling off the bottom of a template function if it is known that there will
+be un-flushed text in the buffer.
 
 Text
 ~~~~
 
+Text covers every other line present in your template source.  cinje efficiently gathers consecutive lines of template
+text, collapses runs of static text into single strings, and splits the template text up to process replacements.
 
+Template text is not permitted at the module scope as there can be no way to "yield" the buffer from there.  To save
+on method calls, the following::
+
+	<meta&{name=name, content=content}>
+
+Is translated, roughly, into the following single outer call and three nested calls:
+
+	__w((
+		_bless('<meta'),
+		_args(name=name, content=content),
+		_bless('>')
+	))
+
+See the Variable Replacement section for details on the replacement options that are available and how they operate.
 
 
 5. Version History
