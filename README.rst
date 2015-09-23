@@ -228,7 +228,7 @@ already includes the keyword-only marker, or combinations of ``*args`` or ``**kw
 		Hello ${name}!
 	: end
 
-Would translate to:
+Would translate to::
 
 	def hello(name, *, _escape=_escape, _bless=_bless):
 		_buffer = []
