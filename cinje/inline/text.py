@@ -23,7 +23,7 @@ class Text:
 		yield from ensure_buffer(context)
 		
 		while line.kind == 'text' or ( line.kind == 'comment' and line.stripped.startswith('#{') ):
-			buffer.append(line.line.rstrip() + '\n')
+			buffer.append(line.line.rstrip().rstrip('\\') + ('' if line.continued else '\n'))
 			try:
 				line = input.next()
 			except StopIteration:
