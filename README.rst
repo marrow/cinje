@@ -35,6 +35,9 @@ cinje from the competition:
 * Many engines are implemented through custom parsing, lexing, and direct abstract syntax tree (AST) manipulation.
   These things are difficult to understand fully and quite an obstacle towards understanding for new users.  cinje
   avoids them by processing the template source as simple text in a clear, linear, single-pass fashion.
+* Almost all require manual processing in the form of constructing Engine or Template classes, etc.  cinje requires,
+  by comparison, a single import or the runtime of your application.  Using a template only involves using the
+  template.
 * The _template to Python source_ conversion code must be extensible to allow for the easy addition of new directives.
 * Performance is less important than streaming functionality, but it should be at least "par" with similar engines
   such as ``mako`` or ``tenjin`` for complete rendering times.  Utilizing streaming functionality should not impose
@@ -105,6 +108,8 @@ Code lines are processed by each of the different "block" and "inline" processor
 are processed by the ``cinje.inline.text`` processor, with replacements processed by the ``cinje.util.chunk``
 helper function.
 
+Text lines can have a "continuation" marker (``\``) on the end to denote that no newline should be emitted there.
+
 4.1. Variable Replacement
 -------------------------
 
@@ -129,7 +134,7 @@ cinje                         Python                           Result
 Unescaped Replacement
 ~~~~~~~~~~~~~~~~~~~~~
 
-The less-safe replacement does not escape HTML entities; you should sholud be careful where this is used.  For trusted
+The less-safe replacement does not escape HTML entities; you should be careful where this is used.  For trusted
 data, though, this form is somewhat more efficient.  In the generated code your expression will be wrapped in a call
 to ``_bless()`` which defaults to the ``bless`` function imported from the ``cinje.helpers`` module.  If
 ``markupsafe`` is installed its ``Markup`` class will be used, otherwise the Python ``str`` function will be used.
@@ -182,6 +187,62 @@ cinje                               Python
 
 Any expression can be used for the "format string" part of the replacement, however for sanity's sake it's generally
 a good idea to keep it short or provide it from a variable.
+
+4.2. Block Transformations
+--------------------------
+
+Block transformations typically denote some form of scope change or flow control, and must be terminated with an
+"end" instruction.  Blocks not terminated by the end of the file will be automatically terminated, allowing trailing
+terminators to be elided away and omitted from most templates.
+
+Module Scope
+~~~~~~~~~~~~
+
+
+
+Declaring Functions
+~~~~~~~~~~~~~~~~~~~
+
+
+
+Conditional Flow
+~~~~~~~~~~~~~~~~
+
+
+
+Iteration
+~~~~~~~~~
+
+
+
+Inheritance
+~~~~~~~~~~~
+
+
+
+
+4.3. Inline Transformations
+---------------------------
+
+Inline transformations are special code lines that do not "start" a section that subsequently needs an "end".
+
+Code
+~~~~
+
+
+
+Comments
+~~~~~~~~
+
+
+
+Flush
+~~~~~
+
+
+
+Text
+~~~~
 
 
 
