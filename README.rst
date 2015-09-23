@@ -271,16 +271,16 @@ Nearly identical to conditional flow, iteration is directly supported::
 		Hello ${name}!
 	: end
 
-Translates to:
+Translates to::
 
 	for name in names:
 		# …
 
 A helper is provided called ``iterate`` which acts similarly to ``enumerate`` but can provide additional details.
-It's a generator that yields ``namedtuple``s of the form ``(first, last, index, total, value)``.  If the current loop
-iteration represents the first iteration, ``first`` will be True.  Similarly—and even for generators where a total
-number of values being iterated could not be calculated beforehand—on the final iteration ``last`` will be True.  The
-``index`` value is an atomic counter provided by ``enumerate``, and ``total`` will be the total number of elements
+It's a generator that yields ``namedtuple`` values in the form ``(first, last, index, total, value)``.  If the current
+loop iteration represents the first iteration, ``first`` will be True.  Similarly—and even for generators where a
+total number of values being iterated could not be calculated beforehand—on the final iteration ``last`` will be True.
+The ``index`` value is an atomic counter provided by ``enumerate``, and ``total`` will be the total number of elements
 being iterated if the object being iterated supports length determination.  You can loop over its results directly::
 
 	: for item in iterate(iterable)
