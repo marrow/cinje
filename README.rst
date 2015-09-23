@@ -402,7 +402,7 @@ on method calls, the following::
 
 	<meta&{name=name, content=content}>
 
-Is translated, roughly, into the following single outer call and three nested calls:
+Is translated, roughly, into the following single outer call and three nested calls::
 
 	__w((
 		_bless('<meta'),
