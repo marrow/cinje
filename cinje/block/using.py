@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-from ..util import dprint, Line, Context
+from ..util import dprint, Line, Context, ensure_buffer
 
 
 @Context.register
@@ -27,12 +27,7 @@ class Using:
 			context.flag.add('using')
 			yield Line(0, "_using_stack = []")
 		
-		if 'text' not in context.flag:
-			yield Line(0, "")
-			yield Line(0, "_buffer = []")
-			yield Line(0, "__w = _buffer.extend")
-			yield Line(0, "")
-			context.flag.add('text')
+		yield from ensure_buffer(context)
 		
 		yield Line(0, "_using_stack.append(" + name + "(" + args + "))")
 		yield Line(0, "_buffer.extend(_interrupt(_using_stack[-1]))")

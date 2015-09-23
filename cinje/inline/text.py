@@ -2,7 +2,7 @@
 
 from pprint import pformat
 
-from ..util import dprint, chunk, Line, Context
+from ..util import dprint, chunk, Line, Context, ensure_buffer
 
 
 @Context.register
@@ -20,12 +20,7 @@ class Text:
 		line = input.next()
 		buffer = []
 		
-		if 'text' not in context.flag:
-			yield Line(0, "")
-			yield Line(0, "_buffer = []")
-			yield Line(0, "__w = _buffer.extend")
-			yield Line(0, "")
-			context.flag.add('text')
+		yield from ensure_buffer(context)
 		
 		while line.kind == 'text' or ( line.kind == 'comment' and line.stripped.startswith('#{') ):
 			buffer.append(line.line.rstrip() + '\n')

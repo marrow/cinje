@@ -154,6 +154,19 @@ def chunk(text, delim=('', '${', '#{', '&{', '%{'), tag=('text', '_escape', '_bl
 		yield tag[0], text[last:]
 
 
+def ensure_buffer(context):
+	if 'text' in context.flag:
+		return
+	
+	yield Line(0, "")
+	yield Line(0, "_buffer = []")
+	yield Line(0, "__w = _buffer.extend")
+	yield Line(0, "")
+	
+	context.flag.add('text')
+
+
+
 # ## Common Classes
 
 
