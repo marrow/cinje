@@ -1,11 +1,11 @@
 # encoding: utf-8
 
-from ..util import Context, Line
+from ..util import Context
 from .flush import flush_template
 
 
 @Context.register
-class Inline:
+class Inline(object):
 	"""Allow mid-stream flushing of the template buffer.
 	
 	This is generally used to flush sections of a page to the client to allow for content pre-loading of CSS,
@@ -32,5 +32,7 @@ class Inline:
 		
 		declaration = context.input.next()
 		
-		yield from flush_template(context, declaration)
+		for i in flush_template(context, declaration):
+			yield i
+		
 		yield declaration

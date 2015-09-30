@@ -1,10 +1,10 @@
 # encoding: utf-8
 
-from ..util import dprint, Line, Context
+from ..util import Line, Context
 
 
 @Context.register
-class Module:
+class Module(object):
 	"""Module handler.
 	
 	This is the initial scope, and the highest priority to ensure its processing of the preamble happens first.
@@ -19,7 +19,6 @@ class Module:
 		input = context.input
 		
 		context.flag.add('init')
-		if __debug__: dprint("\x1b[33;1m", "+", "Module", "\x1b[0m")
 		
 		imported = False
 		
@@ -33,13 +32,15 @@ class Module:
 			break
 		
 		# After any existing preamble, but before other imports, we inject our own.
-		yield Line(0, 'import cinje')  
+		yield Line(0, 'from __future__ import unicode_literals')
+		yield Line(0, '')
+		yield Line(0, 'import cinje')
 		yield Line(0, '')
 		# yield Line(0, 'from types import Generator as __Generator')
 		yield Line(0, 'from cinje.helpers import escape as _escape, bless as _bless, iterate, xmlargs as _args, _interrupt')
 		yield Line(0, '')
 		
-		yield from context.stream  # This increases the scope.
+		for i in context.stream:
+			yield i
 		
 		context.flag.remove('init')
-		if __debug__: dprint("\x1b[33m", "-", "Module", "\x1b[0m")

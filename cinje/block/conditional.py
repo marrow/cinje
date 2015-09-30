@@ -1,10 +1,10 @@
 # encoding: utf-8
 
-from ..util import dprint, Line, Context
+from ..util import Line, Context
 
 
 @Context.register
-class Conditional:
+class Conditional(object):
 	"""Conditional template evaluation support.  Blocks must be terminated by ": end" markers.
 	
 	This block-level transformer handles "if", "elif", and "else" conditional scopes.
@@ -31,8 +31,6 @@ class Conditional:
 		
 		input = context.input
 		
-		if __debug__: dprint("\x1b[33;1m", "+", "Conditional", "\x1b[0m")
-		
 		declaration = input.next()
 		stripped = declaration.stripped
 		prefix, _ = declaration.partitioned
@@ -47,8 +45,7 @@ class Conditional:
 		
 		context.scope += 1
 		
-		yield from context.stream
+		for i in context.stream:
+			yield i
 		
 		context.scope -= 1
-		
-		if __debug__: dprint("\x1b[33m", "-", "Conditional", "\x1b[0m")

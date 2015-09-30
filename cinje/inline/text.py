@@ -6,7 +6,7 @@ from ..util import chunk, Line, Context, ensure_buffer
 
 
 @Context.register
-class Text:
+class Text(object):
 	"""Identify and process contiguous blocks of template text."""
 	
 	priority = -25
@@ -23,7 +23,8 @@ class Text:
 		buffer = []
 		
 		# Make sure we have a buffer to write to.
-		yield from ensure_buffer(context)
+		for i in ensure_buffer(context):
+			yield i
 		
 		# Gather contiguous (uninterrupted) lines of template text.
 		while line.kind == 'text' or ( line.kind == 'comment' and line.stripped.startswith('#{') ):

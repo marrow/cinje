@@ -23,7 +23,7 @@ def flush_template(context, declaration=None):
 
 
 @Context.register
-class Flush:
+class Flush(object):
 	"""Allow mid-stream flushing of the template buffer.
 	
 	This is generally used to flush sections of a page to the client to allow for content pre-loading of CSS,
@@ -46,4 +46,4 @@ class Flush:
 		return line.kind == 'code' and line.stripped == "flush"
 	
 	def __call__(self, context):
-		yield from flush_template(context, context.input.next())
+		return flush_template(context, context.input.next())

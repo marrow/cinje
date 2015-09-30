@@ -4,7 +4,7 @@ from ..util import Context
 
 
 @Context.register
-class Comment:
+class Comment(object):
 	"""Line comment handler.
 	
 	This handles not emitting double-hash comments and has a high priority to prevent other processing of commented-out lines.

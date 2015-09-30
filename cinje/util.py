@@ -281,7 +281,7 @@ class Lines(object):
 		self.buffer.extend((i if isinstance(i, self.Line) else self.Line(self.buffer[-1].number if self.buffer else 0, i)) for i in lines)
 
 
-class Context:
+class Context(object):
 	__slots__ = ('input', 'scope', 'flag', '_handler')
 	
 	handlers = []

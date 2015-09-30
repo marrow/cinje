@@ -1,10 +1,10 @@
 # encoding: utf-8
 
-from ..util import Line, Context
+from ..util import Context
 
 
 @Context.register
-class Use:
+class Use(object):
 	"""Consume the result of calling another template function, extending the local buffer.
 	
 	This is meant to consume non-wrapping template functions.  For wrapping functions see ": using" instead.
@@ -32,7 +32,9 @@ class Use:
 		parts = declaration.partitioned[1]  # Ignore the "use" part, we care about the name and arguments.
 		name, _, args = declaration.partition(' ')
 		
-		yield from ensure_buffer(context)
+		for i in ensure_buffer(context):
+			yield i
+		
 		yield declaration.clone(line="__w(" + name.rstrip() + "(" + args.lstrip() + "))")
 		
 		context.flag.add('dirty')

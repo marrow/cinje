@@ -1,10 +1,10 @@
 # encoding: utf-8
 
-from ..util import dprint, Context
+from ..util import Context
 
 
 @Context.register
-class Iterator:
+class Iterator(object):
 	priority = 50
 	
 	def match(self, context, line):
@@ -13,13 +13,12 @@ class Iterator:
 	def __call__(self, context):
 		input = context.input
 		
-		if __debug__: dprint("\x1b[33;1m", "+", "Iterator", "\x1b[0m")
-		
 		declaration = input.next()
 		yield declaration.clone(line=declaration.stripped + ':')
 		
 		context.scope += 1
-		yield from context.stream
-		context.scope -= 1
 		
-		if __debug__: dprint("\x1b[33m", "-", "Iterator", "\x1b[0m")
+		for i in context.stream:
+			yield i
+		
+		context.scope -= 1

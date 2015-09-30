@@ -4,7 +4,7 @@ from ..util import Context
 
 
 @Context.register
-class Blank:
+class Blank(object):
 	"""Blank line handler.  This eats leading blank lines."""
 	
 	priority = -90

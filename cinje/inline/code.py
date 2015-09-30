@@ -1,10 +1,10 @@
 # encoding: utf-8
 
-from ..util import chunk, Line, Context
+from ..util import Context
 
 
 @Context.register
-class Code:
+class Code(object):
 	"""General code handler.
 	
 	This captures all code segments not otherwise handled.  It has a very low priority to ensure other "code" handlers

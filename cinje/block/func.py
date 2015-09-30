@@ -7,7 +7,7 @@ from ..inline.flush import flush_template
 
 
 @Context.register
-class Function:
+class Function(object):
 	"""Proces function declarations within templates.
 	
 	Syntax:
@@ -107,12 +107,14 @@ class Function:
 		
 		context.scope += 1
 		
-		yield from context.stream  # Descend into the function's scope.
+		for i in context.stream:
+			yield i
 		
 		if 'using' in context.flag:  # Clean up that we were using things.
 			context.flag.remove('using')
 		
-		yield from flush_template(context)
+		for i in flush_template(context):
+			yield i
 		
 		if 'text' in context.flag:  # Handle the final buffer yield if any content was generated.
 			context.flag.remove('text')
