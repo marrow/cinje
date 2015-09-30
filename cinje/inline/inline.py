@@ -1,22 +1,36 @@
 # encoding: utf-8
 
-from ..util import dprint, Line, Context
+from ..util import Context, Line
+from .flush import flush_template
 
 
 @Context.register
 class Inline:
+	"""Allow mid-stream flushing of the template buffer.
+	
+	This is generally used to flush sections of a page to the client to allow for content pre-loading of CSS,
+	JavaScript, images, etc., as well as to provide a more responsive experience for a user during longer operations.
+	
+	Syntax:
+	
+		: flush
+	
+	Note: this will only emit the code needed to flush and clear the buffer if there is a buffer to flush, and the
+	buffer is known to be "dirty" by the translator.  I.e. following ": use" or ": uses", or after some template
+	text has been defined.  Unlike most other commands involving the buffer, this one will not create a buffer if
+	missing.
+	"""
+	
 	priority = 25
 	
 	def match(self, context, line):
-		return line.kind == 'code' and line.stripped == "yield"  # Bare yields indicate insertion points.
+		"""Match bare "yield" usage."""
+		return line.kind == 'code' and line.stripped == "yield"
 	
 	def __call__(self, context):
 		input = context.input
 		
-		if __debug__: dprint("\x1b[34m", "?", "Inline", "\x1b[0m")
+		declaration = context.input.next()
 		
-		if 'dirty' in context.flag:
-			yield Line(0, 'yield "".join(_buffer); _buffer.clear()')
-			context.flag.remove('dirty')
-		
-		yield input.next()
+		yield from flush_template(context, declaration)
+		yield declaration

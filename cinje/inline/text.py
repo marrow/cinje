@@ -2,11 +2,13 @@
 
 from pprint import pformat
 
-from ..util import dprint, chunk, Line, Context, ensure_buffer
+from ..util import chunk, Line, Context, ensure_buffer
 
 
 @Context.register
 class Text:
+	"""Identify and process contiguous blocks of template text."""
+	
 	priority = -25
 	PREFIX = '__w(('
 	SUFFIX = '))'
@@ -20,8 +22,10 @@ class Text:
 		line = input.next()
 		buffer = []
 		
+		# Make sure we have a buffer to write to.
 		yield from ensure_buffer(context)
 		
+		# Gather contiguous (uninterrupted) lines of template text.
 		while line.kind == 'text' or ( line.kind == 'comment' and line.stripped.startswith('#{') ):
 			buffer.append(line.line.rstrip().rstrip('\\') + ('' if line.continued else '\n'))
 			try:
@@ -33,20 +37,20 @@ class Text:
 		if line:
 			input.push(line)  # Put the last line back, as it won't be a text line.
 		
+		# Eliminate trailing blank lines.
 		while buffer and not buffer[-1].strip():
 			del buffer[-1]
 			input.push(Line(0, ''))
 		
-		if __debug__: dprint("\x1b[34m", "?", "Text", len(buffer), "\x1b[0m")
-		
 		text = "".join(buffer)
 		
+		# Track that the buffer will have content moving forward.  Used for conditional flushing.
 		if text:
 			context.flag.add('dirty')
 		
-		# We now have a contiguous block of templated text.  Now we need to split it up.
+		# We now have a contiguous block of templated text.  Split it up into expressions and wrap as appropriate.
 		
-		yield Line(0, self.PREFIX)
+		yield Line(0, self.PREFIX)  # Start a call to _buffer.extend()
 		
 		for token, text in chunk(text):
 			if token == 'text':

@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-from ..util import dprint, Context
+from ..util import Context
 
 
 @Context.register
@@ -8,17 +8,24 @@ class Comment:
 	"""Line comment handler.
 	
 	This handles not emitting double-hash comments and has a high priority to prevent other processing of commented-out lines.
+	
+	Syntax:
+	
+		# <comment>
+		## <hidden comment>
 	"""
 	
 	priority = -90
 	
 	def match(self, context, line):
-		return line.stripped and line.stripped[0] == '#'
+		"""Match lines prefixed with a hash ("#") mark that don't look like text."""
+		stripped = line.stripped
+		return line.stripped.startswith('#') and not line.stripped.startswith('#{')
 	
 	def __call__(self, context):
-		line = context.input.next()
+		"""Emit comments into the final code that aren't marked as hidden/private."""
 		
-		if __debug__: dprint("\x1b[34m", "?", "Comment", line, "\x1b[0m")
+		line = context.input.next()
 		
 		if not line.stripped.startswith('##'):
 			yield line

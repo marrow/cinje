@@ -9,6 +9,10 @@ class Code:
 	
 	This captures all code segments not otherwise handled.  It has a very low priority to ensure other "code" handlers
 	get a chance to run first.
+	
+	Syntax:
+	
+		: <code>
 	"""
 	
 	priority = 100
