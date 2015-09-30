@@ -59,7 +59,7 @@ class Text(object):
 						text,
 						indent = 0,
 						width = 120 - 4 * (context.scope + 1),
-						compact = True
+						# compact = True  Python 3 only.
 					).replace("\n ", "\n" + "\t" * (context.scope + 1)).strip()
 				if text[0] == '(' and text[-1] == ')':
 					text = text[1:-1]

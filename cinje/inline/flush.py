@@ -2,6 +2,12 @@
 
 from ..util import Context, Line
 
+try:
+	unicode
+	py = 2
+except:
+	py = 3
+
 
 def flush_template(context, declaration=None):
 	"""Emit the code needed to flush the buffer.
@@ -16,7 +22,11 @@ def flush_template(context, declaration=None):
 		return
 	
 	yield declaration.clone(line='yield "".join(_buffer)')
-	yield declaration.clone(line='_buffer.clear()')
+	
+	if py == 3:
+		yield declaration.clone(line='_buffer.clear()')
+	else:
+		context.flag.remove('text')  # This will force a new buffer to be constructed.
 	
 	context.flag.remove('dirty')
 

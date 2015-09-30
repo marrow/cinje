@@ -2,7 +2,7 @@
 
 ## This comment won't get included in the result.
 
-: from collections import abc
+: from collections import Mapping, Set, Sequence
 
 : _list = list  # We override an important __builtin__ name in this module.
 
@@ -78,11 +78,11 @@
 	: """Generate an HTML5 list, defaulting to type auto-detection."""
 	
 	: if kind == 'auto'
-		: if isinstance(obj, abc.Mapping)
+		: if isinstance(obj, Mapping)
 			: kind = 'dl'
-		: elif isinstance(obj, abc.Set)
+		: elif isinstance(obj, Set)
 			: kind = 'ul'
-		: elif isinstance(obj, abc.Sequence)
+		: elif isinstance(obj, Sequence)
 			: kind = 'ol'
 		: end
 	: end

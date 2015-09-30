@@ -1,18 +1,36 @@
 # encoding: utf-8
 
+from __future__ import unicode_literals
+
 import codecs
 
-from functools import partial
 from encodings import utf_8 as utf8
-from contextlib import contextmanager, _GeneratorContextManager
+
+try:
+	from io import StringIO
+except:
+	try:
+		from cStringIO import StringIO
+	except:
+		from StringIO import StringIO
 
 from .util import Context
 
+try:
+	bytes = bytes
+except:
+	bytes = str
+
+try:
+	unicode = unicode
+except:
+	unicode = str
+
 
 def transform(input):
-	#__import__('pprint').pprint(input)
+	#__import__('pudb').set_trace()
 	translator = Context(input)
-	return '\n'.join(str(i) for i in translator.stream)
+	return '\n'.join(unicode(i) for i in translator.stream)
 
 
 def cinje_decode(input, errors='strict', final=True):

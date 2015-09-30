@@ -5,6 +5,12 @@ import re
 from ..util import Line, Context
 from ..inline.flush import flush_template
 
+try:
+	unicode
+	py = 2
+except:
+	py = 3
+
 
 @Context.register
 class Function(object):
@@ -95,8 +101,9 @@ class Function(object):
 					context.flag.add(flag)
 		
 		name = name.strip()
-		argspec = self._optimize(context, argspec)
 		
+		if py == 3:
+			argspec = self._optimize(context, argspec)
 		
 		# Reconstruct the line.
 		

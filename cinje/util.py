@@ -1,5 +1,7 @@
 # encoding: utf-8
 
+from __future__ import unicode_literals
+
 """Convienent utilities."""
 
 # ## Imports
@@ -8,18 +10,8 @@ import sys
 
 from inspect import isfunction, isclass
 from collections import deque, namedtuple, Sized
-from contextlib import contextmanager, _GeneratorContextManager
 from xml.sax.saxutils import quoteattr
 from markupsafe import Markup
-
-
-# ## Debugging Helper
-
-def _ndp(*args, **kw):
-	return
-
-dprint = print  # Enable debugging.
-dprint = _ndp  # Disable debugging.  Also run with -O.
 
 
 # ## Type Definitions
@@ -37,7 +29,7 @@ def interruptable(iterable):
 	
 	for i in iterable:
 		if i is None:
-			return iterable
+			return
 		
 		yield i
 
@@ -192,7 +184,6 @@ class Line(object):
 		elif self.stripped.startswith(':'):
 			self.kind = 'code'
 			self.line = self.stripped[1:].lstrip()
-			self.stripped = self.line
 		else:
 			self.kind = 'text'
 	
@@ -241,6 +232,10 @@ class Lines(object):
 		if input is None:
 			self.source = None
 			self.buffer = deque()
+		
+		elif hasattr(input, 'readlines'):
+			self.source = list(self.Line(i + 1, j) for i, j in enumerate(input.readlines()))
+			self.buffer = deque(self.source)
 		
 		else:
 			self.source = list(self.Line(i + 1, j) for i, j in enumerate(input.split('\n')))
@@ -306,7 +301,6 @@ class Context(object):
 	def prepare(self):
 		self.scope = 0
 		self._handler = [i() for i in sorted(self.handlers, key=lambda handler: handler.priority)]
-		if __debug__: dprint("\x1b[31;1m", "H", self._handler, "\x1b[0m")
 	
 	@property
 	def stream(self):
@@ -314,9 +308,7 @@ class Context(object):
 			self.prepare()
 		
 		for line in self.input:
-			if __debug__: dprint("\x1b[30;1;7m\x1bK", "S", self, "\x1b[0m")
 			handler = self.classify(line)
-			if __debug__: dprint("\x1b[30;1m", "s", repr(line), repr(handler), "\x1b[0m")
 			
 			if line.kind == 'code' and line.stripped == 'end':  # Exit the current child scope.
 				return
