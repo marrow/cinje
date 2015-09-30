@@ -1,7 +1,17 @@
 # encoding: cinje
 
 : def _sample
-	: using page "Hello world!"
+	: """A demonstration of how to utilize the page wrapper."""
+	
+	: def custom_footer *, styles=[], scripts=[]
+		: """No jQuery by default on this page, for some reason."""
+		
+		: for href in scripts
+		<script&{src=href}></script>
+		: end
+	: end
+	
+	: using page "Hello world!", footer=custom_footer
 		
 		<p>This is, like, some content or something.</p>
 		
@@ -10,21 +20,19 @@
 
 
 : def _bench identifier
+	: """A benchmark helper to ensure the whole template isn't interned."""
+	
 	: identifier = str(identifier)
+	
 	: using page "Hello " + identifier
 		<p>Page ${identifier} reporting for duty!</p>
 	: end
 : end
 
 
-: def page title, *, metadata=[], styles=[], scripts=[], **attributes
-: """A general HTML page."""
-
-: if not attributes: attributes = {}
-
-<!DOCTYPE html>
-<html&{lang=attributes.pop('lang', 'en')}>
-	<head>
+: def header title, *, metadata=[], styles=[], scripts=[]
+: """Prepare and generate the HTML <head> section."""
+		
 		<meta charset="utf-8">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
@@ -43,35 +51,34 @@
 		<script src="//cdn.jsdelivr.net/html5shiv/3.7.2/html5shiv-printshiv.min.js"></script>
 		<script src="//cdn.jsdelivr.net/respond/1.4.2/respond.min.js"></script>
 		<![endif]-->
+: end
+
+
+: def footer *, styles=[], scripts=[]
+: """Prepare and generate the HTML body postfix."""
+		
+		<script src="//cdn.jsdelivr.net/jquery/1.11.2/jquery.min.js"></script>
+		
+		: for href in scripts
+		<script&{src=href}></script>
+		: end
+: end
+
+
+: def page title, *, header=None, footer=None, metadata=[], styles=[], scripts=[], **attributes
+: """A general HTML page."""
+
+: if attributes is None: attributes = {}
+
+<!DOCTYPE html>
+<html&{lang=attributes.pop('lang', 'en')}>
+	<head>
+		: __w(header(title, metadata=metadata, styles=styles, scripts=scripts) if header else ())
 	</head>
 	
 	<body&{attributes, role='document'}>
 		: yield
 		
-		<script src="//cdn.jsdelivr.net/jquery/1.11.2/jquery.min.js"></script>
-		
-		<script>
-			$(function(){
-				$('a[data-toggle="tab"]').click(function(event) {
-					var self = $(this);
-					event.preventDefault();
-					if ( self.hasClass('disabled') ) return;
-					self.tab('show');
-				});
-				
-				$('a[href^="#"]').click(function(event) {
-					if ( !$(this.hash).length ) return;
-					if ( $(this).data('toggle') == 'tab' ) return;
-					event.preventDefault();
-					$('html, body').animate({scrollTop: $(this.hash).offset().top}, 500);
-				});
-				
-			});
-		</script>
-		
-		: for href in scripts
-		<script&{src=href}></script>
-		: end
-		
+		: __w(footer(styles=styles, scripts=scripts) if footer else ())
 	</body>
 </html>
