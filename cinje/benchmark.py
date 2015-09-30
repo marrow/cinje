@@ -44,7 +44,7 @@
         : for key, value in row.items()
         <td>${ key }</td><td>#{ value }</td>
         : end
-        : if not (i % frequency):
+        : if not (i % frequency)
             : flush
         : end
     </tr>
@@ -62,7 +62,7 @@
         : for key, value in row.items()
         <td&{class_="first" if first else ("last" if last else None)}>${ key }</td><td>#{ value }</td>
         : end
-        : if not (i % frequency):
+        : if not (i % frequency)
             : flush
         : end
     </tr>
