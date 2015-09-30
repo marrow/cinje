@@ -173,12 +173,11 @@ def ensure_buffer(context):
 class Line(object):
 	"""A rich description for a line of input, allowing for annotation."""
 	
-	__slots__ = ('number', 'line', 'stripped', 'scope', 'kind', 'continued')
+	__slots__ = ('number', 'line', 'scope', 'kind', 'continued')
 	
 	def __init__(self, number, line, scope=None):
 		self.number = number
 		self.line = line
-		self.stripped = line.strip()
 		self.scope = scope
 		self.kind = None
 		self.continued = self.stripped.endswith('\\')
@@ -196,6 +195,15 @@ class Line(object):
 			self.stripped = self.line
 		else:
 			self.kind = 'text'
+	
+	@property
+	def stripped(self):
+		return self.line.strip()
+	
+	@property
+	def partitioned(self):
+		prefix, _, remainder = self.stripped.partition(' ')
+		return prefix.rstrip(), remainder.lstrip()
 	
 	def __repr__(self):
 		return '{0.__class__.__name__}({0.number}, {0.kind}, "{0.stripped}")'.format(self)
