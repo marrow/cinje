@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-from ..util import Context
+from ..util import Context, ensure_buffer
 
 
 @Context.register
@@ -30,7 +30,7 @@ class Use(object):
 		
 		declaration = input.next()
 		parts = declaration.partitioned[1]  # Ignore the "use" part, we care about the name and arguments.
-		name, _, args = declaration.partition(' ')
+		name, _, args = parts.partition(' ')
 		
 		for i in ensure_buffer(context):
 			yield i
