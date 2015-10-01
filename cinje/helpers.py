@@ -11,7 +11,7 @@ except ImportError:
 	bless = unicode
 	from html import escape
 
-from .util import iterate, xmlargs, interruptable as _interrupt
+from .util import iterate, xmlargs, interruptable as _interrupt, Pipe as pipe
 
 
-__all__ = ['unicode', 'bless', 'escape', 'iterate', 'xmlargs', '_interrupt']
+__all__ = ['unicode', 'bless', 'escape', 'iterate', 'xmlargs', '_interrupt', 'pipe']

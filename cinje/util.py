@@ -333,3 +333,44 @@ class Context(object):
 				return handler
 		
 		return None
+
+
+class Pipe(object):
+	"""An object representing a pipe-able callable, optionally with preserved arguments.
+	
+	Using this you can custruct custom subclasses (define a method named "callable") or use it as a decorator:
+	
+		@Pipe
+		def s(text):
+			return str(text)
+	
+	"""
+	
+	__slots__ = ('callable', 'args', 'kwargs')
+	
+	def __init__(self, callable, *args, **kw):
+		super(Pipe, self).__init__()
+		
+		self.callable = callable
+		self.args = args if args else ()
+		self.kwargs = kw if kw else {}
+	
+	def __ror__(self, other):
+		"""The main machinery of the Pipe, calling the chosen callable with the recorded arguments."""
+		
+		return self.callable(*(self.args + (other, )), **self.kwargs)
+	
+	def __call__(self, *args, **kw):
+		"""Allow for the preserved args and kwargs to be updated, returning a mutated copy.
+		
+		This allows for usage with arguments, as in the following example:
+		
+			"Hello!" | encode('utf8')
+		
+		This also allows for easy construction of custom mutated copies for use later, a la:
+		
+			utf8 = encode('utf8')
+			"Hello!" | utf8
+		"""
+		
+		return self.__class__(self.callable, *args, **kw)
