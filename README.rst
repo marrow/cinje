@@ -19,31 +19,41 @@ cinje is a modern, elegant template engine constructed as a Python domain specif
 your applications as any other Python code would: by importing them.  Your templates are translated from their source
 into clean, straightforward, and understandable Python source prior to the Python interpreter compiling it to bytecode.
 
-1.1 Goals
----------
+1.1 What kind of name is cinje?!
+--------------------------------
+
+It's a word from the constructed language `Lojban <http://www.lojban.org/>`_.  A combination of Hindi "śikana", English
+"wrinkle", and Chinese "zhé".  It translates as "is a wrinkle/crease/fold [shape] in".  It's also a Hungarian noun
+representing the posessive third-person singular form of "cin", meaning "tin".  The "c" makes a "sh" sound, the "j"
+makes a "jy" sound almost like the "is" in "vision".
+
+1.2 Rationale and Goals
+-----------------------
 
 There is no shortage of template engines available in the Python ecosystem.  The following items help differentiate
 cinje from the competition:
 
-* Streaming is the primary goal.  The vast majority of template engines buffer the entire template during rendering,
-  "yielding" the result once at the end.  This is disadvantageous for any page which involves large amounts of
-  computation or the nessicary loading of resources such as fonts to correctly render.  With cinje you can "flush" the
-  buffer at any point, allowing the browser to get the ``<head>`` section while the rest of the ``<body>`` is
-  generating, as one example, leading to a more responsive experience for end-users.  Few engines (I could find none)
-  support this directly.  Because the templates are of a streaming nature, template to code translation is also
-  streaming.
-* Many engines are implemented through custom parsing, lexing, and direct abstract syntax tree (AST) manipulation.
-  These things are difficult to understand fully and quite an obstacle towards understanding for new users.  cinje
-  avoids them by processing the template source as simple text in a clear, linear, single-pass fashion.
-* Almost all require manual processing in the form of constructing Engine or Template classes, etc.  cinje requires,
-  by comparison, a single import or the runtime of your application.  Using a template only involves using the
-  template.
-* The *template to Python source* conversion code must be extensible to allow for the easy addition of new directives.
+* There are few to no high-performance template engines which support:
+ * Mid-stream flushing for delivery of partial content as it generates.  The vast majority of engines buffer the
+   entire template during rendering, returning the result once at the end.  This is disadvantageous for any content
+   which involves large amounts of computation, and prevents browsers from eagerly loading external static assets.  By
+   comparison, cinje supports a ``: flush`` command to yield the buffer generated so far.
+ * Direct use as a WSGI iterable body.  In cinje, template functions are generators which can be used directly as a
+   WSGI body.  With no explicit ``: flush`` commands behaviour matches other engines: the buffer will be yielded once,
+   at the end.
+* Virtually all require boilerplate to "load" then "render" the template, such as instantiating a ``Template`` class
+  and calling a ``render`` method, which is silly and a waste of repeated developer effort.  Alternatively, complex
+  framework-specific adapters can be used for boilerplate-free engine use, but this solution is sub-optimal.  Since
+  almost all generate Python code in the end, why not treat the templates as Python modules to start with and let the
+  language, which already has all of this machinery, do what it was designed to do?  This is what cinje does.
+* Virtually all perform low-level parsing, lexing, and AST manipulation.  These things are difficult for developers
+  new to the language to understand.  Additionally, many manually orchestrate Python's own parsing and compilation
+  phases, and some even manually manage the bytecode cache.  This greatly increases the complexity of the engine itself.
+* Only a small minority of engines offer extensible syntax which allows for the creation of new directives.
 * Performance is less important than streaming functionality, but it should be at least "par" with similar engines
   such as ``mako`` or ``tenjin`` for complete rendering times.  Utilizing streaming functionality should not impose
-  undue overhead.
-* Utilize ``markupsafe`` if installed, but do not depend on it.  If not present cinje falls back on ``html.escape``.
-
+  undue overhead.  The capability to stream and be reasonably fast should neither obfuscate the template engine code
+  nor obfuscate the generated template code.
 
 2. Installation
 ===============
@@ -144,7 +154,7 @@ The result is appended to the current buffer.
 cinje                         Python                           Result
 ============================= ================================ ================================
 ``#{27*42}``                  ``_bless(27*42)``                ``"1134"``
-``${"<i>Hi.</i>"}``           ``_escape("<i>Hi.</i>")``        ``"<i>Hi.</i>"``
+``#{"<i>Hi.</i>"}``           ``_bless("<i>Hi.</i>")``         ``"<i>Hi.</i>"``
 ============================= ================================ ================================
 
 HTML Attributes Replacement
