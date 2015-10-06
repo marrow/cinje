@@ -78,22 +78,28 @@ There is no shortage of template engines available in the Python ecosystem.  The
 cinje from the competition:
 
 * There are few to no high-performance template engines which support:
-  * Mid-stream flushing for delivery of partial content as it generates.  The vast majority of engines buffer the
+
+  - Mid-stream flushing for delivery of partial content as it generates.  The vast majority of engines buffer the
     entire template during rendering, returning the result once at the end.  This is disadvantageous for any content
     which involves large amounts of computation, and prevents browsers from eagerly loading external static assets.  By
     comparison, cinje supports a ``: flush`` command to yield the buffer generated so far.
-  * Direct use as a WSGI iterable body.  In cinje, template functions are generators which can be used directly as a
+  
+  - Direct use as a WSGI iterable body.  In cinje, template functions are generators which can be used directly as a
     WSGI body.  With no explicit ``: flush`` commands behaviour matches other engines: the buffer will be yielded once,
     at the end.
+
 * Virtually all require boilerplate to "load" then "render" the template, such as instantiating a ``Template`` class
   and calling a ``render`` method, which is silly and a waste of repeated developer effort.  Alternatively, complex
   framework-specific adapters can be used for boilerplate-free engine use, but this solution is sub-optimal.  Since
   almost all generate Python code in the end, why not treat the templates as Python modules to start with and let the
   language, which already has all of this machinery, do what it was designed to do?  This is what cinje does.
+
 * Virtually all perform low-level parsing, lexing, and AST manipulation.  These things are difficult for developers
   new to the language to understand.  Additionally, many manually orchestrate Python's own parsing and compilation
   phases, and some even manually manage the bytecode cache.  This greatly increases the complexity of the engine itself.
+
 * Only a small minority of engines offer extensible syntax which allows for the creation of new directives.
+
 * Performance is less important than streaming functionality, but it should be at least "par" with similar engines
   such as ``mako`` or ``tenjin`` for complete rendering times.  Utilizing streaming functionality should not impose
   undue overhead.  The capability to stream and be reasonably fast should neither obfuscate the template engine code
