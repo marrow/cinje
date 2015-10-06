@@ -12,35 +12,61 @@ cinje
 
     |latestversion| |downloads| |masterstatus| |mastercover| |issuecount|
 
-1. What is cinje?
-=================
+
+
+Contents
+========
+
+1. `What is cinje?`_
+
+   1. `What kind of name is cinje?!`_
+   2. `Rationale and Goals`_
+
+2. `Installation`_
+
+   1. `Development Version`_
+
+3. `Getting Started`_
+4. `Basic Syntax`_
+
+   1. `Variable Replacement`_
+   2. `Block Transformations`_
+   3. `Inline Transformations`_
+
+5. `Version History`_
+6. `License`_
+
+
+
+What is cinje?
+==============
 
 cinje is a modern, elegant template engine constructed as a Python domain specific language (DSL) that integrates into
 your applications as any other Python code would: by importing them.  Your templates are translated from their source
 into clean, straightforward, and understandable Python source prior to the Python interpreter compiling it to bytecode.
 
-1.1 What kind of name is cinje?!
---------------------------------
+What kind of name is cinje?!
+----------------------------
 
 It's a word from the constructed language `Lojban <http://www.lojban.org/>`_.  A combination of Hindi "śikana", English
 "wrinkle", and Chinese "zhé".  It translates as "is a wrinkle/crease/fold [shape] in".  It's also a Hungarian noun
 representing the posessive third-person singular form of "cin", meaning "tin".  The "c" makes a "sh" sound, the "j"
 makes a "jy" sound almost like the "is" in "vision".  Correct use does not capitalize the name.
 
-1.2 Rationale and Goals
------------------------
+Rationale and Goals
+-------------------
 
 There is no shortage of template engines available in the Python ecosystem.  The following items help differentiate
 cinje from the competition:
 
 * There are few to no high-performance template engines which support:
- * Mid-stream flushing for delivery of partial content as it generates.  The vast majority of engines buffer the
-   entire template during rendering, returning the result once at the end.  This is disadvantageous for any content
-   which involves large amounts of computation, and prevents browsers from eagerly loading external static assets.  By
-   comparison, cinje supports a ``: flush`` command to yield the buffer generated so far.
- * Direct use as a WSGI iterable body.  In cinje, template functions are generators which can be used directly as a
-   WSGI body.  With no explicit ``: flush`` commands behaviour matches other engines: the buffer will be yielded once,
-   at the end.
+  * Mid-stream flushing for delivery of partial content as it generates.  The vast majority of engines buffer the
+    entire template during rendering, returning the result once at the end.  This is disadvantageous for any content
+    which involves large amounts of computation, and prevents browsers from eagerly loading external static assets.  By
+    comparison, cinje supports a ``: flush`` command to yield the buffer generated so far.
+  * Direct use as a WSGI iterable body.  In cinje, template functions are generators which can be used directly as a
+    WSGI body.  With no explicit ``: flush`` commands behaviour matches other engines: the buffer will be yielded once,
+    at the end.
 * Virtually all require boilerplate to "load" then "render" the template, such as instantiating a ``Template`` class
   and calling a ``render`` method, which is silly and a waste of repeated developer effort.  Alternatively, complex
   framework-specific adapters can be used for boilerplate-free engine use, but this solution is sub-optimal.  Since
@@ -55,8 +81,8 @@ cinje from the competition:
   undue overhead.  The capability to stream and be reasonably fast should neither obfuscate the template engine code
   nor obfuscate the generated template code.
 
-2. Installation
-===============
+Installation
+============
 
 Installing ``cinje`` is easy, just execute the following in a terminal::
 
@@ -74,8 +100,8 @@ side-effects when updating.  Use ``cinje<1.1`` to get all bugfixes for the curre
 ``cinje<2.0`` to get bugfixes and feature updates while ensuring that large breaking changes are not installed.
 
 
-2.1. Development Version
-------------------------
+Development Version
+-------------------
 
     |developstatus| |developcover|
 
@@ -99,8 +125,8 @@ and submit a pull request.  This process is beyond the scope of this documentati
 `GitHub's documentation <http://help.github.com/>`_.
 
 
-3. Getting Started
-==================
+Getting Started
+===============
 
 In order for imports of cinje template functions to correctly translate the source you must first ``import cinje``
 in order to register the file encoding.  This may sound like magic, but it's not: it's just the Python unicode decoding
@@ -120,8 +146,8 @@ point generate a ``None`` value; you can iterate up to that point, and subsequen
 point using the ``cinje.util.interrupt`` iterator to iterate up to the first ``None``.
 
 
-4. Basic Syntax
-===============
+Basic Syntax
+============
 
 If you have prior experience using template engines, the syntax should feel quite familiar.  Lines prefixed with a
 colon (``:``) are "code".  Lines prefixed with a # are comments, excluding lines starting with a ``#{`` variable
@@ -133,8 +159,8 @@ helper function.
 
 Text lines can have a "continuation" marker (``\``) on the end to denote that no newline should be emitted there.
 
-4.1. Variable Replacement
--------------------------
+Variable Replacement
+--------------------
 
 There are several flavours of variable replacement available.  Within these use of curly braces is allowed only if
 the braces are balanced.  Any of the helper functions mentioned can be overridden at the module or function level.
@@ -215,10 +241,10 @@ cinje                               Python
 =================================== ===============================================
 
 Any expression can be used for the "format string" part of the replacement, however for sanity's sake it's generally
-a good idea to keep it short or provide it from a variable.
+a good idea to keep it as a short string literal or provide it from a variable.
 
-4.2. Block Transformations
---------------------------
+Block Transformations
+---------------------
 
 Block transformations typically denote some form of scope change or flow control, and must be terminated with an
 "end" instruction.  Blocks not terminated by the end of the file will be automatically terminated, allowing trailing
@@ -250,8 +276,8 @@ The above translates to, roughly, the following Python source::
 
 You do not need the extraneous trailing colon to denote the end of the declaration, nor do you need to provide
 parenthesis around the argument specification.  The optimization keyword-only arguments will be added automatically to
-the argument specification you give.  It will gracefully handle integration into your arglist even if your arglist
-already includes the keyword-only marker, or combinations of ``*args`` or ``**kw``.  For example::
+the argument specification you give on Python 3.  It will gracefully handle integration into your arglist even if your
+arglist already includes the keyword-only marker, or combinations of ``*args`` or ``**kw``.  For example::
 
 	: def hello name
 		Hello ${name}!
@@ -354,7 +380,7 @@ the effect of extending the wrapped template's buffer by, at a minimum, two elem
 additional ``: flush`` statements within the wrapper are allowed.
 
 **Important note:** Because the bare yield will produce a value of ``None``, wrapping functions like these are **not**
-safe for use as a WSGI body iterable.
+safe for direct use as a WSGI body iterable.
 
 Subsequently, to use this wrapper::
 
@@ -371,7 +397,7 @@ Execution of this would produce the following HTML::
 	</html>
 
 Because wrapping templates are just template functions like any other, you can pass arguments to them.  In the above
-example we're using arbitrary keyword arguments as a "HTML attribute" replacement.  The following::
+example we're using arbitrary keyword arguments as an "HTML attribute" replacement.  The following::
 
 	: using page class_="hero"
 	: end
@@ -384,10 +410,10 @@ Would produce the following::
 	</html>
 
 Similar to having a single-function file, if your whole template is wrapped you can omit the trailing ``: end`` as one
-will be added for you automatically at the end of the file if it is missing.
+will be added for you automatically if it is missing.
 
-4.3. Inline Transformations
----------------------------
+Inline Transformations
+----------------------
 
 Inline transformations are code lines that do not "start" a section that subsequently needs an "end".
 
@@ -403,10 +429,10 @@ The only lines acceptable at the module scope are code and comments.
 Comments
 ~~~~~~~~
 
-Comments are preserved in the final Python source.  Any line starting with the Python-standard line comment prefix,
-a ``#`` hash mark or "pound" symbol, that doesn't match another rule, will be preserved as a comment.  If the line is
-instead prefixed with a double hash mark ``##`` the comment will be stripped and *not* included in the final Python
-module.
+Basic comments are preserved in the final Python source.  Any line starting with the Python-standard line comment
+prefix, a ``#`` hash mark or "pound" symbol, that doesn't match another rule, will be preserved as a comment.  If the
+line is instead prefixed with a double hash mark ``##`` the comment will be stripped and *not* included in the final
+Python module.
 
 Flush
 ~~~~~
@@ -442,8 +468,8 @@ Is translated, roughly, into the following single outer call and three nested ca
 See the Variable Replacement section for details on the replacement options that are available and how they operate.
 
 
-5. Version History
-==================
+Version History
+===============
 
 Version 1.0
 -----------
@@ -451,13 +477,13 @@ Version 1.0
 * Initial release.
 
 
-6. License
-==========
+License
+=======
 
 cinje has been released under the MIT Open Source license.
 
-6.1. The MIT License
---------------------
+The MIT License
+---------------
 
 Copyright © 2015 Alice Bevan-McGregor and contributors.
 

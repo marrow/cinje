@@ -277,6 +277,11 @@ class Lines(object):
 
 
 class Context(object):
+	"""The processing context for translating cinje source into Python source.
+	
+	This is the primary entry point for translation.
+	"""
+	
 	__slots__ = ('input', 'scope', 'flag', '_handler')
 	
 	handlers = []
@@ -292,6 +297,8 @@ class Context(object):
 	
 	@classmethod
 	def register(cls, handler):
+		"""Register a line transformer class with the processing context."""
+		
 		assert isclass(handler), "Must supply handler class for registration, not instance."
 		
 		cls.handlers.append(handler)
@@ -299,11 +306,17 @@ class Context(object):
 		return handler  # Allow certain types of chaining, i.e. use as a decorator.
 	
 	def prepare(self):
+		"""Prepare the ordered list of transformers and reset context state to initial."""
 		self.scope = 0
 		self._handler = [i() for i in sorted(self.handlers, key=lambda handler: handler.priority)]
 	
 	@property
 	def stream(self):
+		"""The workhorse of cinje: transform input lines and emit output lines.
+		
+		After constructing an instance with a set of input lines iterate this property to generate the template.
+		"""
+		
 		if 'init' not in self.flag:
 			self.prepare()
 		
@@ -328,6 +341,8 @@ class Context(object):
 			yield line
 	
 	def classify(self, line):
+		"""Identify the correct handler for a given line of input."""
+		
 		for handler in self._handler:
 			if handler.match(self, line):
 				return handler
