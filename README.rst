@@ -25,7 +25,7 @@ into clean, straightforward, and understandable Python source prior to the Pytho
 It's a word from the constructed language `Lojban <http://www.lojban.org/>`_.  A combination of Hindi "śikana", English
 "wrinkle", and Chinese "zhé".  It translates as "is a wrinkle/crease/fold [shape] in".  It's also a Hungarian noun
 representing the posessive third-person singular form of "cin", meaning "tin".  The "c" makes a "sh" sound, the "j"
-makes a "jy" sound almost like the "is" in "vision".
+makes a "jy" sound almost like the "is" in "vision".  Correct use does not capitalize the name.
 
 1.2 Rationale and Goals
 -----------------------
@@ -63,12 +63,14 @@ Installing ``cinje`` is easy, just execute the following in a terminal::
     pip install cinje
 
 **Note:** We *strongly* recommend always using a container, virtualization, or sandboxing environment of some kind when
-developing using Python; installing things system-wide is yucky (for a variety of reasons) nine times out of ten.  We prefer light-weight `virtualenv <https://virtualenv.pypa.io/en/latest/virtualenv.html>`_, others prefer solutions as robust as `Vagrant <http://www.vagrantup.com>`_.
+developing using Python; installing things system-wide is yucky (for a variety of reasons) nine times out of ten.  We
+prefer light-weight `virtualenv <https://virtualenv.pypa.io/en/latest/virtualenv.html>`_, others prefer solutions as
+robust as `Vagrant <http://www.vagrantup.com>`_.
 
-If you add ``cinje`` to the ``install_requires`` argument of the call to ``setup()`` in your applicaiton's
+If you add ``cinje`` to the ``install_requires`` argument of the call to ``setup()`` in your application's
 ``setup.py`` file, cinje will be automatically installed and made available when your own application or
 library is installed.  We recommend using "less than" version numbers to ensure there are no unintentional
-side-effects when updating.  Use ``cinje<1.2`` to get all bugfixes for the current release, and
+side-effects when updating.  Use ``cinje<1.1`` to get all bugfixes for the current release, and
 ``cinje<2.0`` to get bugfixes and feature updates while ensuring that large breaking changes are not installed.
 
 
@@ -100,11 +102,22 @@ and submit a pull request.  This process is beyond the scope of this documentati
 3. Getting Started
 ==================
 
-In order for imports of cinje template functions to correctly translate the source you must first import the ``cinje``
-module in order to register the file encoding.  Once this has been done you can import functions from cinje modules
-just like any other Python module.  Calling a cinje function is identical to calling a generator function, as all
-cinje template functions—those containing text—are generators.  This generator *can* be directly used as the
-``body_iter`` value returned by WSGI applications.
+In order for imports of cinje template functions to correctly translate the source you must first ``import cinje``
+in order to register the file encoding.  This may sound like magic, but it's not: it's just the Python unicode decoding
+hook in the ``cinje.encoding`` module.  Once this has been done you can directly import functions from cinje modules.
+
+Your cinje template files are Python modules like any other: they should have a ``.py`` filename extension and begin
+with the the encoding declaration::
+
+    # encoding: cinje
+
+This tells Python to process the file using the ``cinje`` codec prior to interpreting the code.  cinje itself assumes
+the file is actually UTF-8 encoded.
+
+Calling a cinje function is identical to calling a generator function, as all cinje template functions—those containing
+text—are generators.  Normal template functions generate unicode fragments.  Wrapper template functions will at some
+point generate a ``None`` value; you can iterate up to that point, and subsequently continue iterating after that
+point using the ``cinje.util.interrupt`` iterator to iterate up to the first ``None``.
 
 
 4. Basic Syntax
@@ -164,16 +177,22 @@ A frequent pattern in reusable templates is to provide some method to emit key/v
 XML attributes.  To eliminate boilerplate cinje provides a replacement which handles this naturally.
 
 Attributes which are literally ``True`` have no emitted value.  Attributes which are literally ``False`` or ``None``
-are omitted.  A value can be provided, then defaults provided using the ``key=value`` keyword argument style; if the
-key does not have a value in the initial argument, the default will be used.
+are omitted.  Non-string iterables are treated as a space-separated set of strings, for example, for use as a set of
+CSS classes.  Trailing underscores are removed, to allow for use of Python-reserved words.  Single underscores
+(``_``) within the key are replaced with hyphens.  Double underscores (``__``) within a key are replaced with colons.
+
+A value can be provided, then defaults provided using the ``key=value`` keyword argument style; if the key does not
+have a value in the initial argument, the default will be used.
 
 =================================== ======================================= ================================
 cinje                               Python                                  Result
 =================================== ======================================= ================================
-``&{dict(autocomplete=True)}``      ``_args(dict(autocomplete=True))``      ``" autocomplete"``
-``&{dict(autocomplete=False)}``     ``_args(dict(autocomplete=False))``     ``""`` (empty)
-``&{dict(name="Bob Dole")}``        ``_args(dict(name="Bob Dole"))``        ``' name="Bob Dole"'``
-``&{somevar default=27}``           ``_args(somevar, default="hello")``     (depends on ``somevar``)
+``&{autocomplete=True}``            ``_args(autocomplete=True)``            ``" autocomplete"``
+``&{autocomplete=False}``           ``_args(autocomplete=False)``           ``""`` (empty)
+``&{data_key="value"}``             ``_args(data_key="value")``             ``' data-key="value"'``
+``&{xmlns__foo="bob"}``             ``_args(xmlns__foo="bob")``             ``' xmlns:bob="foo"'``
+``&{name="Bob Dole"}``              ``_args(name="Bob Dole")``              ``' name="Bob Dole"'``
+``&{somevar, default=27}``          ``_args(somevar, default="hello")``     (depends on ``somevar``)
 =================================== ======================================= ================================
 
 A preceeding space will be emitted automatically if any values would be emitted.  The following would be correct::
