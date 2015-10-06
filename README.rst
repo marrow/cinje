@@ -30,8 +30,26 @@ Contents
 4. `Basic Syntax`_
 
    1. `Variable Replacement`_
+   
+      1. `HTML/XML Escaped Replacement`_
+      2. `Unescaped Replacement`_
+      3. `HTML Attributes Replacement`_
+      4. `Formatted Replacement`_
+   
    2. `Block Transformations`_
+   
+      1. `Module Scope`_
+      2. `Function Declaration`_
+      3. `Conditional Flow`_
+      4. `Iteration`_
+      5. `Inheritance`_
+
    3. `Inline Transformations`_
+   
+      1. `Code`_
+      2. `Comments`_
+      3. `Flush`_
+      4. `Text`_
 
 5. `Version History`_
 6. `License`_
@@ -257,8 +275,8 @@ This is an automatic transformer triggered by the start of a source file.  It au
 top of your file to import the required helpers from cinje.
 
 
-Declaring Functions
-~~~~~~~~~~~~~~~~~~~
+Function Declaration
+~~~~~~~~~~~~~~~~~~~~
 
 Lines beginning with ``: def`` are used to declare functions within your template source::
 
