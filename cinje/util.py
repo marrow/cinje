@@ -326,19 +326,15 @@ class Context(object):
 			if line.kind == 'code' and line.stripped == 'end':  # Exit the current child scope.
 				return
 			
-			if handler:
-				self.input.push(line)  # Put it back so it can be consumed by the handler.
-				
-				for line in handler(self):  # This re-indents the code to match, if missing scope.
-					if line.scope is None:
-						line = line.clone(scope=self.scope)
-					
-					yield line
-				
-				continue
+			assert handler, "Unable to identify handler for line; this should be impossible!"
 			
-			# TODO: Error out?
-			yield line
+			self.input.push(line)  # Put it back so it can be consumed by the handler.
+			
+			for line in handler(self):  # This re-indents the code to match, if missing explicit scope.
+				if line.scope is None:
+					line = line.clone(scope=self.scope)
+				
+				yield line
 	
 	def classify(self, line):
 		"""Identify the correct handler for a given line of input."""
