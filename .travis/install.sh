@@ -9,3 +9,7 @@ pip install --upgrade setuptools pytest
 pip install tox
 pip install python-coveralls
 pip install pytest-cov
+
+if [ "${ACCELERATED}" = "1" ]; then
+	pip install markupsafe
+fi
