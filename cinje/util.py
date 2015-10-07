@@ -9,7 +9,7 @@ from __future__ import unicode_literals
 import sys
 
 from inspect import isfunction, isclass
-from collections import deque, namedtuple, Sized
+from collections import deque, namedtuple, Sized, Iterable
 from xml.sax.saxutils import quoteattr
 from markupsafe import Markup
 
@@ -96,21 +96,31 @@ def iterate(obj):
 		first = False
 
 
-def xmlargs(source=None, **values):
+def xmlargs(_source=None, **values):
 	parts = []
 	
-	# If a data source is provided, it overrides the keyword arguments which are treated as defaults.
-	if source: values.update(source)
+	# If a data source is provided it overrides the keyword arguments which are treated as defaults.
+	if _source:
+		values.update(_source)
 	
 	for k in sorted(values):
-		if not values[k]:  # We skip empty, None, False, and other falsy values.
+		# We technically allow non-string values for keys.  They're just converted to strings first.
+		key = str(k).rstrip('_').replace('__', ':').replace('_', '-')
+		value = values[k]
+		
+		# We skip empty, None, False, and other falsy values other than zero.
+		if k[0] == '_' or (not value and (value is False or value != 0)):  # False == 0, so, uh, work around that.
 			continue
 		
-		if values[k] is True:  # For explicitly True values, we don't have a value for the attribute.
-			parts.append(k)
+		if value is True:  # For explicitly True values, we don't have a value for the attribute.
+			parts.append(key)
 			continue
 		
-		parts.append(k + "=" + quoteattr(values[k]))
+		# Non-string iterables (such as lists, sets, tuples, etc.) are treated as space-separated strings.
+		if isinstance(value, Iterable) and not isinstance(value, stringy):
+			value = " ".join(str(i) for i in value)
+		
+		parts.append(key + "=" + quoteattr(str(value)))
 	
 	return Markup(" " + " ".join(parts)) if parts else ''
 
