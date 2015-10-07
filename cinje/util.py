@@ -11,7 +11,7 @@ import sys
 from inspect import isfunction, isclass
 from collections import deque, namedtuple, Sized, Iterable
 from xml.sax.saxutils import quoteattr
-from markupsafe import Markup
+from .helpers import bless
 
 # ## Python Cross-Compatibility
 
@@ -122,7 +122,7 @@ def xmlargs(_source=None, **values):
 		
 		parts.append(key + "=" + quoteattr(str(value)))
 	
-	return Markup(" " + " ".join(parts)) if parts else ''
+	return bless(" " + " ".join(parts)) if parts else ''
 
 
 def chunk(text, delim=('', '${', '#{', '&{', '%{'), tag=('text', '_escape', '_bless', '_args', 'format')):
