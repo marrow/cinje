@@ -22,6 +22,8 @@ try:  # pragma: no cover
 	py = 2
 except:
 	stringy = str
+	bytes = bytes
+	str = str
 	py = 3
 
 

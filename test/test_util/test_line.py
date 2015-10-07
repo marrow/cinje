@@ -2,13 +2,7 @@
 
 from __future__ import unicode_literals
 
-from cinje.util import Line
-
-try:
-	bytes
-except:
-	bytes = str
-	str = unicode
+from cinje.util import Line, bytes, str
 
 
 def test_line_processing():

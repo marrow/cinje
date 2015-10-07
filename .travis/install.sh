@@ -9,6 +9,9 @@ pip install --upgrade setuptools pytest
 pip install tox
 pip install python-coveralls
 pip install pytest-cov
+pip install pyflakes
+pip install pytest_cagoule
+pip install pytest-spec
 
 if [ "${ACCELERATED}" = "1" ]; then
 	pip install markupsafe
