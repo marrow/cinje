@@ -14,6 +14,8 @@ env:
   - TOXENV=py33 ACCELERATED=1
   - TOXENV=py34 ACCELERATED=0
   - TOXENV=py34 ACCELERATED=1
+  - TOXENV=py35 ACCELERATED=0
+  - TOXENV=py35 ACCELERATED=1
 
 install: travis_retry .travis/install.sh
 
