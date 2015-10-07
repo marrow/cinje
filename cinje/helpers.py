@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-try:
+try:  # pragma: no cover
 	unicode = unicode
 except:
 	unicode = str

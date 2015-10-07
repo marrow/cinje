@@ -5,7 +5,7 @@ import re
 from ..util import Line, Context
 from ..inline.flush import flush_template
 
-try:
+try:  # pragma: no cover
 	unicode
 	py = 2
 except:

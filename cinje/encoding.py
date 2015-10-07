@@ -8,7 +8,7 @@ from encodings import utf_8 as utf8
 
 try:
 	from io import StringIO
-except:
+except:  # pragma: no cover
 	try:
 		from cStringIO import StringIO
 	except:
@@ -18,12 +18,12 @@ from .util import Context
 
 try:
 	bytes = bytes
-except:
+except:  # pragma: no cover
 	bytes = str
 
 try:
 	unicode = unicode
-except:
+except:  # pragma: no cover
 	unicode = str
 
 

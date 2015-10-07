@@ -13,6 +13,17 @@ from collections import deque, namedtuple, Sized
 from xml.sax.saxutils import quoteattr
 from markupsafe import Markup
 
+# ## Python Cross-Compatibility
+
+try:  # pragma: no cover
+	from types import StringTypes as stringy
+	bytes = str
+	str = unicode
+	py = 2
+except:
+	stringy = str
+	py = 3
+
 
 # ## Type Definitions
 

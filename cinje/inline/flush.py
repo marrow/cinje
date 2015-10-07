@@ -2,7 +2,7 @@
 
 from ..util import Context, Line
 
-try:
+try:  # pragma: no cover
 	unicode
 	py = 2
 except:
