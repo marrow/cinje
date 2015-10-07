@@ -53,22 +53,27 @@ class Text(object):
 		
 		yield Line(0, self.PREFIX)  # Start a call to _buffer.extend()
 		
-		for token, text in chunk(text):
+		for token, part in chunk(text):
 			if token == 'text':
-				text = pformat(
-						text,
+				part = pformat(
+						part,
 						indent = 0,
 						width = 120 - 4 * (context.scope + 1),
 						# compact = True  Python 3 only.
 					).replace("\n ", "\n" + "\t" * (context.scope + 1)).strip()
-				if text[0] == '(' and text[-1] == ')':
-					text = text[1:-1]
-				yield Line(0, text + ',', (context.scope + 1))
+				
+				if part[0] == '(' and part[-1] == ')':
+					part = part[1:-1]
+				
+				yield Line(0, part + ',', (context.scope + 1))
+			
 			elif token == 'format':
 				pass  # TODO: Need to think about that.
+			
 			elif token != '':
-				yield Line(0, token + '(' + text + '),', (context.scope + 1))
+				yield Line(0, token + '(' + part + '),', (context.scope + 1))
+			
 			else:
-				yield Line(0, '_escape(' + text + '),', (context.scope + 1))
+				yield Line(0, '_escape(' + part + '),', (context.scope + 1))
 		
-		yield Line(0, self.SUFFIX, (context.scope + 1))
+		yield Line(0, self.SUFFIX, (context.scope + 1))  # End the call to _buffer.extend()
