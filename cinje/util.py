@@ -171,6 +171,8 @@ def ensure_buffer(context):
 	if 'text' in context.flag:
 		return
 	
+	# TODO: Determine if the Python 2-required approach (reassignment) is faster than the .clear() approach.
+	
 	yield Line(0, "")
 	yield Line(0, "_buffer = []")
 	yield Line(0, "__w = _buffer.extend")
@@ -220,11 +222,19 @@ class Line(object):
 	def __repr__(self):
 		return '{0.__class__.__name__}({0.number}, {0.kind}, "{0.stripped}")'.format(self)
 	
+	def __bytes__(self):
+		return str(self).encode('utf8')
+	
 	def __str__(self):
 		if self.scope is None:
 			return self.line
 		
 		return '\t' * self.scope + self.line.lstrip()
+	
+	if py == 2:  # pragma: no cover
+		__unicode__ = __str__
+		__str__ = __bytes__
+		del __bytes__
 	
 	def clone(self, **kw):
 		values = dict(
@@ -233,11 +243,9 @@ class Line(object):
 				scope = self.scope,
 			)
 		
-		kind = self.kind or kw.pop('kind')
 		values.update(kw)
 		
 		instance = self.__class__(**values)
-		instance.kind = kind
 		
 		return instance
 
@@ -268,6 +276,9 @@ class Lines(object):
 	def count(self):
 		return len(self.buffer)
 	
+	def __len__(self):
+		return self.count
+	
 	def __repr__(self):
 		return 'Lines({0.count})'.format(self)
 	
@@ -278,12 +289,11 @@ class Lines(object):
 		return self.next()
 	
 	def __str__(self):
-		return "\n".join(str(i) for i in self.buffer)
+		return "\n".join(str(i) for i in self)
 	
 	def next(self):
 		if not self.buffer:
 			raise StopIteration()
-			self.buffer = deque(self.source)  # We reset to allow for re-iteration.
 		
 		return self.buffer.popleft()
 	
@@ -292,6 +302,9 @@ class Lines(object):
 	
 	def push(self, *lines):
 		self.buffer.extendleft((i if isinstance(i, self.Line) else self.Line(self.buffer[0].number if self.buffer else 0, i)) for i in reversed(lines))
+	
+	def reset(self):
+		self.buffer = deque(self.source)
 	
 	def append(self, *lines):
 		self.buffer.extend((i if isinstance(i, self.Line) else self.Line(self.buffer[-1].number if self.buffer else 0, i)) for i in lines)
