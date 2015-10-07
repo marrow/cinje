@@ -2,17 +2,20 @@ language: python
 sudo: false
 
 env:
-  global:
-    - TOXENV=pypy 
-    - TOXENV=pypy3
-    - TOXENV=py26
-    - TOXENV=py27
-    - TOXENV=py32
-    - TOXENV=py33
-    - TOXENV=py34
-  matrix:
-    - ACCELERATED=0
-    - ACCELERATED=1
+  - TOXENV=pypy ACCELERATED=0
+  - TOXENV=pypy ACCELERATED=1
+  - TOXENV=pypy3 ACCELERATED=0
+  - TOXENV=pypy3 ACCELERATED=1
+  - TOXENV=py26 ACCELERATED=0
+  - TOXENV=py26 ACCELERATED=1
+  - TOXENV=py27 ACCELERATED=0
+  - TOXENV=py27 ACCELERATED=1
+  - TOXENV=py32 ACCELERATED=0
+  - TOXENV=py32 ACCELERATED=1
+  - TOXENV=py33 ACCELERATED=0
+  - TOXENV=py33 ACCELERATED=1
+  - TOXENV=py34 ACCELERATED=0
+  - TOXENV=py34 ACCELERATED=1
 
 install: travis_retry .travis/install.sh
 
