@@ -9,7 +9,10 @@ try:
 	from markupsafe import Markup as bless, escape_silent as escape
 except ImportError:
 	bless = unicode
-	from html import escape
+	try:
+		from html import escape
+	except:
+		from cgi import escape
 
 from .util import iterate, xmlargs, interruptable as _interrupt, Pipe as pipe
 

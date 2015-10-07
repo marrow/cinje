@@ -11,7 +11,7 @@ import sys
 from inspect import isfunction, isclass
 from collections import deque, namedtuple, Sized, Iterable
 from xml.sax.saxutils import quoteattr
-from .helpers import bless
+
 
 # ## Python Cross-Compatibility
 
@@ -97,6 +97,8 @@ def iterate(obj):
 
 
 def xmlargs(_source=None, **values):
+	from cinje.helpers import bless
+	
 	parts = []
 	
 	# If a data source is provided it overrides the keyword arguments which are treated as defaults.
