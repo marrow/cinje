@@ -13,11 +13,11 @@ class TestLines(object):
 	def example(self):
 		return Lines("text\nmore text\nreplacement ${text}\n: code\n\n# comment\n")
 	
-	def test_io(self):
+	def test_representation(self):
 		assert repr(self.example) == 'Lines(7)'
 	
 	# TODO: Make this a fixture variant of example and repeat all tests on it instead of... this.
-	def test_filelike(self):
+	def test_load_from_filelike(self):
 		text = str(self.example).split('\n')
 		
 		class MockFile(object):
@@ -27,7 +27,7 @@ class TestLines(object):
 		self.test_basic_usage(Lines(MockFile()))
 		self.test_iteration_methods(Lines(MockFile()))
 	
-	def test_empty(self):
+	def test_empty_buffer(self):
 		example = Lines()
 		
 		assert len(example) == example.count == len(example.buffer) == 0

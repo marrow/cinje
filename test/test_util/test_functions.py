@@ -44,57 +44,79 @@ class TestIterate(object):
 
 
 class TestXMLArgs(object):
-	_values = [
-			(dict(autocomplete=True), " autocomplete"),  # Truth
-			(dict(autocomplete=False), ""),  # Falsy
-			(dict(autocomplete=None), ""),  # Falsy
-			(dict(autocomplete=""), ""),  # Falsy
-			(dict(count=0), ' count="0"'),  # Falsy, but is actually a value.
-			(dict(foo=27), ' foo="27"'),  # Stringification.
-			(dict(foo_bar=42), ' foo-bar="42"'),  # Hyphenation.
-			(dict(ns__bob="dole"), ' ns:bob="dole"'),  # XML namespace notation.
-			(dict(class_="first"), ' class="first"'),  # Reserved word avoidance.
-			(dict(_omitted="yup"), ""),  # Hide "private" values.
-			(dict(class_=['foo', 27, 'bar']), ' class="foo 27 bar"'),  # Non-string iterable support.
-			(  # Merged default.
-				dict(_source=dict(), placeholder="Bob Dole"),
-				' placeholder="Bob Dole"'
-			),
-			(  # Overridden default.
-				dict(_source=dict(placeholder="Placeholder value."), placeholder="Bob Dole"),
-				' placeholder="Placeholder value."'
-			),
-		]
-	
 	def _do(self, value):
 		input, output = value
 		assert xmlargs(**input) == output
 	
-	def test_values(self):
-		for test in self._values:
-			yield self._do, test
+	def test_valueless_attribute(self):
+		self._do((dict(autocomplete=True), " autocomplete"))
+	
+	def test_falsy_value_exclusion(self):
+		self._do((dict(autocomplete=False), ""))
+		self._do((dict(autocomplete=None), ""))
+		self._do((dict(autocomplete=""), ""))
+	
+	def test_falsy_zero_exception(self):
+		self._do((dict(count=0), ' count="0"'))
+	
+	def test_value_stringification(self):
+		self._do((dict(foo=27), ' foo="27"'))
+	
+	def test_key_hyphenation(self):
+		self._do((dict(foo_bar=42), ' foo-bar="42"'))
+	
+	def test_xml_namespace(self):
+		self._do((dict(ns__bob="dole"), ' ns:bob="dole"'))
+	
+	def test_reserved_word_avoidance(self):
+		self._do((dict(class_="first"), ' class="first"'))
+	
+	def test_exclude_private_keys(self):
+		self._do((dict(_omitted="yup"), ""))
+	
+	def test_iterable_support(self):
+		self._do((dict(class_=['foo', 27, 'bar']), ' class="foo 27 bar"'))
+	
+	def test_defaults_merged(self):
+		self._do((
+				dict(_source=dict(), placeholder="Bob Dole"),
+				' placeholder="Bob Dole"'
+			))
+	
+	def test_defaults_overridden(self):
+		self._do((
+				dict(_source=dict(placeholder="Placeholder value."), placeholder="Bob Dole"),
+				' placeholder="Placeholder value."'
+			))
 
 
 class TestChunker(object):
-	_singular_values = [
-			('', 'text', "This is some text."),
-			('', 'text', "Some text with {matched braces}."),
-			('$', '_escape', "Escaped text."),
-			('$', '_escape', "Escaped text with {matched brackets}."),
-			('#', '_bless', "Blessed text."),
-			('&', '_args', "Escaped text."),
-			('%', 'format', "Formatted text."),
-		]
-	
 	def _do(self, value):
 		token, kind, value = value
 		phrase = value if not token else (token + '{' + value + '}')
 		
 		assert list(chunk(phrase)) == [(kind, value)]
 	
-	def test_singular_chunks(self):
-		for i in self._singular_values:
-			yield self._do, i
+	def test_plain_text_chunk(self):
+		self._do(('', 'text', "This is some text."))
+	
+	def test_plain_text_matched_braces(self):
+		self._do(('', 'text', "Some text with {matched braces}."))
+	
+	def test_escaped_text_chunk(self):
+		self._do(('$', '_escape', "Escaped text."))
+	
+	def test_excaped_text_matched_braces(self):
+		self._do(('$', '_escape', "Escaped text with {matched brackets}."))
+	
+	def test_blessed_text_chunk(self):
+		self._do(('#', '_bless', "Blessed text."))
+	
+	def test_argument_chunk(self):
+		self._do(('&', '_args', "Arguments."))
+	
+	def test_formatted_chunk(self):
+		self._do(('%', 'format', "Formatted text."))
 	
 	def test_multiple_chunks(self):
 		assert list(chunk("Test ${phrase}.")) == [
