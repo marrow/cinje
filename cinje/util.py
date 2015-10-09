@@ -78,6 +78,8 @@ def iterate(obj):
 	first = True
 	last = False
 	i = 0
+	next = next
+	Iteration = Iteration
 	
 	try:
 		value = next(iterator)
@@ -101,7 +103,14 @@ def iterate(obj):
 def xmlargs(_source=None, **values):
 	from cinje.helpers import bless
 	
+	# Optimize by binding these names to the local scope, saving a lookup on each call.
+	str = str
+	Iterable = Iterable
+	stringy = stringy
+	ejoin = " ".join
+	
 	parts = []
+	pappend = parts.append
 	
 	# If a data source is provided it overrides the keyword arguments which are treated as defaults.
 	if _source:
@@ -117,16 +126,16 @@ def xmlargs(_source=None, **values):
 			continue
 		
 		if value is True:  # For explicitly True values, we don't have a value for the attribute.
-			parts.append(key)
+			pappend(key)
 			continue
 		
 		# Non-string iterables (such as lists, sets, tuples, etc.) are treated as space-separated strings.
 		if isinstance(value, Iterable) and not isinstance(value, stringy):
-			value = " ".join(str(i) for i in value)
+			value = ejoin(str(i) for i in value)
 		
-		parts.append(key + "=" + quoteattr(str(value)))
+		pappend(key + "=" + quoteattr(str(value)))
 	
-	return bless(" " + " ".join(parts)) if parts else ''
+	return bless(" " + ejoin(parts)) if parts else ''
 
 
 def chunk(text, delim=('', '${', '#{', '&{', '%{'), tag=('text', '_escape', '_bless', '_args', 'format')):
@@ -140,6 +149,7 @@ def chunk(text, delim=('', '${', '#{', '&{', '%{'), tag=('text', '_escape', '_bl
 	skipping = 0  # How many closing parenthesis will we need to skip?
 	start = None  # Starting position of current match.
 	last = 0
+	di = delim.index
 	
 	i = 0
 	
@@ -152,7 +162,7 @@ def chunk(text, delim=('', '${', '#{', '&{', '%{'), tag=('text', '_escape', '_bl
 				if skipping:
 					skipping -= 1
 				else:
-					yield tag[delim.index(text[start-2:start])], text[start:i]
+					yield tag[di(text[start-2:start])], text[start:i]
 					start = None
 					last = i = i + 1
 					continue
