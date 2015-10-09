@@ -73,13 +73,15 @@ def iterate(obj):
 	track state.  Use `enumerate()` elsewhere.
 	"""
 	
+	global next, Iteration
+	next = next
+	Iteration = Iteration
+	
 	total = len(obj) if isinstance(obj, Sized) else None
 	iterator = iter(obj)
 	first = True
 	last = False
 	i = 0
-	next = next
-	Iteration = Iteration
 	
 	try:
 		value = next(iterator)
@@ -104,6 +106,7 @@ def xmlargs(_source=None, **values):
 	from cinje.helpers import bless
 	
 	# Optimize by binding these names to the local scope, saving a lookup on each call.
+	global str, Iterable, stringy
 	str = str
 	Iterable = Iterable
 	stringy = stringy
@@ -138,7 +141,7 @@ def xmlargs(_source=None, **values):
 	return bless(" " + ejoin(parts)) if parts else ''
 
 
-def chunk(text, delim=('', '${', '#{', '&{', '%{'), tag=('text', '_escape', '_bless', '_args', 'format')):
+def chunk(text, mapping={None: 'text', '${': '_escape', '#{': '_bless', '&{': '_args', '%{': 'format'}):
 	"""Chunkify and "tag" a block of text into plain text and code sections.
 	
 	The first delimeter is blank to represent text sections, and keep the indexes aligned with the tags.
@@ -149,7 +152,6 @@ def chunk(text, delim=('', '${', '#{', '&{', '%{'), tag=('text', '_escape', '_bl
 	skipping = 0  # How many closing parenthesis will we need to skip?
 	start = None  # Starting position of current match.
 	last = 0
-	di = delim.index
 	
 	i = 0
 	
@@ -162,14 +164,14 @@ def chunk(text, delim=('', '${', '#{', '&{', '%{'), tag=('text', '_escape', '_bl
 				if skipping:
 					skipping -= 1
 				else:
-					yield tag[di(text[start-2:start])], text[start:i]
+					yield mapping[text[start-2:start]], text[start:i]
 					start = None
 					last = i = i + 1
 					continue
 		
-		elif text[i:i+2] in delim:
+		elif text[i:i+2] in mapping:
 			if last is not None and last != i:
-				yield tag[0], text[last:i]
+				yield mapping[None], text[last:i]
 				last = None
 			
 			start = i = i + 2
@@ -178,7 +180,7 @@ def chunk(text, delim=('', '${', '#{', '&{', '%{'), tag=('text', '_escape', '_bl
 		i += 1
 	
 	if last < len(text):
-		yield tag[0], text[last:]
+		yield mapping[None], text[last:]
 
 
 def ensure_buffer(context):
