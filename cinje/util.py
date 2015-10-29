@@ -141,7 +141,7 @@ def xmlargs(_source=None, **values):
 	return bless(" " + ejoin(parts)) if parts else ''
 
 
-def chunk(text, mapping={None: 'text', '${': '_escape', '#{': '_bless', '&{': '_args', '%{': 'format'}):
+def chunk(text, mapping={None: 'text', '${': '_escape', '#{': '_bless', '&{': '_args', '%{': 'format', '@{': '_json'}):
 	"""Chunkify and "tag" a block of text into plain text and code sections.
 	
 	The first delimeter is blank to represent text sections, and keep the indexes aligned with the tags.

@@ -15,6 +15,8 @@ except ImportError:
 	except:
 		from cgi import escape
 
+from json import dumps as _json
+
 from .util import iterate, xmlargs, interruptable as _interrupt, Pipe as pipe
 
 

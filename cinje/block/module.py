@@ -37,7 +37,7 @@ class Module(object):
 		yield Line(0, 'import cinje')
 		yield Line(0, '')
 		# yield Line(0, 'from types import Generator as __Generator')
-		yield Line(0, 'from cinje.helpers import escape as _escape, bless as _bless, iterate, xmlargs as _args, _interrupt')
+		yield Line(0, 'from cinje.helpers import escape as _escape, bless as _bless, iterate, xmlargs as _args, _interrupt, _json')
 		yield Line(0, '')
 		
 		for i in context.stream:
