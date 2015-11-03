@@ -109,7 +109,7 @@ class Function(object):
 		
 		line = 'def ' + name + '(' + argspec + '):' + ((' -> ' + annotation) if annotation else '')
 		
-		yield declaration.clone(line='@cinje.Function.prepare')  # This lets us do some work before and after runtime.
+		# yield declaration.clone(line='@cinje.Function.prepare')  # This lets us do some work before and after runtime.
 		yield declaration.clone(line=line)
 		
 		context.scope += 1
