@@ -43,4 +43,9 @@ class Module(object):
 		for i in context.stream:
 			yield i
 		
+		if context.templates:
+			yield Line(0, '')
+			yield Line(0, '__tmpl__ = ["' + '", "'.join(context.templates) + '"]')
+			context.templates = []
+		
 		context.flag.remove('init')

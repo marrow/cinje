@@ -120,13 +120,14 @@ class Function(object):
 		if 'using' in context.flag:  # Clean up that we were using things.
 			context.flag.remove('using')
 		
-		for i in flush_template(context):
+		for i in flush_template(context):  # Handle the final buffer yield if any content was generated.
 			yield i
 		
-		if 'text' in context.flag:  # Handle the final buffer yield if any content was generated.
-			context.flag.remove('text')
-		
 		context.scope -= 1
+		
+		if 'text' in context.flag:
+			context.templates.append(name)
+			context.flag.remove('text')
 	
 	@classmethod
 	def prepare(cls, fn):

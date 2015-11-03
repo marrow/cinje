@@ -332,7 +332,7 @@ class Context(object):
 	This is the primary entry point for translation.
 	"""
 	
-	__slots__ = ('input', 'scope', 'flag', '_handler')
+	__slots__ = ('input', 'scope', 'flag', '_handler', 'templates')
 	
 	handlers = []
 	
@@ -341,6 +341,7 @@ class Context(object):
 		self.scope = 0
 		self.flag = set()
 		self._handler = []
+		self.templates = []
 	
 	def __repr__(self):
 		return "Context({!r}, {}, {})".format(self.input, self.scope, self.flag)
