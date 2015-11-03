@@ -29,6 +29,9 @@ def flush_template(context, declaration=None):
 		context.flag.remove('text')  # This will force a new buffer to be constructed.
 	
 	context.flag.remove('dirty')
+	
+	if declaration.stripped == 'yield':
+		yield declaration
 
 
 
@@ -47,13 +50,15 @@ class Flush(object):
 	buffer is known to be "dirty" by the translator.  I.e. following ": use" or ": uses", or after some template
 	text has been defined.  Unlike most other commands involving the buffer, this one will not create a buffer if
 	missing.
+	
+	This also handles flushing prior to yielding, for wrapper templates.
 	"""
 	
 	priority = 25
 	
 	def match(self, context, line):
 		"""Match exact "flush" command usage."""
-		return line.kind == 'code' and line.stripped == "flush"
+		return line.kind == 'code' and line.stripped in ("flush", "yield")
 	
 	def __call__(self, context):
 		return flush_template(context, context.input.next())
