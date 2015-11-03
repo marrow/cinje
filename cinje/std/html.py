@@ -58,13 +58,13 @@
 <!DOCTYPE html>
 <html&{lang=attributes.pop('lang', 'en')}>
 	<head>
-		: __w(header(title, metadata=metadata, styles=styles, scripts=scripts) if header else ())
+		: __w(header(title, metadata=metadata, styles=styles, scripts=[]) if header else ())
 	</head>
 	
 	<body&{attributes, role='document'}>
 		: yield
 		
-		: __w(footer(styles=styles, scripts=scripts) if footer else ())
+		: __w(footer(styles=[], scripts=scripts) if footer else ())
 	</body>
 </html>
 : end
