@@ -51,29 +51,37 @@ class Text(object):
 		
 		# We now have a contiguous block of templated text.  Split it up into expressions and wrap as appropriate.
 		
-		yield Line(0, self.PREFIX)  # Start a call to _buffer.extend()
+		chunks = list(chunk(text))  # Ugh; this breaks streaming, but...
+		single = len(chunks) == 1
 		
-		for token, part in chunk(text):
+		if single:
+			PREFIX = '__ws('
+		else:
+			yield Line(0, '__w((')  # Start a call to _buffer.extend()
+			PREFIX = ''
+		
+		for token, part in chunks:
 			if token == 'text':
 				part = pformat(
 						part,
 						indent = 0,
-						width = 120 - 4 * (context.scope + 1),
+						width = 120 - 4 * (context.scope + (0 if single else 1)),
 						# compact = True  Python 3 only.
-					).replace("\n ", "\n" + "\t" * (context.scope + 1)).strip()
+					).replace("\n ", "\n" + "\t" * (context.scope + (0 if single else 1))).strip()
 				
 				if part[0] == '(' and part[-1] == ')':
 					part = part[1:-1]
 				
-				yield Line(0, part + ',', (context.scope + 1))
+				yield Line(0, PREFIX + part + (')' if single else ','), (context.scope + (0 if single else 1)))
 			
 			elif token == 'format':
 				pass  # TODO: Need to think about that.
 			
 			elif token != '':
-				yield Line(0, token + '(' + part + '),', (context.scope + 1))
+				yield Line(0, PREFIX + token + '(' + part + ')' + (')' if single else ','), (context.scope + (0 if single else 1)))
 			
 			else:
-				yield Line(0, '_escape(' + part + '),', (context.scope + 1))
+				yield Line(0, PREFIX + '_escape(' + part + ')' + ('' if single else ','), (context.scope + (0 if single else 1)))
 		
-		yield Line(0, self.SUFFIX, (context.scope + 1))  # End the call to _buffer.extend()
+		if not single:
+			yield Line(0, '))', (context.scope + 1))  # End the call to _buffer.extend()

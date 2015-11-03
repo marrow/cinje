@@ -191,7 +191,7 @@ def ensure_buffer(context):
 	
 	yield Line(0, "")
 	yield Line(0, "_buffer = []")
-	yield Line(0, "__w = _buffer.extend")
+	yield Line(0, "__w, __ws = _buffer.extend, _buffer.append")
 	yield Line(0, "")
 	
 	context.flag.add('text')
