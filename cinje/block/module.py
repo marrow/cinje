@@ -35,9 +35,10 @@ class Module(object):
 		yield Line(0, 'from __future__ import unicode_literals')
 		yield Line(0, '')
 		yield Line(0, 'import cinje')
-		yield Line(0, '')
-		# yield Line(0, 'from types import Generator as __Generator')
 		yield Line(0, 'from cinje.helpers import escape as _escape, bless as _bless, iterate, xmlargs as _args, _interrupt, _json')
+		yield Line(0, '')
+		yield Line(0, '')
+		yield Line(0, '__tmpl__ = []  # Exported template functions.')
 		yield Line(0, '')
 		
 		for i in context.stream:
@@ -45,7 +46,7 @@ class Module(object):
 		
 		if context.templates:
 			yield Line(0, '')
-			yield Line(0, '__tmpl__ = ["' + '", "'.join(context.templates) + '"]')
+			yield Line(0, '__tmpl__.extend(["' + '", "'.join(context.templates) + '"])')
 			context.templates = []
 		
 		context.flag.remove('init')
