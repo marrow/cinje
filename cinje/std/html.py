@@ -39,6 +39,10 @@
 
 : def default_footer *, styles=[], scripts=[]
 	: """Prepare and generate the HTML body postfix."""
+	
+	# This is here to force construction of the _buffer early.
+	<!-- End Matter -->
+	
 	: for href in styles
 		<link&{href=href, rel="stylesheet"}>
 	: end
