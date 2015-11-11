@@ -11,6 +11,7 @@ import sys
 from inspect import isfunction, isclass
 from collections import deque, namedtuple, Sized, Iterable
 from xml.sax.saxutils import quoteattr
+from html.parser import HTMLParser
 
 
 # ## Python Cross-Compatibility
@@ -436,3 +437,26 @@ class Pipe(object):
 		"""
 		
 		return self.__class__(self.callable, *args, **kw)
+
+
+# ## Tag Stripper
+
+class MLStripper(HTMLParser):
+	def __init__(self):
+		self.reset()
+		self.strict = False
+		self.convert_charrefs = True
+		self.fed = []
+	
+	def handle_data(self, d):
+		self.fed.append(d)
+	
+	def get_data(self):
+		return ''.join(self.fed)
+
+
+def strip_tags(html):
+	s = MLStripper()
+	s.feed(html)
+	return s.get_data()
+
