@@ -11,7 +11,11 @@ import sys
 from inspect import isfunction, isclass
 from collections import deque, namedtuple, Sized, Iterable
 from xml.sax.saxutils import quoteattr
-from html.parser import HTMLParser
+
+try:  # pragma: no cover
+	from html.parser import HTMLParser
+except ImportError:  # pragma: no cover
+	from HTMLParser import HTMLParser
 
 
 # ## Python Cross-Compatibility
