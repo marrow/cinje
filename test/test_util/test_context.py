@@ -2,7 +2,7 @@
 
 from __future__ import unicode_literals
 
-from cinje.util import py2, Context
+from cinje.util import py, Context
 from cinje.block.module import Module
 from cinje.inline.code import Code
 
@@ -11,7 +11,7 @@ class TestContextBehaviours(object):
 	def test_repr_is_reasonable(self):
 		context = Context('')
 		
-		if py2:
+		if py == 2:
 			assert repr(context) == 'Context(Lines(1), 0, set([]))'
 		else:
 			assert repr(context) == 'Context(Lines(1), 0, set())'
