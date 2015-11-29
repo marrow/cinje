@@ -74,6 +74,7 @@
 : end
 
 
+# TODO: __url__ protocol support, take str() of object, url from __url__, 
 : def link href, **kwargs
 	: """HTML5 hypertext reference."""
 <a href="${href}"&{kwargs}>\
@@ -84,9 +85,9 @@
 
 : def div **kwargs
 	: """Generic HTML5 block element."""
-	<div&{kwargs}>
-		: yield
-	</div>
+<div&{kwargs}>
+	: yield
+</div>
 : end
 
 
