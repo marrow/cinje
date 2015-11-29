@@ -2,7 +2,7 @@
 
 from __future__ import unicode_literals
 
-from cinje.util import Context
+from cinje.util import py2, Context
 from cinje.block.module import Module
 from cinje.inline.code import Code
 
@@ -10,7 +10,11 @@ from cinje.inline.code import Code
 class TestContextBehaviours(object):
 	def test_repr_is_reasonable(self):
 		context = Context('')
-		assert repr(context) == 'Context(Lines(1), 0, set())'
+		
+		if py2:
+			assert repr(context) == 'Context(Lines(1), 0, set([]))'
+		else:
+			assert repr(context) == 'Context(Lines(1), 0, set())'
 	
 	def test_prepare_required_translator_priority(self):
 		context = Context('')
