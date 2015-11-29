@@ -398,8 +398,6 @@ class Context(object):
 		for handler in self._handler:
 			if handler.match(self, line):
 				return handler
-		
-		return None
 
 
 class Pipe(object):
@@ -421,6 +419,13 @@ class Pipe(object):
 		self.callable = callable
 		self.args = args if args else ()
 		self.kwargs = kw if kw else {}
+	
+	def __repr__(self):
+		return "Pipe({self.callable!r}{0}{1})".format(
+				(', ' + ', '.join(repr(i) for i in self.args)) if self.args else '',
+				(', ' + ', '.join("{0}={1!r}".format(i, j) for i, j in self.kwargs.items())) if self.kwargs else '',
+				self = self,
+			)
 	
 	def __ror__(self, other):
 		"""The main machinery of the Pipe, calling the chosen callable with the recorded arguments."""
