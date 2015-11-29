@@ -15,7 +15,7 @@ env:
 
 install: travis_retry .travis/install.sh
 
-script: .travis/run.sh
+script: tox
 
 notifications:
   irc:
@@ -25,4 +25,4 @@ notifications:
     skip_join: true
 
 after_success:
-  - coveralls
+  - codecov

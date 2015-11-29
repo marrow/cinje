@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-from cinje.util import interruptable, iterate, xmlargs, chunk
+from cinje.util import interruptable, iterate, xmlargs, chunk, ensure_buffer, Line, strip_tags
 
 # Note: ensure_buffer is tested indirectly via template conformance testing.
 
@@ -18,7 +18,25 @@ def test_iterruptable():
 	iterable = sample_generator()
 	
 	assert list(interruptable(iterable)) == [27, 42]
-	assert next(iterable) == "Bob Dole!"
+	assert list(iterable) == ["Bob Dole!"]
+
+
+def test_ensure_buffer():
+	class context(object):
+		flag = set()
+	
+	assert 'text' not in context.flag
+	result = list(ensure_buffer(context))
+	assert 'text' in context.flag
+	assert len(result) > 0
+	assert isinstance(result[0], Line)
+	
+	result = list(ensure_buffer(context))
+	assert len(result) == 0
+
+
+def test_html_stripper():
+	assert strip_tags('<foo>bar</foo>') == 'bar'
 
 
 class TestIterate(object):

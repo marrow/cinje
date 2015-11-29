@@ -9,6 +9,7 @@ pip install --upgrade setuptools pip
 pip install --upgrade pytest
 pip install tox
 pip install tox-travis
+pip install codecov
 pip install python-coveralls
 pip install pytest-cov
 pip install pyflakes
