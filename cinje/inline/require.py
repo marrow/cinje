@@ -35,6 +35,6 @@ class Require(object):
 		module = import_module(namespace)
 		
 		if not hasattr(module, '__tmpl__'):
-			raise Exception("Attempted to require " + namespace + ", which contains no template functions.")
+			raise ImportError("Attempted to require " + namespace + ", which contains no template functions.")
 		
 		yield declaration.clone(line="from " + namespace + " import " + ", ".join(module.__tmpl__))
