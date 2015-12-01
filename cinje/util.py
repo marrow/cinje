@@ -42,6 +42,13 @@ Iteration = namedtuple('Iteration', ['first', 'last', 'index', 'total', 'value']
 # ## Simple Utility Functions
 
 
+def s(input, encoding=None):
+	if encoding:
+		return ''.join(i for i in input if i is not None).encode(encoding)
+	
+	return ''.join(i for i in input if i is not None)
+
+
 def interruptable(iterable):
 	"""Allow easy catching of a generator interrupting operation when using "yield from"."""
 	
