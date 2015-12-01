@@ -5,7 +5,7 @@ from ..util import Context, Line
 try:  # pragma: no cover
 	unicode
 	py = 2
-except:
+except:  # pragma: no cover
 	py = 3
 
 
@@ -18,19 +18,17 @@ def flush_template(context, declaration=None):
 	if declaration is None:
 		declaration = Line(0, '')
 	
-	if 'text' not in context.flag or 'dirty' not in context.flag:
-		return
+	if {'text', 'dirty'}.issubset(context.flag):
+		yield declaration.clone(line='yield "".join(_buffer)')
+		
+		if py == 3:  # pragma: no cover
+			yield declaration.clone(line='_buffer.clear()')
+		else:  # pragma: no cover
+			context.flag.remove('text')  # This will force a new buffer to be constructed.
+		
+		context.flag.remove('dirty')
 	
-	yield declaration.clone(line='yield "".join(_buffer)')
-	
-	if py == 3:
-		yield declaration.clone(line='_buffer.clear()')
-	else:
-		context.flag.remove('text')  # This will force a new buffer to be constructed.
-	
-	context.flag.remove('dirty')
-	
-	if declaration.stripped == 'yield':
+	if declaration.stripped != 'yield':
 		yield declaration
 
 
