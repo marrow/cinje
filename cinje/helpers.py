@@ -11,9 +11,12 @@ try:
 except ImportError:
 	bless = unicode
 	try:
-		from html import escape
+		from html import escape as __escape
+		
+		def escape(value):
+			return __escape(str(value))
 	except:
-		from cgi import escape
+		from cgi import escape as escape
 
 from json import dumps as _json
 
