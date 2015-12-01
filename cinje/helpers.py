@@ -16,7 +16,7 @@ except ImportError:
 		from cgi import escape as escape
 	
 	def escape(value):
-		return __escape(str(value))
+		return __escape(unicode(value))
 
 from json import dumps as _json
 
