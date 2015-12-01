@@ -9,7 +9,7 @@
 : _list = list  # We override an important __builtin__ name in this module.
 
 
-: def default_header title, *, metadata=[], styles=[], scripts=[]
+: def default_header title, metadata=[], styles=[], scripts=[]
 	: """Prepare and generate the HTML <head> section."""
 		
 		<meta charset="utf-8">
@@ -37,7 +37,7 @@
 : end
 
 
-: def default_footer *, styles=[], scripts=[]
+: def default_footer styles=[], scripts=[]
 	: """Prepare and generate the HTML body postfix."""
 	
 	# This is here to force construction of the _buffer early.
@@ -52,7 +52,7 @@
 : end
 
 
-: def page title, *, header=default_header, footer=default_footer, metadata=[], styles=[], scripts=[], **attributes
+: def page title, header=default_header, footer=default_footer, metadata=[], styles=[], scripts=[], **attributes
 	: """A general HTML page."""
 	
 	: if attributes is None
