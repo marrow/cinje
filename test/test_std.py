@@ -2,10 +2,7 @@
 
 import cinje; cinje  # avoid "unused import" complaint
 import pytest
-
-
-def s(input):
-	return ''.join(i for i in input if i is not None)
+from cinje.util import s
 
 
 
