@@ -23,7 +23,6 @@ class Function(object):
 	
 	"""
 	
-	
 	priority = -50
 	
 	# Patterns to search for bare *, *args, or **kwargs declarations.
@@ -57,8 +56,8 @@ class Function(object):
 			if matches:
 				split = matches[-1].span()[1]  # Inject after, a la "*args>_<", as we're positional-only arguments.
 				if split != len(argspec):
-					prefix = ' ' if argspec[split] in (',', ' ') else ', '
-					suffix = ','
+					prefix = ', ' if argspec[split] == ',' else ''
+					suffix = '' if argspec[split] == ',' else ', ' 
 			
 			else:  # Ok, we can do this a different way…
 				matches = list(self.STARSTARARGS.finditer(argspec))
