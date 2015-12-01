@@ -37,6 +37,10 @@ here = os.path.abspath(os.path.dirname(__file__))
 
 tests_require = ['pytest', 'pytest-cov', 'pytest-spec', 'pytest-flakes', 'pytest-cagoule']
 
+if 'ACCELERATED' not in os.environ or os.environ.get('ACCELERATED', '1') != '0':
+	tests_require.append('markupsafe')
+
+
 setup(
 	name = "cinje",
 	version = version,
