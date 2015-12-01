@@ -13,7 +13,7 @@ except ImportError:
 	try:
 		from html import escape as __escape
 	except:
-		from cgi import escape as escape
+		from cgi import escape as __escape
 	
 	def escape(value):
 		return __escape(unicode(value))
