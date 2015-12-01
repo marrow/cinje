@@ -21,11 +21,7 @@ def flush_template(context, declaration=None):
 	if {'text', 'dirty'}.issubset(context.flag):
 		yield declaration.clone(line='yield "".join(_buffer)')
 		
-		if py == 3:  # pragma: no cover
-			yield declaration.clone(line='_buffer.clear()')
-		else:  # pragma: no cover
-			context.flag.remove('text')  # This will force a new buffer to be constructed.
-		
+		context.flag.remove('text')  # This will force a new buffer to be constructed.
 		context.flag.remove('dirty')
 	
 	if declaration.stripped != 'yield':
