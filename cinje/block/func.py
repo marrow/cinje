@@ -8,8 +8,15 @@ from ..inline.flush import flush_template
 try:  # pragma: no cover
 	unicode
 	py = 2
-except:
+except:  # pragma: no cover
 	py = 3
+
+
+try:  # pragma: no cover
+	import sys.pypy_version_info
+	pypy = True
+except ImportError:  # pragma: no cover
+	pypy = False
 
 
 @Context.register
@@ -101,7 +108,7 @@ class Function(object):
 		
 		name = name.strip()
 		
-		if py == 3:
+		if py == 3 and not pypy:
 			argspec = self._optimize(context, argspec)
 		
 		# Reconstruct the line.
