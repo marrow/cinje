@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-from ..util import Line, Context
+from ..util import py, Line, Context
 
 
 @Context.register
@@ -32,8 +32,11 @@ class Module(object):
 			break
 		
 		# After any existing preamble, but before other imports, we inject our own.
-		yield Line(0, 'from __future__ import unicode_literals')
-		yield Line(0, '')
+		
+		if py == 2:
+			yield Line(0, 'from __future__ import unicode_literals')
+			yield Line(0, '')
+		
 		yield Line(0, 'import cinje')
 		yield Line(0, 'from cinje.helpers import escape as _escape, bless as _bless, iterate, xmlargs as _args, _interrupt, _json')
 		yield Line(0, '')
