@@ -24,7 +24,7 @@ def flush_template(context, declaration=None):
 		context.flag.remove('text')  # This will force a new buffer to be constructed.
 		context.flag.remove('dirty')
 	
-	if declaration.stripped != 'yield':
+	if declaration.stripped == 'yield':
 		yield declaration
 
 
