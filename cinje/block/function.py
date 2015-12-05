@@ -88,7 +88,7 @@ class Function(object):
 		if '->' in line:
 			argspec, _, flags = line.rpartition('->')
 			for flag in set(i.strip() for i in flags.split()):
-				if flag[0] == '!':
+				if flag[0] == '!' and flag[1:] in context.flag:
 					context.flag.remove(flag[1:])
 				else:
 					context.flag.add(flag)
