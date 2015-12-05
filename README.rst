@@ -541,11 +541,11 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
     :target: https://pypi.python.org/pypi/cinje
     :alt: Downloads per Week
 
-.. |mastercover| image:: http://img.shields.io/coveralls/marrow/cinje/master.svg?style=flat
+.. |mastercover| image:: http://img.shields.io/codecov/c/github/marrow/cinje/master.svg?style=flat
     :target: https://travis-ci.org/marrow/cinje
     :alt: Release Test Coverage
 
-.. |developcover| image:: http://img.shields.io/coveralls/marrow/cinje/develop.svg?style=flat
+.. |developcover| image:: http://img.shields.io/codecov/c/github/marrow/cinje/develop.svg?style=flat
     :target: https://travis-ci.org/marrow/cinje
     :alt: Development Test Coverage
 
