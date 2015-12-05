@@ -10,7 +10,9 @@ import sys
 
 from codecs import iterencode
 from inspect import isfunction, isclass
+from operator import methodcaller
 from collections import deque, namedtuple, Sized, Iterable
+from pkg_resources import iter_entry_points
 from xml.sax.saxutils import quoteattr
 
 try:  # pragma: no cover
@@ -406,29 +408,21 @@ class Context(object):
 	This is the primary entry point for translation.
 	"""
 	
-	__slots__ = ('input', 'scope', 'flag', '_handler', 'templates')
-	
-	handlers = []
+	__slots__ = ('input', 'scope', 'flag', '_handler', 'templates', 'handlers')
 	
 	def __init__(self, input):
 		self.input = Lines(input.decode('utf8') if hasattr(input, 'decode') else input)
 		self.scope = 0
 		self.flag = set()
 		self._handler = []
+		self.handlers = []
 		self.templates = []
+		
+		for translator in map(methodcaller('load'), iter_entry_points('cinje.translator')):
+			self.handlers.append(translator)
 	
 	def __repr__(self):
 		return "Context({!r}, {}, {})".format(self.input, self.scope, self.flag)
-	
-	@classmethod
-	def register(cls, handler):
-		"""Register a line transformer class with the processing context."""
-		
-		assert isclass(handler), "Must supply handler class for registration, not instance."
-		
-		cls.handlers.append(handler)
-		
-		return handler  # Allow certain types of chaining, i.e. use as a decorator.
 	
 	def prepare(self):
 		"""Prepare the ordered list of transformers and reset context state to initial."""

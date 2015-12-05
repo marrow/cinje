@@ -2,10 +2,9 @@
 
 from pprint import pformat
 
-from ..util import chunk, Line, Context, ensure_buffer
+from ..util import chunk, Line, ensure_buffer
 
 
-@Context.register
 class Text(object):
 	"""Identify and process contiguous blocks of template text."""
 	

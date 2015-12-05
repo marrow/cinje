@@ -1,9 +1,6 @@
 # encoding: utf-8
 
-from ..util import Context
 
-
-@Context.register
 class Code(object):
 	"""General code handler.
 	

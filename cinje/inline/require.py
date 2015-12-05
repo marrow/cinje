@@ -2,10 +2,9 @@
 
 from importlib import import_module
 
-from ..util import Context, ensure_buffer
+from ..util import ensure_buffer
 
 
-@Context.register
 class Require(object):
 	"""Include reusable components from other modules.
 	

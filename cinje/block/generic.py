@@ -3,7 +3,6 @@
 from ..util import Line, Context
 
 
-@Context.register
 class Generic(object):
 	"""Block-level passthrough.  Blocks must be terminated by ": end" markers.
 	

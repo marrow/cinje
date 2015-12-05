@@ -2,7 +2,7 @@
 
 import re
 
-from ..util import Line, Context
+from ..util import Line
 from ..inline.flush import flush_template
 
 try:  # pragma: no cover
@@ -19,7 +19,6 @@ except ImportError:  # pragma: no cover
 	pypy = False
 
 
-@Context.register
 class Function(object):
 	"""Proces function declarations within templates.
 	

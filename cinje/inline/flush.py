@@ -1,12 +1,6 @@
 # encoding: utf-8
 
-from ..util import Context, Line, ensure_buffer
-
-try:  # pragma: no cover
-	unicode
-	py = 2
-except:  # pragma: no cover
-	py = 3
+from ..util import Line, ensure_buffer, py
 
 
 def flush_template(context, declaration=None):
@@ -31,8 +25,6 @@ def flush_template(context, declaration=None):
 		yield declaration
 
 
-
-@Context.register
 class Flush(object):
 	"""Allow mid-stream flushing of the template buffer.
 	

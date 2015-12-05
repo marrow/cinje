@@ -1,9 +1,8 @@
 # encoding: utf-8
 
-from ..util import py, Line, Context
+from ..util import py, Line
 
 
-@Context.register
 class Module(object):
 	"""Module handler.
 	
