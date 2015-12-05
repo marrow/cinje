@@ -17,9 +17,6 @@ install: travis_retry .travis/install.sh
 
 script: tox
 
-after_success:
-  - coveralls
-
 notifications:
   irc:
     channels:
