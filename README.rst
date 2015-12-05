@@ -266,7 +266,7 @@ cinje                         Python                           Result
 HTML Attributes Replacement
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-	``#{<argspec>}`` → ``_args(<argspec>)``
+	``&{<argspec>}`` → ``_args(<argspec>)``
 
 A frequent pattern in reusable templates is to provide some method to emit key/value pairs, with defaults, as HTML or
 XML attributes.  To eliminate boilerplate cinje provides a replacement which handles this naturally and can help
