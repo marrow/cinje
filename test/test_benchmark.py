@@ -2,11 +2,10 @@
 
 from __future__ import unicode_literals
 
+import io
+import os.path
 import hashlib
-import base64
-import gzip
-
-import cinje
+import pytest
 
 from cinje import benchmark
 from cinje.util import s
@@ -15,6 +14,12 @@ from cinje.util import s
 # Let's just say, the end result is tremendously large.
 EXPECT = '04c074de62bad5d428f24b3610974c2096a8a0b6f13a3827d1267f3537c112e2'
 
+
+def test_benchmark_io_open():
+	a = io.open(os.path.join(os.path.dirname(__file__), '../cinje/benchmark.py'), mode='r', encoding='cinje').read()
+	assert 'def bigtable(' in a
+	env = dict()
+	exec(a, env)
 
 
 def test_benchmark_bigtable():
@@ -43,4 +48,3 @@ def test_benchmark_bigtable_fancy():
 	assert len(result) > 1
 	result = hashlib.sha256(s(result).encode('utf8')).hexdigest()
 	assert result == EXPECT
-
