@@ -83,15 +83,6 @@ class Function(object):
 		name, _, line = line.partition(' ')  # Split the function name.
 		
 		argspec = line
-		annotation = '' # "__Generator[yield_type, send_type, return_type]"
-		
-		if '->' in line:
-			argspec, _, flags = line.rpartition('->')
-			for flag in set(i.strip() for i in flags.split()):
-				if flag[0] == '!' and flag[1:] in context.flag:
-					context.flag.remove(flag[1:])
-				else:
-					context.flag.add(flag)
 		
 		name = name.strip()
 		
@@ -100,7 +91,7 @@ class Function(object):
 		
 		# Reconstruct the line.
 		
-		line = 'def ' + name + '(' + argspec + '):' + ((' -> ' + annotation) if annotation else '')
+		line = 'def ' + name + '(' + argspec + '):'
 		
 		# yield declaration.clone(line='@cinje.Function.prepare')  # This lets us do some work before and after runtime.
 		yield declaration.clone(line=line)
