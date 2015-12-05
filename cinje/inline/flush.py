@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-from ..util import Context, Line
+from ..util import Context, Line, ensure_buffer
 
 try:  # pragma: no cover
 	unicode
@@ -23,6 +23,9 @@ def flush_template(context, declaration=None):
 		
 		context.flag.remove('text')  # This will force a new buffer to be constructed.
 		context.flag.remove('dirty')
+		
+		for i in ensure_buffer(context, ):
+			yield i
 	
 	if declaration.stripped == 'yield':
 		yield declaration
