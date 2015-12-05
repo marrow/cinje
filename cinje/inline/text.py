@@ -72,15 +72,13 @@ class Text(object):
 					part = part[1:-1]
 				
 				yield Line(0, PREFIX + part + (')' if single else ','), (context.scope + (0 if single else 1)))
+				continue
 			
 			elif token == 'format':
 				raise NotImplementedError("Guru meditation. ")  # TODO: Need to think about that.
+				continue
 			
-			elif token != '':
-				yield Line(0, PREFIX + token + '(' + part + ')' + (')' if single else ','), (context.scope + (0 if single else 1)))
-			
-			else:
-				yield Line(0, PREFIX + '_escape(' + part + ')' + ('' if single else ','), (context.scope + (0 if single else 1)))
+			yield Line(0, PREFIX + token + '(' + part + ')' + (')' if single else ','), (context.scope + (0 if single else 1)))
 		
 		if not single:
 			yield Line(0, '))', (context.scope + 1))  # End the call to _buffer.extend()
