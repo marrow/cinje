@@ -1,5 +1,6 @@
 # encoding: utf-8
 
+import ast  # Tighten your belts...
 from pprint import pformat
 
 from ..util import chunk, Line, ensure_buffer
@@ -75,7 +76,18 @@ class Text(object):
 				continue
 			
 			elif token == 'format':
-				raise NotImplementedError("Guru meditation. ")  # TODO: Need to think about that.
+				# We need to split the expression defining the format string from the values to pass when formatting.
+				# We want to allow any Python expression, so we'll need to piggyback on Python's own parser in order
+				# to exploit the currently available syntax.  Apologies, this is probably the scariest thing in here.
+				split = -1
+				
+				try:
+					ast.parse(part)
+				except SyntaxError as e:  # We expect this, and catch it.  It'll have exploded after the first expr.
+					split = part.rfind(' ', 0, e.offset)
+				
+				token = '(' + part[:split].rstrip() + ').format'
+				part = part[split:].lstrip()
 			
 			yield Line(0, PREFIX + token + '(' + part + ')' + (')' if single else ','), (context.scope + (0 if single else 1)))
 		

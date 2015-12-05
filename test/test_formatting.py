@@ -1,39 +1,17 @@
 # encoding: utf-8
 
-import pytest
 from cinje.util import fragment, flatten
 
 
-
-def std():
-	from cinje.std import html as std
-	return std
-
-
-# {None: 'text', '${': '_escape', '#{': '_bless', '&{': '_args', '%{': 'format', '@{': '_json'}
-
-class TestNotImplementedFormatters(object):
-	def test_formatted_string(self):
-		with pytest.raises(NotImplementedError):
-			fragment('%{"{foo}" foo=27}')
-		
-		with pytest.raises(NotImplementedError):
-			fragment('%{"{0}" 27}')
-		
-		with pytest.raises(NotImplementedError):
-			fragment('%{format 27}', format="{0}")
-		
-		with pytest.raises(NotImplementedError):
-			fragment('%{format() 27}', format=lambda: "{0}")
-		
-		with pytest.raises(NotImplementedError):
-			fragment('%{format["first"] 27}', format=dict(first="{0}"))
-		
-		with pytest.raises(NotImplementedError):
-			fragment('%{format[0] 27}', format=["{0}"])
-
-
 class TestBasicFormatters(object):
+	def test_formatted_strings(self):
+		assert flatten(fragment('%{"{foo}" foo=27}')()) == '27\n'
+		assert flatten(fragment('%{"{0}" 27}')()) == '27\n'
+		assert flatten(fragment('%{format 27}', format="{0}")()) == '27\n'
+		assert flatten(fragment('%{format() 27}', format=lambda: "{0}")()) == '27\n'
+		assert flatten(fragment('%{format["first"] 27}', format=dict(first="{0}"))()) == '27\n'
+		assert flatten(fragment('%{format[0] 27}', format=["{0}"])()) == '27\n'
+	
 	def test_basic_text(self):
 		assert flatten(fragment('text')()) == "text\n"
 	
