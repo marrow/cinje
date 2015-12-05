@@ -322,6 +322,14 @@ reasons.  When MarkupSafe is *not* installed the replacements are passed through
 If, however, MarkupSafe *is* installed, then the replacements are escaped prior to formatting and additional
 functionality is available to make your objects HTML-formatting aware.  (See the MarkupSafe documentation.)
 
+JSON Object Replacement
+~~~~~~~~~~~~~~~~~~~~~~~
+
+	``@{<expr>}`` → ``_json(<expr>)``
+
+It is sometimes useful to pass data through a template to JavaScript. This will emit the JSON-serialized version of
+the expression result.
+
 
 Block Transformations
 ---------------------
