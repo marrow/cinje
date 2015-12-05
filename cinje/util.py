@@ -427,7 +427,7 @@ class Context(object):
 	__slots__ = ('input', 'scope', 'flag', '_handler', 'templates', 'handlers')
 	
 	def __init__(self, input):
-		self.input = Lines(input.decode('utf8') if hasattr(input, 'decode') else input)
+		self.input = Lines(input.decode('utf8') if isinstance(input, bytes) else input)
 		self.scope = 0
 		self.flag = set()
 		self._handler = []
