@@ -6,31 +6,13 @@ import codecs
 
 from encodings import utf_8 as utf8
 
-try:
-	from io import StringIO
-except:  # pragma: no cover
-	try:
-		from cStringIO import StringIO
-	except:
-		from StringIO import StringIO
-
-from .util import Context
-
-try:
-	bytes = bytes
-except:  # pragma: no cover
-	bytes = str
-
-try:
-	unicode = unicode
-except:  # pragma: no cover
-	unicode = str
+from .util import StringIO, bytes, str, Context
 
 
 def transform(input):
 	#__import__('pudb').set_trace()
 	translator = Context(input)
-	return '\n'.join(unicode(i) for i in translator.stream)
+	return '\n'.join(str(i) for i in translator.stream)
 
 
 def cinje_decode(input, errors='strict', final=True):

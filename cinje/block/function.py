@@ -2,21 +2,9 @@
 
 import re
 
-from ..util import Line
+from ..util import Line, py, pypy
 from ..inline.flush import flush_template
 
-try:  # pragma: no cover
-	unicode
-	py = 2
-except:  # pragma: no cover
-	py = 3
-
-
-try:  # pragma: no cover
-	import sys.pypy_version_info
-	pypy = True
-except ImportError:  # pragma: no cover
-	pypy = False
 
 
 class Function(object):

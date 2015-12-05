@@ -30,18 +30,34 @@ except ImportError:  # pragma: no cover
 # code.  Handily, even built-in labels are not sacrosanct; they can be easily assigned to and re-mapped.
 # 
 
-try:  # pragma: no cover
+try:  # Python 2
 	from types import StringTypes as stringy
+	
+	try:
+		from cStringIO import StringIO
+	except:
+		from StringIO import StringIO
+	
 	bytes = str
 	str = unicode
 	py = 2
 	reduce = reduce
-except:
+
+except:  # Python 3
+	from io import StringIO
+	
 	stringy = str
 	bytes = bytes
 	str = str
 	py = 3
 
+# There are some additional complications for the Pypy runtime.
+
+try:
+	import sys.pypy_version_info
+	pypy = True
+except ImportError:
+	pypy = False
 
 # ## Type Definitions
 
