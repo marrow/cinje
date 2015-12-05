@@ -75,7 +75,7 @@ class Text(object):
 				yield Line(0, PREFIX + part + (')' if single else ','), (context.scope + (0 if single else 1)))
 			
 			elif token == 'format':
-				pass  # TODO: Need to think about that.
+				raise NotImplementedError("Guru meditation. ")  # TODO: Need to think about that.
 			
 			elif token != '':
 				yield Line(0, PREFIX + token + '(' + part + ')' + (')' if single else ','), (context.scope + (0 if single else 1)))
