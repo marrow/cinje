@@ -121,8 +121,3 @@ class Function(object):
 		if 'text' in context.flag:
 			context.templates.append(name)
 			context.flag.remove('text')
-	
-	@classmethod
-	def prepare(cls, fn):
-		# Decorator hook.
-		return fn
