@@ -59,7 +59,7 @@ Contents
 What is cinje?
 ==============
 
-cinje is a modern, elegant template engine constructed as a Python domain specific language (DSL) that integrates into
+Cinje is a modern, elegant template engine constructed as a Python domain specific language (DSL) that integrates into
 your applications as any other Python code would: by importing them.  Your templates are transformed from their source
 into clean, straightforward, and understandable Python source prior to the Python interpreter compiling it to bytecode.
 
@@ -69,7 +69,8 @@ What kind of name is cinje?!
 It's a word from the constructed language `Lojban <http://www.lojban.org/>`_.  A combination of Hindi "śikana", English
 "wrinkle", and Chinese "zhé".  It translates as "is a wrinkle/crease/fold [shape] in".  It's also a Hungarian noun
 representing the posessive third-person singular form of "cin", meaning "tin".  The "c" makes a "sh" sound, the "j"
-makes a "jy" sound almost like the "is" in "vision".  Correct use does not capitalize the name.
+makes a "jy" sound almost like the "is" in "vision".  Correct use does not capitalize the name except at the beginning
+of sentences.
 
 Rationale and Goals
 -------------------
@@ -122,6 +123,10 @@ If you add ``cinje`` to the ``install_requires`` argument of the call to ``setup
 library is installed.  We recommend using "less than" version numbers to ensure there are no unintentional
 side-effects when updating.  Use ``cinje<1.1`` to get all bugfixes for the current release, and
 ``cinje<2.0`` to get bugfixes and feature updates while ensuring that large breaking changes are not installed.
+
+While cinje does not have any hard dependencies on any other package, it is **strongly** recommended that applications
+using cinje also install the ``markupsafe`` package to provide more efficient string escaping and some additional
+functionality.
 
 
 Development Version
@@ -179,16 +184,20 @@ Primarily for testing small chunks of template template code in actual unit test
 * ``cinje.flatten(input, file=None, encoding=None, errors='strict')`` Return a flattened representation of a cinje
   chunk stream.
   
-  This has several modes of operation.  If no `file` argument is given, output will be returned as a string.
-  The type of string will be determined by the presence of an `encoding`; if one is given the returned value is a
-  binary string, otherwise the native unicode representation.  If a `file` is present, chunks will be written
-  iteratively through repeated calls to `file.write()`, and the amount of data (characters or bytes) written
-  returned.  The type of string written will be determined by `encoding`, just as the return value is when not
-  writing to a file-like object.  The `errors` argument is passed through when encoding.
+  This has several modes of operation.  If no ``file`` argument is given, output will be returned as a string.
+  The type of string will be determined by the presence of an ``encoding``; if one is given the returned value is a
+  binary string, otherwise the native unicode representation.  If a ``file`` is present, chunks will be written
+  iteratively through repeated calls to ``file.write()``, and the amount of data (characters or bytes) written
+  returned.  The type of string written will be determined by ``encoding``, just as the return value is when not
+  writing to a file-like object.  The ``errors`` argument is passed through when encoding.
   
   We can highly recommend using the various stremaing IO containers available in the
   `io <https://docs.python.org/3/library/io.html>`_ module, though
   `tempfile <https://docs.python.org/3/library/tempfile.html>`_ classes are also quite useful.
+
+You can always also transform arbitrary template source by passing it through ``.decode('cinje')``, which would return
+the resulting transformed source code.
+
 
 Basic Syntax
 ============
@@ -204,6 +213,7 @@ helper function.
 Text lines can have a "continuation" marker (``\``) on the end to denote that no newline should be emitted there.
 
 We use a shell-like argument format for illustrating the syntax.
+
 
 Variable Replacement
 --------------------
@@ -311,6 +321,7 @@ reasons.  When MarkupSafe is *not* installed the replacements are passed through
 If, however, MarkupSafe *is* installed, then the replacements are escaped prior to formatting and additional
 functionality is available to make your objects HTML-formatting aware.  (See the MarkupSafe documentation.)
 
+
 Block Transformations
 ---------------------
 
@@ -323,7 +334,6 @@ Module Scope
 
 This is an automatic transformer triggered by the start of a source file.  It automatically adds a few imports to the
 top of your file to import the required helpers from cinje.
-
 
 Function Declaration
 ~~~~~~~~~~~~~~~~~~~~
@@ -347,7 +357,6 @@ You do not need the extraneous trailing colon to denote the end of the declarati
 parenthesis around the argument specification.  The optimization keyword-only arguments will be added automatically to
 the argument specification you give on non-Pypy Python 3 versions.  It will gracefully handle integration into your
 arglist even if your arglist already includes the keyword-only marker, or combinations of ``*args`` or ``**kw``.
-
 
 Flow Control
 ~~~~~~~~~~~~
@@ -435,7 +444,7 @@ on method calls, the following::
 
 	<meta&{name=name, content=content}>
 
-Is translated, roughly, into the following single outer call and three nested calls::
+Is transformed, roughly, into the following single outer call and three nested calls::
 
 	__w((
 		_bless('<meta'),
@@ -502,7 +511,7 @@ Lastly, there is a quick shortcut for consuming a template function and injectin
 
 	: use <expr>[ <argspec>]
 
-And directly translates to::
+And directly transforms to::
 
 	__w(<expr>(<argspec>))
 
