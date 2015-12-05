@@ -44,9 +44,8 @@ except:
 # ## Type Definitions
 
 
+# A tuple representing a single step of fancy iteration.
 Iteration = namedtuple('Iteration', ['first', 'last', 'index', 'total', 'value'])
-Iteration.__doc__ = """A tuple representing a single step of fancy iteration."""
-
 
 
 # ## Simple Utility Functions
