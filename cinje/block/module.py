@@ -24,7 +24,7 @@ class Module(object):
 		
 		for line in input:
 			if not line.stripped or line.stripped[0] == '#':
-				if not line.stripped.startswith('##'):
+				if not line.stripped.startswith('##') and 'coding:' not in line.stripped:
 					yield line
 				continue
 			
