@@ -54,7 +54,7 @@ except:  # Python 3
 # There are some additional complications for the Pypy runtime.
 
 try:
-	import sys.pypy_version_info
+	from sys import pypy_version_info
 	pypy = True
 except ImportError:
 	pypy = False
