@@ -41,6 +41,8 @@ if 'ACCELERATED' not in os.environ or os.environ.get('ACCELERATED', '1') != '0':
 	tests_require.append('markupsafe')
 
 
+# # Entry Point
+
 setup(
 	name = "cinje",
 	version = version,
@@ -75,6 +77,8 @@ setup(
 	packages = find_packages(exclude=['test', 'example', 'benchmark']),
 	include_package_data = True,
 	
+	# ## Dependency Declaration
+	
 	install_requires = [],
 	
 	extras_require = dict(
@@ -83,10 +87,25 @@ setup(
 	
 	tests_require = tests_require,
 	
+	# ## Plugin Registration
+	
 	entry_points = {
-				#'web.template': [
-				#		'cinje = cinje.engine:CinjeEngine',
-				#	]
+				'cinje.translator': [
+						# ### Block Translators
+						'function = cinje.block.function:Function',
+						'generic = cinje.block.generic:Generic',
+						'module = cinje.block.module:Module',
+						'using = cinje.block.using:Using',
+						
+						# ### Inline Translators
+						'blank = cinje.inline.blank:Blank',
+						'code = cinje.inline.code:Code',
+						'comment = cinje.inline.comment:Comment',
+						'flush = cinje.inline.flush:Flush',
+						'require = cinje.inline.require:Require',
+						'text = cinje.inline.text:Text',
+						'use = cinje.inline.use:Use',
+					]
 			},
 	
 	zip_safe = False,
