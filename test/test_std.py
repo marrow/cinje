@@ -1,6 +1,5 @@
 # encoding: utf-8
 
-import cinje; cinje  # avoid "unused import" complaint
 import pytest
 from cinje.util import flatten
 
