@@ -107,7 +107,7 @@ def fragment(string, name="anonymous", **context):
 	**Note:** Use of this function is discouraged everywhere except tests, as no caching is implemented at this time.
 	
 	Only one function may be declared, either manually, or automatically. If automatic defintition is chosen the
-	resulting function takes no arguments.  Additional keyword arguments are handled as global variables.
+	resulting function takes no arguments.  Additional keyword arguments are passed through as global variables.
 	"""
 	
 	if ": def" in string or ":def" in string:

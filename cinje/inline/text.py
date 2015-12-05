@@ -86,7 +86,7 @@ class Text(object):
 				except SyntaxError as e:  # We expect this, and catch it.  It'll have exploded after the first expr.
 					split = part.rfind(' ', 0, e.offset)
 				
-				token = part[:split].rstrip() + '.format'
+				token = '_bless(' + part[:split].rstrip() + ').format'
 				part = part[split:].lstrip()
 			
 			yield Line(0, PREFIX + token + '(' + part + ')' + (')' if single else ','), (context.scope + (0 if single else 1)))
