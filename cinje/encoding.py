@@ -38,7 +38,8 @@ class CinjeStreamReader(utf8.StreamReader):
 
 
 def cinje_search_function(name):
-	if name != 'cinje':
+	# I have absolutely no idea how to reliably test this scenario, other than artificially.
+	if name != 'cinje':  # pragma: no cover
 		return None
 	
 	return codecs.CodecInfo(
