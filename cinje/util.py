@@ -89,8 +89,8 @@ def flatten(input, file=None, encoding=None, errors='strict'):
 	if encoding:  # Automatically, and iteratively, encode the text if requested.
 		input = iterencode(input, encoding, errors=errors)
 	
-	if not file:  # Exit early if we're not writing to a file.
-		return ''.join(input)
+	if file is None:  # Exit early if we're not writing to a file.
+		return b''.join(input) if encoding else ''.join(input)
 	
 	counter = 0
 	
