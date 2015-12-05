@@ -35,22 +35,23 @@ Contents
       2. `Unescaped Replacement`_
       3. `HTML Attributes Replacement`_
       4. `Formatted Replacement`_
+      5. `JSON Object Replacement`_
    
    2. `Block Transformations`_
    
       1. `Module Scope`_
       2. `Function Declaration`_
-      3. `Conditional Flow`_
-      4. `Iteration`_
-      5. `Inheritance`_
-
+      3. `Flow Control`_
+   
    3. `Inline Transformations`_
    
       1. `Code`_
       2. `Comments`_
       3. `Flush`_
       4. `Text`_
-
+   
+   4. `Inheritance`_
+  
 5. `Version History`_
 6. `License`_
 
@@ -456,7 +457,7 @@ See the Variable Replacement section for details on the replacement options that
 
 
 Inheritance
-~~~~~~~~~~~
+-----------
 
 Due to the streaming and "native Python code" natures of cinje, template inheritance is generally handled through
 the standard definition of functions, and passing of those first-class objects around.  The most common case, where
