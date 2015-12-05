@@ -35,8 +35,8 @@ try:  # Python 2
 	
 	try:
 		from cStringIO import StringIO
-	except:
-		from StringIO import StringIO
+	except:  # pragma: no cover
+		from StringIO import StringIO  # This never really happens.  Still, nice to be defensive.
 	
 	bytes = str
 	str = unicode
