@@ -4,7 +4,6 @@ import pytest
 import os.path
 
 from cinje.inline.require import Require
-from cinje.util import s
 
 
 class TestInlineRequire(object):

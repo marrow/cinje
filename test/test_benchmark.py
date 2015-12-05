@@ -8,7 +8,7 @@ import hashlib
 import pytest
 
 from cinje import benchmark
-from cinje.util import s
+from cinje.util import flatten
 
 
 # Let's just say, the end result is tremendously large.
@@ -25,26 +25,26 @@ def test_benchmark_io_open():
 def test_benchmark_bigtable():
 	result = list(benchmark.bigtable())
 	assert len(result) == 1
-	result = hashlib.sha256(s(result).encode('utf8')).hexdigest()
+	result = hashlib.sha256(flatten(result).encode('utf8')).hexdigest()
 	assert result == EXPECT
 
 
 def test_benchmark_bigtable_unsafe():
 	result = list(benchmark.bigtable_unsafe())
 	assert len(result) == 1
-	result = hashlib.sha256(s(result).encode('utf8')).hexdigest()
+	result = hashlib.sha256(flatten(result).encode('utf8')).hexdigest()
 	assert result == EXPECT
 
 
 def test_benchmark_bigtable_stream():
 	result = list(benchmark.bigtable_stream())
 	assert len(result) > 1
-	result = hashlib.sha256(s(result).encode('utf8')).hexdigest()
+	result = hashlib.sha256(flatten(result).encode('utf8')).hexdigest()
 	assert result == EXPECT
 
 
 def test_benchmark_bigtable_fancy():
 	result = list(benchmark.bigtable_fancy())
 	assert len(result) > 1
-	result = hashlib.sha256(s(result).encode('utf8')).hexdigest()
+	result = hashlib.sha256(flatten(result).encode('utf8')).hexdigest()
 	assert result == EXPECT

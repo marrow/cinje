@@ -5,7 +5,7 @@ import json
 import os.path
 
 from cinje.inline.use import Use
-from cinje.util import s
+from cinje.util import flatten, fragment
 
 
 def producer(*args, **kw):
@@ -14,18 +14,15 @@ def producer(*args, **kw):
 
 @pytest.fixture
 def tmpl():
-	env = dict()
-	src = b': def consumer arg, *args, **kw\n\t: use arg *args, **kw'.decode('cinje')
-	exec(src, env)
-	return env['consumer']
+	return fragment(': def consumer arg, *args, **kw\n\t: use arg *args, **kw')
 
 
 class TestInlineUse(object):
 	def test_simple(self, tmpl):
-		assert s(tmpl(producer)) == '\n{}'
+		assert flatten(tmpl(producer)) == '\n{}'
 	
 	def test_args(self, tmpl):
-		assert s(tmpl(producer, 'foo', 'bar')) == "foo, bar\n{}"
+		assert flatten(tmpl(producer, 'foo', 'bar')) == "foo, bar\n{}"
 	
 	def test_kwargs(self, tmpl):
-		assert s(tmpl(producer, name='foo', occupation='bar')) == '\n{"name": "foo", "occupation": "bar"}'
+		assert flatten(tmpl(producer, name='foo', occupation='bar')) == '\n{"name": "foo", "occupation": "bar"}'

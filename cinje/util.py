@@ -8,6 +8,7 @@ from __future__ import unicode_literals
 
 import sys
 
+from codecs import iterencode
 from inspect import isfunction, isclass
 from collections import deque, namedtuple, Sized, Iterable
 from xml.sax.saxutils import quoteattr
@@ -19,12 +20,20 @@ except ImportError:  # pragma: no cover
 
 
 # ## Python Cross-Compatibility
+# 
+# These allow us to detect relevant version differences for code generation, and overcome some of the minor
+# differences in labels between Python 2 and Python 3 compatible runtimes.
+# 
+# The differences, in practice, are minor, and are easily overcome through a small block of version-dependant
+# code.  Handily, even built-in labels are not sacrosanct; they can be easily assigned to and re-mapped.
+# 
 
 try:  # pragma: no cover
 	from types import StringTypes as stringy
 	bytes = str
 	str = unicode
 	py = 2
+	reduce = reduce
 except:
 	stringy = str
 	bytes = bytes
@@ -36,17 +45,71 @@ except:
 
 
 Iteration = namedtuple('Iteration', ['first', 'last', 'index', 'total', 'value'])
+Iteration.__doc__ = """A tuple representing a single step of fancy iteration."""
 
 
 
 # ## Simple Utility Functions
 
 
-def s(input, encoding=None):
-	if encoding:
-		return ''.join(i for i in input if i is not None).encode(encoding)
+def flatten(input, file=None, encoding=None, errors='strict'):
+	"""Return a flattened representation of a cinje chunk stream.
 	
-	return ''.join(i for i in input if i is not None)
+	This has several modes of operation.  If no `file` argument is given, output will be returned as a string.
+	The type of string will be determined by the presence of an `encoding`; if one is given the returned value is a
+	binary string, otherwise the native unicode representation.  If a `file` is present, chunks will be written
+	iteratively through repeated calls to `file.write()`, and the amount of data (characters or bytes) written
+	returned.  The type of string written will be determined by `encoding`, just as the return value is when not
+	writing to a file-like object.  The `errors` argument is passed through when encoding.
+	
+	We can highly recommend using the various stremaing IO containers available in the
+	[`io`](https://docs.python.org/3/library/io.html) module, though
+	[`tempfile`](https://docs.python.org/3/library/tempfile.html) classes are also quite useful.
+	"""
+	
+	input = (i for i in input if i)  # Omits `None` (empty wrappers) and empty chunks.
+	
+	if encoding:  # Automatically, and iteratively, encode the text if requested.
+		input = iterencode(input, encoding, errors=errors)
+	
+	if not file:  # Exit early if we're not writing to a file.
+		return ''.join(input)
+	
+	counter = 0
+	
+	for chunk in input:
+		file.write(chunk)
+		counter += len(chunk)
+	
+	return counter
+
+
+def fragment(string, name="anonymous", **context):
+	"""Translate a template fragment into a callable function.
+	
+	**Note:** Use of this function is discouraged everywhere except tests, as no caching is implemented at this time.
+	
+	Only one function may be declared, either manually, or automatically. If automatic defintition is chosen the
+	resulting function takes no arguments.  Additional keyword arguments are handled as global variables.
+	"""
+	
+	if ": def" in string or ":def" in string:
+		code = string.encode('utf8').decode('cinje')
+		name = None
+	else:
+		code = ": def {name}\n\n{string}\n\n: end".format(
+				name = name,
+				string = string,
+			).encode('utf8').decode('cinje')
+	
+	environ = dict(context)
+	
+	exec(code, environ)
+	
+	if name is None:  # We need to dig it out of the `___tmpl__` list.
+		return environ[environ['__tmpl__'][-1]]  # Super secret sauce: you _can_ define more than one function...
+	
+	return environ[name]
 
 
 def interruptable(iterable):
