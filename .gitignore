@@ -27,3 +27,5 @@ htmlcov
 
 # Mac
 .DS_Store
+
+coverage.xml
