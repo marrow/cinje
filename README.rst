@@ -192,7 +192,7 @@ Primarily for testing small chunks of template template code in actual unit test
   returned.  The type of string written will be determined by ``encoding``, just as the return value is when not
   writing to a file-like object.  The ``errors`` argument is passed through when encoding.
   
-  We can highly recommend using the various stremaing IO containers available in the
+  We can highly recommend using the various streaming IO containers available in the
   `io <https://docs.python.org/3/library/io.html>`_ module, though
   `tempfile <https://docs.python.org/3/library/tempfile.html>`_ classes are also quite useful.
 
