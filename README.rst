@@ -579,11 +579,11 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
     :alt: Downloads per Week
 
 .. |mastercover| image:: http://img.shields.io/codecov/c/github/marrow/cinje/master.svg?style=flat
-    :target: https://travis-ci.org/marrow/cinje
+    :target: https://codecov.io/github/marrow/cinje?branch=master
     :alt: Release Test Coverage
 
 .. |developcover| image:: http://img.shields.io/codecov/c/github/marrow/cinje/develop.svg?style=flat
-    :target: https://travis-ci.org/marrow/cinje
+    :target: https://codecov.io/github/marrow/cinje?branch=develop
     :alt: Development Test Coverage
 
 .. |issuecount| image:: http://img.shields.io/github/issues/marrow/cinje.svg?style=flat
