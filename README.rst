@@ -167,7 +167,7 @@ with the the encoding declaration::
 
     # encoding: cinje
 
-This tells Python to process the file using the ``cinje`` codec prior to interpreting the code.  cinje itself assumes
+This tells Python to process the file using the ``cinje`` codec prior to interpreting the code.  Cinje itself assumes
 the file is actually UTF-8 encoded.
 
 Calling a cinje function is identical to calling a generator function, as all cinje template functions—those containing
