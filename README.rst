@@ -565,7 +565,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
     :target: https://github.com/marrow/cinje/subscription
     :alt: Subscribe to project activity on Github.
 
-.. |ghstar| image:: https://img.shields.io/github/stars/badges/shields.svg?style=social&label=Star
+.. |ghstar| image:: https://img.shields.io/github/stars/marrow/cinje.svg?style=social&label=Star
     :target: https://github.com/marrow/cinje/subscription
     :alt: Star this project on Github.
 
