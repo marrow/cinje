@@ -1,6 +1,7 @@
 # encoding: utf-8
 
 import ast  # Tighten your belts...
+
 from pprint import pformat
 
 from ..util import chunk, Line, ensure_buffer
@@ -19,31 +20,46 @@ class Text(object):
 	def __call__(self, context):
 		input = context.input
 		
-		line = input.next()
-		buffer = []
-		
 		# Make sure we have a buffer to write to.
 		for i in ensure_buffer(context):
 			yield i
 		
-		# Gather contiguous (uninterrupted) lines of template text.
-		while line.kind == 'text' or ( line.kind == 'comment' and line.stripped.startswith('#{') ):
-			buffer.append(line.line.rstrip().rstrip('\\') + ('' if line.continued else '\n'))
-			try:
-				line = input.next()
-			except StopIteration:
-				line = None
-				break
+		def gather():
+			line = input.next()
+			lead = True
+			buffer = []
+			
+			# Gather contiguous (uninterrupted) lines of template text.
+			while line.kind == 'text':
+				value = line.line.rstrip().rstrip('\\') + ('' if line.continued else '\n')
+				
+				if lead and line.stripped:
+					yield line.number, value
+					lead = False
+				
+				elif not lead:
+					if line.stripped:
+						for buf in buffer:
+							yield buf
+						
+						buffer = []
+						yield line.number, value
+					
+					else:
+						buffer.append((line.number, value))
+				
+				try:
+					line = input.next()
+				except StopIteration:
+					line = None
+					break
+				
+			if line:
+				input.push(line)  # Put the last line back, as it won't be a text line.
 		
-		if line:
-			input.push(line)  # Put the last line back, as it won't be a text line.
+		input.push(Line(0, ''))  # For code cleanlieness reasons, add some whitespace before a new block.
 		
-		# Eliminate trailing blank lines.
-		while buffer and not buffer[-1].strip():
-			del buffer[-1]
-			input.push(Line(0, ''))
-		
-		text = "".join(buffer)
+		text = "".join(i[1] for i in gather())
 		
 		# Track that the buffer will have content moving forward.  Used for conditional flushing.
 		if text:

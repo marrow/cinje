@@ -1,5 +1,8 @@
 # encoding: utf-8
 
+from pprint import pformat
+from collections import deque
+
 from ..util import py, Line
 
 
@@ -50,5 +53,17 @@ class Module(object):
 			yield Line(0, '')
 			yield Line(0, '__tmpl__.extend(["' + '", "'.join(context.templates) + '"])')
 			context.templates = []
+		
+		# Snapshot the line number mapping.
+		# TODO: Run-length encode the line number deltas, 'cause damn, this is a lot of data.
+		mapping = deque(context.mapping)
+		mapping.reverse()
+		
+		mapping = deque(pformat(list(mapping), indent=0, width=105, compact=True).split('\n'))
+		
+		yield Line(0, '')
+		yield Line(0, '__mapping__ = ' + mapping.popleft())
+		for line in mapping:
+			yield Line(0, line)
 		
 		context.flag.remove('init')

@@ -320,7 +320,7 @@ class Line(object):
 		super(Line, self).__init__()
 	
 	def process(self):
-		if self.stripped.startswith('#'):
+		if self.stripped.startswith('#') and not self.stripped.startswith('#{'):
 			self.kind = 'comment'
 		elif self.stripped.startswith(':'):
 			self.kind = 'code'
@@ -434,7 +434,7 @@ class Context(object):
 	This is the primary entry point for translation.
 	"""
 	
-	__slots__ = ('input', 'scope', 'flag', '_handler', 'templates', 'handlers')
+	__slots__ = ('input', 'scope', 'flag', '_handler', 'templates', 'handlers', 'mapping')
 	
 	def __init__(self, input):
 		self.input = Lines(input.decode('utf8') if isinstance(input, bytes) else input)
@@ -443,6 +443,7 @@ class Context(object):
 		self._handler = []
 		self.handlers = []
 		self.templates = []
+		self.mapping = None
 		
 		for translator in map(methodcaller('load'), iter_entry_points('cinje.translator')):
 			self.handlers.append(translator)
@@ -453,6 +454,7 @@ class Context(object):
 	def prepare(self):
 		"""Prepare the ordered list of transformers and reset context state to initial."""
 		self.scope = 0
+		self.mapping = deque([0])
 		self._handler = [i() for i in sorted(self.handlers, key=lambda handler: handler.priority)]
 	
 	@property
@@ -463,7 +465,18 @@ class Context(object):
 		"""
 		
 		if 'init' not in self.flag:
+			root = True
 			self.prepare()
+		else:
+			root = False
+		
+		# Track which lines were generated in response to which lines of source code.
+		# The end result is that there is one entry here for every line emitted, each integer representing the source
+		# line number that triggered it.  If any lines are returned with missing line numbers, they're inferred from
+		# the last entry already in the list.
+		# Fun fact: this list is backwards; we optimize by using a deque and appending to the left edge. this updates
+		# the head of a linked list; the whole thing needs to be reversed to make sense.
+		mapping = self.mapping
 		
 		for line in self.input:
 			handler = self.classify(line)
@@ -476,6 +489,8 @@ class Context(object):
 			self.input.push(line)  # Put it back so it can be consumed by the handler.
 			
 			for line in handler(self):  # This re-indents the code to match, if missing explicit scope.
+				if root: mapping.appendleft(line.number or mapping[0])  # Track source line number.
+				
 				if line.scope is None:
 					line = line.clone(scope=self.scope)
 				
