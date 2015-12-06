@@ -59,7 +59,7 @@ class Module(object):
 		mapping = deque(context.mapping)
 		mapping.reverse()
 		
-		mapping = deque(pformat(list(mapping), indent=0, width=105, compact=True).split('\n'))
+		mapping = deque(pformat(list(mapping), indent=0, width=105).split('\n'))
 		
 		yield Line(0, '')
 		yield Line(0, '__mapping__ = ' + mapping.popleft())
