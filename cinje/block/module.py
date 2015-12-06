@@ -3,7 +3,7 @@
 from __future__ import unicode_literals
 
 from zlib import compress, decompress
-from base64 import b85encode, b85decode
+from base64 import b64encode, b64decode
 from pprint import pformat
 from collections import deque
 
@@ -20,7 +20,7 @@ def red(numbers):
 		deltas.append(value - line)
 		line = value
 	
-	return b85encode(compress(b''.join(chr(i).encode('latin1') for i in deltas))).decode('latin1')
+	return b64encode(compress(b''.join(chr(i).encode('latin1') for i in deltas))).decode('latin1')
 
 
 
