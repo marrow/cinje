@@ -561,7 +561,7 @@ WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGE
 COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-.. |ghwatch| image:: https://img.shields.io/github/watchers/badges/shields.svg?style=social&label=Watch
+.. |ghwatch| image:: https://img.shields.io/github/watchers/marrow/cinje.svg?style=social&label=Watch
     :target: https://github.com/marrow/cinje/subscription
     :alt: Subscribe to project activity on Github.
 
@@ -569,7 +569,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
     :target: https://github.com/marrow/cinje/subscription
     :alt: Star this project on Github.
 
-.. |ghfork| image:: https://img.shields.io/github/forks/badges/shields.svg?style=social&label=Fork
+.. |ghfork| image:: https://img.shields.io/github/forks/marrow/cinje.svg?style=social&label=Fork
     :target: https://github.com/marrow/cinje/fork
     :alt: Fork this project on Github.
 
@@ -597,7 +597,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
     :target: https://requires.io/github/marrow/cinje/requirements/?branch=develop
     :alt: Status of development dependencies.
 
-.. |issuecount| image:: http://img.shields.io/github/issues/marrow/cinje.svg?style=flat
+.. |issuecount| image:: http://img.shields.io/github/issues-raw/marrow/cinje.svg?style=flat
     :target: https://github.com/marrow/cinje/issues
     :alt: Github Issues
 
