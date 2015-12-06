@@ -602,7 +602,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
     :alt: Github Issues
 
 .. |ghsince| image:: https://img.shields.io/github/commits-since/marrow/cinje/1.0.svg
-    :target: 
+    :target: https://github.com/marrow/cinje/commits/develop
     :alt: Changes since last release.
 
 .. |ghtag| image:: https://img.shields.io/github/tag/marrow/cinje.svg
