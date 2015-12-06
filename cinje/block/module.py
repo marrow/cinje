@@ -1,9 +1,27 @@
 # encoding: utf-8
 
+from __future__ import unicode_literals
+
+from gzip import compress, decompress
+from base64 import b85encode, b85decode
 from pprint import pformat
 from collections import deque
 
-from ..util import py, Line
+from ..util import py, Line, iterate
+
+
+def red(numbers):
+	"""Encode the deltas to reduce entropy."""
+	
+	line = 0
+	deltas = []
+	
+	for value in numbers:
+		deltas.append(value - line)
+		line = value
+	
+	return b85encode(compress(b''.join(chr(i).encode('latin1') for i in deltas))).decode('latin1')
+
 
 
 class Module(object):
@@ -55,15 +73,14 @@ class Module(object):
 			context.templates = []
 		
 		# Snapshot the line number mapping.
-		# TODO: Run-length encode the line number deltas, 'cause damn, this is a lot of data.
 		mapping = deque(context.mapping)
 		mapping.reverse()
 		
-		mapping = deque(pformat(list(mapping), indent=0, width=105).split('\n'))
-		
 		yield Line(0, '')
-		yield Line(0, '__mapping__ = ' + mapping.popleft())
-		for line in mapping:
-			yield Line(0, line)
+		
+		if __debug__:
+			yield Line(0, '__mapping__ = [' + ','.join(str(i) for i in mapping) + ']')
+		
+		yield Line(0, '__gzmapping__ = rb"""' + red(mapping) + '"""')
 		
 		context.flag.remove('init')
