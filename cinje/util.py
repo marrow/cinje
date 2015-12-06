@@ -68,6 +68,19 @@ Iteration = namedtuple('Iteration', ['first', 'last', 'index', 'total', 'value']
 
 # ## Simple Utility Functions
 
+def stream(input, encoding=None, errors='strict'):
+	"""Safely iterate a template generator, ignoring ``None`` values and optionally stream encoding.
+	
+	Used internally by ``cinje.flatten``, this allows for easy use of a template generator as a WSGI body.
+	"""
+	
+	input = (i for i in input if i)  # Omits `None` (empty wrappers) and empty chunks.
+	
+	if encoding:  # Automatically, and iteratively, encode the text if requested.
+		input = iterencode(input, encoding, errors=errors)
+	
+	return input
+
 
 def flatten(input, file=None, encoding=None, errors='strict'):
 	"""Return a flattened representation of a cinje chunk stream.
@@ -84,10 +97,7 @@ def flatten(input, file=None, encoding=None, errors='strict'):
 	[`tempfile`](https://docs.python.org/3/library/tempfile.html) classes are also quite useful.
 	"""
 	
-	input = (i for i in input if i)  # Omits `None` (empty wrappers) and empty chunks.
-	
-	if encoding:  # Automatically, and iteratively, encode the text if requested.
-		input = iterencode(input, encoding, errors=errors)
+	input = stream(input, encoding, errors)
 	
 	if file is None:  # Exit early if we're not writing to a file.
 		return b''.join(input) if encoding else ''.join(input)

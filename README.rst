@@ -196,6 +196,10 @@ Primarily for testing small chunks of template template code in actual unit test
   `io <https://docs.python.org/3/library/io.html>`_ module, though
   `tempfile <https://docs.python.org/3/library/tempfile.html>`_ classes are also quite useful.
 
+* ``cinje.stream(input, encoding=None, errors='strict')`` Safely iterate a template generator, ignoring ``None``
+  values and optionally stream encoding.  Used internally by ``cinje.flatten``, this allows for easy use of a template
+  generator as a WSGI body.
+
 You can always also transform arbitrary template source by passing it through ``.decode('cinje')``, which would return
 the resulting transformed source code.
 
