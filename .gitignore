@@ -19,9 +19,13 @@ pip-log.txt
 # Unit test / coverage reports
 .coverage
 .tox
+.cache
+htmlcov
 
 # Translations
 *.mo
 
 # Mac
 .DS_Store
+
+coverage.xml

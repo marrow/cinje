@@ -10,7 +10,7 @@
 <table>
     : for row in table
     <tr>
-        : for key, value in row.items()
+        : for key, value in sorted(row.items())
         <td>${ key }</td><td>#{ value }</td>
         : end
     </tr>
@@ -26,7 +26,7 @@
 <table>
     : for row in table
     <tr>
-        : for key, value in row.items()
+        : for key, value in sorted(row.items())
         <td>${ key }</td><td>#{ value }</td>
         : end
     </tr>
@@ -41,7 +41,7 @@
 <table>
     : for i, row in enumerate(table)
     <tr>
-        : for key, value in row.items()
+        : for key, value in sorted(row.items())
         <td>${ key }</td><td>#{ value }</td>
         : end
         : if not (i % frequency)
@@ -59,8 +59,8 @@
 <table>
     : for first, last, i, total, row in iterate(table)
     <tr>
-        : for key, value in row.items()
-        <td&{class_="first" if first else ("last" if last else None)}>${ key }</td><td>#{ value }</td>
+        : for key, value in sorted(row.items())
+        <td>${ key }</td><td>#{ value }</td>
         : end
         : if not (i % frequency)
             : flush

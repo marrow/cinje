@@ -10,7 +10,7 @@ from pygments.formatters import Terminal256Formatter
 
 
 def main():
-	with open('../cinje/std/html.py', 'rb') as fh:
+	with open('../cinje/std/form/select.py', 'rb') as fh:
 		lines = transform(fh.read().decode('utf8'))
 	
 	print(highlight(lines, PythonLexer(), Terminal256Formatter()))
@@ -18,3 +18,4 @@ def main():
 
 if __name__ == '__main__':
 	main()
+

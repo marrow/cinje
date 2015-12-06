@@ -35,22 +35,23 @@ Contents
       2. `Unescaped Replacement`_
       3. `HTML Attributes Replacement`_
       4. `Formatted Replacement`_
+      5. `JSON Object Replacement`_
    
    2. `Block Transformations`_
    
       1. `Module Scope`_
       2. `Function Declaration`_
-      3. `Conditional Flow`_
-      4. `Iteration`_
-      5. `Inheritance`_
-
+      3. `Flow Control`_
+   
    3. `Inline Transformations`_
    
       1. `Code`_
       2. `Comments`_
       3. `Flush`_
       4. `Text`_
-
+   
+   4. `Inheritance`_
+  
 5. `Version History`_
 6. `License`_
 
@@ -59,8 +60,8 @@ Contents
 What is cinje?
 ==============
 
-cinje is a modern, elegant template engine constructed as a Python domain specific language (DSL) that integrates into
-your applications as any other Python code would: by importing them.  Your templates are translated from their source
+Cinje is a modern, elegant template engine constructed as a Python domain specific language (DSL) that integrates into
+your applications as any other Python code would: by importing them.  Your templates are transformed from their source
 into clean, straightforward, and understandable Python source prior to the Python interpreter compiling it to bytecode.
 
 What kind of name is cinje?!
@@ -69,7 +70,8 @@ What kind of name is cinje?!
 It's a word from the constructed language `Lojban <http://www.lojban.org/>`_.  A combination of Hindi "śikana", English
 "wrinkle", and Chinese "zhé".  It translates as "is a wrinkle/crease/fold [shape] in".  It's also a Hungarian noun
 representing the posessive third-person singular form of "cin", meaning "tin".  The "c" makes a "sh" sound, the "j"
-makes a "jy" sound almost like the "is" in "vision".  Correct use does not capitalize the name.
+makes a "jy" sound almost like the "is" in "vision".  Correct use does not capitalize the name except at the beginning
+of sentences.
 
 Rationale and Goals
 -------------------
@@ -94,9 +96,10 @@ cinje from the competition:
   almost all generate Python code in the end, why not treat the templates as Python modules to start with and let the
   language, which already has all of this machinery, do what it was designed to do?  This is what cinje does.
 
-* Virtually all perform low-level parsing, lexing, and AST manipulation.  These things are difficult for developers
-  new to the language to understand.  Additionally, many manually orchestrate Python's own parsing and compilation
-  phases, and some even manually manage the bytecode cache.  This greatly increases the complexity of the engine itself.
+* Virtually all perform low-level parsing, lexing, and Abstract Syntax Tree (AST) manipulation.  These things are
+  difficult for developers new to the language to understand.  Additionally, many manually orchestrate Python's own
+  parsing and compilation phases, and some even manually manage the bytecode cache.  This greatly increases the
+  complexity of the engine itself.
 
 * Only a small minority of engines offer extensible syntax which allows for the creation of new directives.
 
@@ -122,6 +125,10 @@ If you add ``cinje`` to the ``install_requires`` argument of the call to ``setup
 library is installed.  We recommend using "less than" version numbers to ensure there are no unintentional
 side-effects when updating.  Use ``cinje<1.1`` to get all bugfixes for the current release, and
 ``cinje<2.0`` to get bugfixes and feature updates while ensuring that large breaking changes are not installed.
+
+While cinje does not have any hard dependencies on any other package, it is **strongly** recommended that applications
+using cinje also install the ``markupsafe`` package to provide more efficient string escaping and some additional
+functionality.
 
 
 Development Version
@@ -152,7 +159,7 @@ and submit a pull request.  This process is beyond the scope of this documentati
 Getting Started
 ===============
 
-In order for imports of cinje template functions to correctly translate the source you must first ``import cinje``
+In order for imports of cinje template functions to correctly transform the source you must first ``import cinje``
 in order to register the file encoding.  This may sound like magic, but it's not: it's just the Python unicode decoding
 hook in the ``cinje.encoding`` module.  Once this has been done you can directly import functions from cinje modules.
 
@@ -161,7 +168,7 @@ with the the encoding declaration::
 
     # encoding: cinje
 
-This tells Python to process the file using the ``cinje`` codec prior to interpreting the code.  cinje itself assumes
+This tells Python to process the file using the ``cinje`` codec prior to interpreting the code.  Cinje itself assumes
 the file is actually UTF-8 encoded.
 
 Calling a cinje function is identical to calling a generator function, as all cinje template functions—those containing
@@ -169,13 +176,41 @@ text—are generators.  Normal template functions generate unicode fragments.  W
 point generate a ``None`` value; you can iterate up to that point, and subsequently continue iterating after that
 point using the ``cinje.util.interrupt`` iterator to iterate up to the first ``None``.
 
+Primarily for testing small chunks of template template code in actual unit tests, two helpful functions are provided:
+
+* ``cinje.fragment(string, name="anonymous", **context)`` Transform a template fragment into a callable function.
+  
+  Only one function may be declared, either manually, or automatically. If automatic defintition is chosen the
+  resulting function takes no arguments.  Additional keyword arguments are passed through as global variables.
+
+* ``cinje.flatten(input, file=None, encoding=None, errors='strict')`` Return a flattened representation of a cinje
+  chunk stream.
+  
+  This has several modes of operation.  If no ``file`` argument is given, output will be returned as a string.
+  The type of string will be determined by the presence of an ``encoding``; if one is given the returned value is a
+  binary string, otherwise the native unicode representation.  If a ``file`` is present, chunks will be written
+  iteratively through repeated calls to ``file.write()``, and the amount of data (characters or bytes) written
+  returned.  The type of string written will be determined by ``encoding``, just as the return value is when not
+  writing to a file-like object.  The ``errors`` argument is passed through when encoding.
+  
+  We can highly recommend using the various streaming IO containers available in the
+  `io <https://docs.python.org/3/library/io.html>`_ module, though
+  `tempfile <https://docs.python.org/3/library/tempfile.html>`_ classes are also quite useful.
+
+* ``cinje.stream(input, encoding=None, errors='strict')`` Safely iterate a template generator, ignoring ``None``
+  values and optionally stream encoding.  Used internally by ``cinje.flatten``, this allows for easy use of a template
+  generator as a WSGI body.
+
+You can always also transform arbitrary template source by passing it through ``.decode('cinje')``, which would return
+the resulting transformed source code.
+
 
 Basic Syntax
 ============
 
 If you have prior experience using template engines, the syntax should feel quite familiar.  Lines prefixed with a
-colon (``:``) are "code".  Lines prefixed with a # are comments, excluding lines starting with a ``#{`` variable
-replacement.  All other lines are treated as template text.  Template text is not allowed at the module level.
+colon (``:``) are "code".  Lines prefixed with a hash mark (`#`) are comments.  All other lines are treated as
+template text.  Template text is not allowed at the module level as it is not valid for a module to ``yield``.
 
 Code lines are processed by each of the different "block" and "inline" processor classes and runs of template text
 are processed by the ``cinje.inline.text`` processor, with replacements processed by the ``cinje.util.chunk``
@@ -183,19 +218,29 @@ helper function.
 
 Text lines can have a "continuation" marker (``\``) on the end to denote that no newline should be emitted there.
 
+We use a shell-like argument format for illustrating the syntax.
+
+
 Variable Replacement
 --------------------
 
 There are several flavours of variable replacement available.  Within these use of curly braces is allowed only if
 the braces are balanced.  Any of the helper functions mentioned can be overridden at the module or function level.
 
+All variable replacement is a simple transformation of the source text into a function call wrapped version of the
+source text.
+
 HTML/XML Escaped Replacement
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+	``${<expr>}`` → ``_escape(<expr>)``
 
 The default replacement operator is a Python expression surrounded by ``${`` and ``}``.  In the generated code your
 expression will be wrapped in a call to ``_escape()`` which defaults to the ``escape`` function imported from the
 ``cinje.helpers`` module.  If ``markupsafe`` is installed its escaping function will be used, otherwise the Python-
-standard ``html.escape`` function will be used.  The result is appended to the current buffer.
+standard ``html.escape`` function will be used.  Please see the
+`MarkupSafe <https://pypi.python.org/pypi/MarkupSafe>`_ documentation for a full description of the additional
+capabilities it offers.  The result is appended to the current buffer.
 
 ============================= ================================ ================================
 cinje                         Python                           Result
@@ -206,6 +251,8 @@ cinje                         Python                           Result
 
 Unescaped Replacement
 ~~~~~~~~~~~~~~~~~~~~~
+
+	``#{<expr>}`` → ``_bless(<expr>)``
 
 The less-safe replacement does not escape HTML entities; you should be careful where this is used.  For trusted
 data, though, this form is somewhat more efficient.  In the generated code your expression will be wrapped in a call
@@ -223,8 +270,12 @@ cinje                         Python                           Result
 HTML Attributes Replacement
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+	``&{<argspec>}`` → ``_args(<argspec>)``
+
 A frequent pattern in reusable templates is to provide some method to emit key/value pairs, with defaults, as HTML or
-XML attributes.  To eliminate boilerplate cinje provides a replacement which handles this naturally.
+XML attributes.  To eliminate boilerplate cinje provides a replacement which handles this naturally and can help
+users, especially users new to template engines, avoid certain common but hideous structures to conditionally add
+attributes.
 
 Attributes which are literally ``True`` have no emitted value.  Attributes which are literally ``False`` or ``None``
 are omitted.  Non-string iterables are treated as a space-separated set of strings, for example, for use as a set of
@@ -252,6 +303,8 @@ A preceeding space will be emitted automatically if any values would be emitted.
 Formatted Replacement
 ~~~~~~~~~~~~~~~~~~~~~
 
+	``%{<expr> <argspec>}`` → ``_bless(<expr>).format(<argspec>)``
+
 Modern string formatting in Python utilizes the ``str.format`` string formatting system.  To facilitate replacements
 using the advanced formatting features available in ``markupsafe`` while removing common boilerplate the "formatted
 replacement" is made available.  Your source expression undergoes some mild reformatting, similar to that applied to
@@ -264,8 +317,22 @@ cinje                               Python
 ``%{"Lif: {}  {num}" 42, num=27}``  ``_bless("Lif: {}  {num}").format(42, num=27)``
 =================================== ===============================================
 
-Any expression can be used for the "format string" part of the replacement, however for sanity's sake it's generally
-a good idea to keep it as a short string literal or provide it from a variable.
+Any expression can be used for the "format string" expression, however for sanity's sake it's generally a good idea to
+keep it as a short string literal or provide it from a variable.
+
+**Note:** The format string is blessed, meaning it should not be sourced from user-supplied data, for security
+reasons.  When MarkupSafe is *not* installed the replacements are passed through to Python-standard string formatting.
+If, however, MarkupSafe *is* installed, then the replacements are escaped prior to formatting and additional
+functionality is available to make your objects HTML-formatting aware.  (See the MarkupSafe documentation.)
+
+JSON Object Replacement
+~~~~~~~~~~~~~~~~~~~~~~~
+
+	``@{<expr>}`` → ``_json(<expr>)``
+
+It is sometimes useful to pass data through a template to JavaScript. This will emit the JSON-serialized version of
+the expression result.
+
 
 Block Transformations
 ---------------------
@@ -280,9 +347,10 @@ Module Scope
 This is an automatic transformer triggered by the start of a source file.  It automatically adds a few imports to the
 top of your file to import the required helpers from cinje.
 
-
 Function Declaration
 ~~~~~~~~~~~~~~~~~~~~
+
+	``: def <name-literal>[ <argspec>]`` → ``def <name-literal>([<argspec>][<scope-binding>]):``
 
 Lines beginning with ``: def`` are used to declare functions within your template source::
 
@@ -290,70 +358,32 @@ Lines beginning with ``: def`` are used to declare functions within your templat
 		Hello world!
 	: end
 
-The above translates to, roughly, the following Python source::
+The above transforms to, roughly, the following Python source::
 
 	def somefunction(*, _escape=_escape, _bless=_bless):
 		_buffer = []
-		__w = _buffer.extend
-		__w((_bless("\tHello world!\n"), ))
+		_buffer.append(_bless("\tHello world!\n"))
 		yield ''.join(_buffer)
 
 You do not need the extraneous trailing colon to denote the end of the declaration, nor do you need to provide
 parenthesis around the argument specification.  The optimization keyword-only arguments will be added automatically to
-the argument specification you give on Python 3.  It will gracefully handle integration into your arglist even if your
-arglist already includes the keyword-only marker, or combinations of ``*args`` or ``**kw``.  For example::
+the argument specification you give on non-Pypy Python 3 versions.  It will gracefully handle integration into your
+arglist even if your arglist already includes the keyword-only marker, or combinations of ``*args`` or ``**kw``.
 
-	: def hello name
-		Hello ${name}!
-	: end
+Flow Control
+~~~~~~~~~~~~
 
-Would translate to::
+	``: <statement>`` → ``<statement>:``
 
-	def hello(name, *, _escape=_escape, _bless=_bless):
-		_buffer = []
-		__w = _buffer.extend
-		__w((_bless("\tHello "), _escape(name), _bless("!\n")))
-		yield ''.join(_buffer)
+Cinje is fairly agnostic towards most Python flow control statements.  The ``cinje.block.generic`` transformer handles
+most Python block scope syntax.  These include:
 
-If your template file only contains one function, i.e. it's a full page template, you can omit the final ``: end``.
+* **Conditionals** including ``if``, ``elif``, and ``else``.
+* **Iterators** including ``while``, and ``for``, inlcuding the ``else`` block for ``for`` loops.
+* **Context managers** via ``with``.
+* **Exception handling** including ``try``, ``except``, ``finally``, and ``else``.
 
-Conditional Flow
-~~~~~~~~~~~~~~~~
-
-Conditional template generation is integral to any engine that could call itself complete.  To facilitate this cinje
-performs very light translation.  Similar to function declaration, trailing colons are unneeded::
-
-	: if name
-		Hello ${name}!
-	: elif name == "Bob Dole"
-		Mehp, ${name}!
-	: else
-		Hello world!
-	: end
-
-The translation is straightforward::
-
-	if name:
-		# …
-	elif name == "Bob Dole":
-		# …
-	else:
-		…
-
-
-Iteration
-~~~~~~~~~
-
-Nearly identical to conditional flow, iteration is directly supported::
-
-	: for name in names
-		Hello ${name}!
-	: end
-
-Translates to::
-
-	for name in names:
-		# …
+In all cases the only real transformation done is moving the colon from the beginning of the declared line to the end.
 
 A helper is provided called ``iterate`` which acts similarly to ``enumerate`` but can provide additional details.
 It's a generator that yields ``namedtuple`` values in the form ``(first, last, index, total, value)``.  If the current
@@ -381,14 +411,70 @@ If you wish to unpack the values being iterated, you can wrap the additional unp
 	: end
 
 
+Inline Transformations
+----------------------
+
+Inline transformations are code lines that do not "start" a section that subsequently needs an "end".
+
+Code
+~~~~
+
+Lines prefixed with a colon (``:``) that aren't matched by another transformation rule are treated as inline Python
+code in the generated module.  Within these bits of code you do have access to the helpers and buffer, and so can
+easily customize template rendering at will.
+
+The only lines acceptable at the module scope are code and comments.
+
+Comments
+~~~~~~~~
+
+Basic comments are preserved in the final Python source.  Any line starting with the Python-standard line comment
+prefix, a ``#`` hash mark or "pound" symbol, that doesn't match another rule, will be preserved as a comment.  If the
+line is instead prefixed with a double hash mark ``##`` the comment will be stripped and *not* included in the final
+Python module.
+
+Flush
+~~~~~
+
+The ``: flush`` statement triggers cinje to emit the Python code needed to yield the current contents of the template
+buffer and clear it.  The result, in Python, is roughly analogous to::
+
+	yield ''.join(_buffer)
+	_buffer.clear()
+
+A flush is automatically triggered when falling off the bottom of a template function if it is known that there will
+be un-flushed text in the buffer.  (Processing context marked with the "dirty" flag.)
+
+Text
+~~~~
+
+Text covers every other line present in your template source.  Cinje efficiently gathers consecutive lines of template
+text, collapses runs of static text into single strings, and splits the template text up to process replacements.
+
+Template text is not permitted at the module scope as there can be no way to "yield" the buffer from there.  To save
+on method calls, the following::
+
+	<meta&{name=name, content=content}>
+
+Is transformed, roughly, into the following single outer call and three nested calls::
+
+	__w((
+		_bless('<meta'),
+		_args(name=name, content=content),
+		_bless('>')
+	))
+
+See the Variable Replacement section for details on the replacement options that are available and how they operate.
+
+
 Inheritance
-~~~~~~~~~~~
+-----------
 
 Due to the streaming and "native Python code" natures of cinje, template inheritance is generally handled through
 the standard definition of functions, and passing of those first-class objects around.  The most common case, where
 one template "wraps" another, is handled through the ``: using`` and ``: yield`` directives.
 
-An example "parent" template::
+An example "wrapper" template::
 
 	: def page **properties
 	<html>
@@ -403,10 +489,10 @@ automatically prior to the yield, then flush automatically at the end of the fun
 the effect of extending the wrapped template's buffer by, at a minimum, two elements (prefix and suffix), though
 additional ``: flush`` statements within the wrapper are allowed.
 
-**Important note:** Because the bare yield will produce a value of ``None``, wrapping functions like these are **not**
-safe for direct use as a WSGI body iterable.
+**Note:** Because the bare yield will produce a value of ``None``, wrapping functions like these are **not**
+safe for use as a WSGI body iterable without wrapping in a generator to throw away ``None`` values.
 
-Subsequently, to use this wrapper::
+The syntax for the ``using`` directive is ``: using <expr>[ <argspec>]``, thus to use this wrapper::
 
 	: using page
 		<p>Hello world!</p>
@@ -433,63 +519,15 @@ Would produce the following::
 		</body>
 	</html>
 
-Similar to having a single-function file, if your whole template is wrapped you can omit the trailing ``: end`` as one
-will be added for you automatically if it is missing.
+Lastly, there is a quick shortcut for consuming a template function and injecting its output into the current buffer::
 
-Inline Transformations
-----------------------
+	: use <expr>[ <argspec>]
 
-Inline transformations are code lines that do not "start" a section that subsequently needs an "end".
+And directly transforms to::
 
-Code
-~~~~
+	__w(<expr>(<argspec>))
 
-Lines prefixed with ``:`` that aren't matched by another transformation rule are treated as inline Python code in the
-generated module.  Within these bits of code you do have access to the helpers and buffer, and so can easily customize
-template rendering at runtime.
-
-The only lines acceptable at the module scope are code and comments.
-
-Comments
-~~~~~~~~
-
-Basic comments are preserved in the final Python source.  Any line starting with the Python-standard line comment
-prefix, a ``#`` hash mark or "pound" symbol, that doesn't match another rule, will be preserved as a comment.  If the
-line is instead prefixed with a double hash mark ``##`` the comment will be stripped and *not* included in the final
-Python module.
-
-Flush
-~~~~~
-
-The ``: flush`` statement triggers cinje to emit the Python code needed to yield the current contents of the template
-buffer and clear it.  The result, in Python, is roughly analogous to::
-
-	yield ''.join(_buffer)
-	_buffer.clear()
-
-A flush is automatically triggered when falling off the bottom of a template function if it is known that there will
-be un-flushed text in the buffer.
-
-Text
-~~~~
-
-Text covers every other line present in your template source.  cinje efficiently gathers consecutive lines of template
-text, collapses runs of static text into single strings, and splits the template text up to process replacements.
-
-Template text is not permitted at the module scope as there can be no way to "yield" the buffer from there.  To save
-on method calls, the following::
-
-	<meta&{name=name, content=content}>
-
-Is translated, roughly, into the following single outer call and three nested calls::
-
-	__w((
-		_bless('<meta'),
-		_args(name=name, content=content),
-		_bless('>')
-	))
-
-See the Variable Replacement section for details on the replacement options that are available and how they operate.
+Just like with ``using``, the result of the expression must be a callable generator function.
 
 
 Version History
@@ -541,12 +579,12 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
     :target: https://pypi.python.org/pypi/cinje
     :alt: Downloads per Week
 
-.. |mastercover| image:: http://img.shields.io/coveralls/marrow/cinje/master.svg?style=flat
-    :target: https://travis-ci.org/marrow/cinje
+.. |mastercover| image:: http://img.shields.io/codecov/c/github/marrow/cinje/master.svg?style=flat
+    :target: https://codecov.io/github/marrow/cinje?branch=master
     :alt: Release Test Coverage
 
-.. |developcover| image:: http://img.shields.io/coveralls/marrow/cinje/develop.svg?style=flat
-    :target: https://travis-ci.org/marrow/cinje
+.. |developcover| image:: http://img.shields.io/codecov/c/github/marrow/cinje/develop.svg?style=flat
+    :target: https://codecov.io/github/marrow/cinje?branch=develop
     :alt: Development Test Coverage
 
 .. |issuecount| image:: http://img.shields.io/github/issues/marrow/cinje.svg?style=flat

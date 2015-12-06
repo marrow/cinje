@@ -2,17 +2,11 @@
 
 import re
 
-from ..util import Line, Context
+from ..util import Line, py, pypy
 from ..inline.flush import flush_template
 
-try:  # pragma: no cover
-	unicode
-	py = 2
-except:
-	py = 3
 
 
-@Context.register
 class Function(object):
 	"""Proces function declarations within templates.
 	
@@ -22,7 +16,6 @@ class Function(object):
 		: end
 	
 	"""
-	
 	
 	priority = -50
 	
@@ -57,8 +50,8 @@ class Function(object):
 			if matches:
 				split = matches[-1].span()[1]  # Inject after, a la "*args>_<", as we're positional-only arguments.
 				if split != len(argspec):
-					prefix = ' ' if argspec[split] in (',', ' ') else ', '
-					suffix = ','
+					prefix = ', ' if argspec[split] == ',' else ''
+					suffix = '' if argspec[split] == ',' else ', ' 
 			
 			else:  # Ok, we can do this a different way…
 				matches = list(self.STARSTARARGS.finditer(argspec))
@@ -90,26 +83,17 @@ class Function(object):
 		name, _, line = line.partition(' ')  # Split the function name.
 		
 		argspec = line
-		annotation = '' # "__Generator[yield_type, send_type, return_type]"
-		
-		if '->' in line:
-			argspec, _, flags = line.rpartition('->')
-			for flag in set(i.strip() for i in flags.split()):
-				if flag[0] == '!':
-					context.flag.remove(flag[1:])
-				else:
-					context.flag.add(flag)
 		
 		name = name.strip()
 		
-		if py == 3:
+		if py == 3 and not pypy:
 			argspec = self._optimize(context, argspec)
 		
 		# Reconstruct the line.
 		
-		line = 'def ' + name + '(' + argspec + '):' + ((' -> ' + annotation) if annotation else '')
+		line = 'def ' + name + '(' + argspec + '):'
 		
-		yield declaration.clone(line='@cinje.Function.prepare')  # This lets us do some work before and after runtime.
+		# yield declaration.clone(line='@cinje.Function.prepare')  # This lets us do some work before and after runtime.
 		yield declaration.clone(line=line)
 		
 		context.scope += 1
@@ -120,15 +104,11 @@ class Function(object):
 		if 'using' in context.flag:  # Clean up that we were using things.
 			context.flag.remove('using')
 		
-		for i in flush_template(context):
+		for i in flush_template(context):  # Handle the final buffer yield if any content was generated.
 			yield i
 		
-		if 'text' in context.flag:  # Handle the final buffer yield if any content was generated.
-			context.flag.remove('text')
-		
 		context.scope -= 1
-	
-	@classmethod
-	def prepare(cls, fn):
-		# Decorator hook.
-		return fn
+		
+		if 'text' in context.flag:
+			context.templates.append(name)
+			context.flag.remove('text')

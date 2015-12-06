@@ -1,23 +1,21 @@
 language: python
 sudo: false
 
+python:
+  - pypy
+  - pypy3
+  - "2.7"
+  - "3.3"
+  - "3.4"
+  - "3.5"
+
 env:
-  - TOXENV=pypy ACCELERATED=0
-  - TOXENV=pypy ACCELERATED=1
-  - TOXENV=pypy3 ACCELERATED=0
-  - TOXENV=pypy3 ACCELERATED=1
-  - TOXENV=py26 ACCELERATED=0
-  - TOXENV=py26 ACCELERATED=1
-  - TOXENV=py27 ACCELERATED=0
-  - TOXENV=py27 ACCELERATED=1
-  - TOXENV=py33 ACCELERATED=0
-  - TOXENV=py33 ACCELERATED=1
-  - TOXENV=py34 ACCELERATED=0
-  - TOXENV=py34 ACCELERATED=1
+  - ACCELERATED=0
+  - ACCELERATED=1
 
 install: travis_retry .travis/install.sh
 
-script: .travis/run.sh
+script: tox
 
 notifications:
   irc:
@@ -25,6 +23,3 @@ notifications:
       - 'irc.freenode.org#webcore'
     use_notice: true
     skip_join: true
-
-after_success:
-  - coveralls

@@ -1,11 +1,11 @@
 # encoding: utf-8
 
+import ast  # Tighten your belts...
 from pprint import pformat
 
-from ..util import chunk, Line, Context, ensure_buffer
+from ..util import chunk, Line, ensure_buffer
 
 
-@Context.register
 class Text(object):
 	"""Identify and process contiguous blocks of template text."""
 	
@@ -51,29 +51,45 @@ class Text(object):
 		
 		# We now have a contiguous block of templated text.  Split it up into expressions and wrap as appropriate.
 		
-		yield Line(0, self.PREFIX)  # Start a call to _buffer.extend()
+		chunks = list(chunk(text))  # Ugh; this breaks streaming, but...
+		single = len(chunks) == 1
 		
-		for token, part in chunk(text):
+		if single:
+			PREFIX = '__ws('
+		else:
+			yield Line(0, '__w((')  # Start a call to _buffer.extend()
+			PREFIX = ''
+		
+		for token, part in chunks:
 			if token == 'text':
 				part = pformat(
 						part,
 						indent = 0,
-						width = 120 - 4 * (context.scope + 1),
+						width = 120 - 4 * (context.scope + (0 if single else 1)),
 						# compact = True  Python 3 only.
-					).replace("\n ", "\n" + "\t" * (context.scope + 1)).strip()
+					).replace("\n ", "\n" + "\t" * (context.scope + (0 if single else 1))).strip()
 				
 				if part[0] == '(' and part[-1] == ')':
 					part = part[1:-1]
 				
-				yield Line(0, part + ',', (context.scope + 1))
+				yield Line(0, PREFIX + part + (')' if single else ','), (context.scope + (0 if single else 1)))
+				continue
 			
 			elif token == 'format':
-				pass  # TODO: Need to think about that.
+				# We need to split the expression defining the format string from the values to pass when formatting.
+				# We want to allow any Python expression, so we'll need to piggyback on Python's own parser in order
+				# to exploit the currently available syntax.  Apologies, this is probably the scariest thing in here.
+				split = -1
+				
+				try:
+					ast.parse(part)
+				except SyntaxError as e:  # We expect this, and catch it.  It'll have exploded after the first expr.
+					split = part.rfind(' ', 0, e.offset)
+				
+				token = '_bless(' + part[:split].rstrip() + ').format'
+				part = part[split:].lstrip()
 			
-			elif token != '':
-				yield Line(0, token + '(' + part + '),', (context.scope + 1))
-			
-			else:
-				yield Line(0, '_escape(' + part + '),', (context.scope + 1))
+			yield Line(0, PREFIX + token + '(' + part + ')' + (')' if single else ','), (context.scope + (0 if single else 1)))
 		
-		yield Line(0, self.SUFFIX, (context.scope + 1))  # End the call to _buffer.extend()
+		if not single:
+			yield Line(0, '))', (context.scope + 1))  # End the call to _buffer.extend()

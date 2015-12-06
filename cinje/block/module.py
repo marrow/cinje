@@ -1,9 +1,8 @@
 # encoding: utf-8
 
-from ..util import Line, Context
+from ..util import py, Line
 
 
-@Context.register
 class Module(object):
 	"""Module handler.
 	
@@ -24,7 +23,7 @@ class Module(object):
 		
 		for line in input:
 			if not line.stripped or line.stripped[0] == '#':
-				if not line.stripped.startswith('##'):
+				if not line.stripped.startswith('##') and 'coding:' not in line.stripped:
 					yield line
 				continue
 			
@@ -32,15 +31,24 @@ class Module(object):
 			break
 		
 		# After any existing preamble, but before other imports, we inject our own.
-		yield Line(0, 'from __future__ import unicode_literals')
-		yield Line(0, '')
+		
+		if py == 2:
+			yield Line(0, 'from __future__ import unicode_literals')
+			yield Line(0, '')
+		
 		yield Line(0, 'import cinje')
+		yield Line(0, 'from cinje.helpers import escape as _escape, bless as _bless, iterate, xmlargs as _args, _interrupt, _json')
 		yield Line(0, '')
-		# yield Line(0, 'from types import Generator as __Generator')
-		yield Line(0, 'from cinje.helpers import escape as _escape, bless as _bless, iterate, xmlargs as _args, _interrupt')
+		yield Line(0, '')
+		yield Line(0, '__tmpl__ = []  # Exported template functions.')
 		yield Line(0, '')
 		
 		for i in context.stream:
 			yield i
+		
+		if context.templates:
+			yield Line(0, '')
+			yield Line(0, '__tmpl__.extend(["' + '", "'.join(context.templates) + '"])')
+			context.templates = []
 		
 		context.flag.remove('init')

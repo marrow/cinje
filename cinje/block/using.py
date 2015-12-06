@@ -1,9 +1,8 @@
 # encoding: utf-8
 
-from ..util import Line, Context, ensure_buffer
+from ..util import Line, ensure_buffer
 
 
-@Context.register
 class Using(object):
 	priority = 25
 	

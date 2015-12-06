@@ -1,12 +1,6 @@
 # encoding: utf-8
 
-from ..util import Context, Line
-
-try:  # pragma: no cover
-	unicode
-	py = 2
-except:
-	py = 3
+from ..util import Line, ensure_buffer, py
 
 
 def flush_template(context, declaration=None):
@@ -18,21 +12,19 @@ def flush_template(context, declaration=None):
 	if declaration is None:
 		declaration = Line(0, '')
 	
-	if 'text' not in context.flag or 'dirty' not in context.flag:
-		return
-	
-	yield declaration.clone(line='yield "".join(_buffer)')
-	
-	if py == 3:
-		yield declaration.clone(line='_buffer.clear()')
-	else:
+	if {'text', 'dirty'}.issubset(context.flag):
+		yield declaration.clone(line='yield "".join(_buffer)')
+		
 		context.flag.remove('text')  # This will force a new buffer to be constructed.
+		context.flag.remove('dirty')
+		
+		for i in ensure_buffer(context, ):
+			yield i
 	
-	context.flag.remove('dirty')
+	if declaration.stripped == 'yield':
+		yield declaration
 
 
-
-@Context.register
 class Flush(object):
 	"""Allow mid-stream flushing of the template buffer.
 	
@@ -47,13 +39,15 @@ class Flush(object):
 	buffer is known to be "dirty" by the translator.  I.e. following ": use" or ": uses", or after some template
 	text has been defined.  Unlike most other commands involving the buffer, this one will not create a buffer if
 	missing.
+	
+	This also handles flushing prior to yielding, for wrapper templates.
 	"""
 	
 	priority = 25
 	
 	def match(self, context, line):
 		"""Match exact "flush" command usage."""
-		return line.kind == 'code' and line.stripped == "flush"
+		return line.kind == 'code' and line.stripped in ("flush", "yield")
 	
 	def __call__(self, context):
 		return flush_template(context, context.input.next())

@@ -8,33 +8,135 @@ from __future__ import unicode_literals
 
 import sys
 
+from codecs import iterencode
 from inspect import isfunction, isclass
+from operator import methodcaller
 from collections import deque, namedtuple, Sized, Iterable
+from pkg_resources import iter_entry_points
 from xml.sax.saxutils import quoteattr
+
+try:  # pragma: no cover
+	from html.parser import HTMLParser
+except ImportError:  # pragma: no cover
+	from HTMLParser import HTMLParser
 
 
 # ## Python Cross-Compatibility
+# 
+# These allow us to detect relevant version differences for code generation, and overcome some of the minor
+# differences in labels between Python 2 and Python 3 compatible runtimes.
+# 
+# The differences, in practice, are minor, and are easily overcome through a small block of version-dependant
+# code.  Handily, even built-in labels are not sacrosanct; they can be easily assigned to and re-mapped.
+# 
 
-try:  # pragma: no cover
+try:  # Python 2
 	from types import StringTypes as stringy
+	
+	try:
+		from cStringIO import StringIO
+	except:  # pragma: no cover
+		from StringIO import StringIO  # This never really happens.  Still, nice to be defensive.
+	
 	bytes = str
 	str = unicode
 	py = 2
-except:
+	reduce = reduce
+
+except:  # Python 3
+	from io import StringIO
+	
 	stringy = str
 	bytes = bytes
 	str = str
 	py = 3
 
+# There are some additional complications for the Pypy runtime.
+
+try:
+	from sys import pypy_version_info
+	pypy = True
+except ImportError:
+	pypy = False
 
 # ## Type Definitions
 
 
+# A tuple representing a single step of fancy iteration.
 Iteration = namedtuple('Iteration', ['first', 'last', 'index', 'total', 'value'])
 
 
-
 # ## Simple Utility Functions
+
+def stream(input, encoding=None, errors='strict'):
+	"""Safely iterate a template generator, ignoring ``None`` values and optionally stream encoding.
+	
+	Used internally by ``cinje.flatten``, this allows for easy use of a template generator as a WSGI body.
+	"""
+	
+	input = (i for i in input if i)  # Omits `None` (empty wrappers) and empty chunks.
+	
+	if encoding:  # Automatically, and iteratively, encode the text if requested.
+		input = iterencode(input, encoding, errors=errors)
+	
+	return input
+
+
+def flatten(input, file=None, encoding=None, errors='strict'):
+	"""Return a flattened representation of a cinje chunk stream.
+	
+	This has several modes of operation.  If no `file` argument is given, output will be returned as a string.
+	The type of string will be determined by the presence of an `encoding`; if one is given the returned value is a
+	binary string, otherwise the native unicode representation.  If a `file` is present, chunks will be written
+	iteratively through repeated calls to `file.write()`, and the amount of data (characters or bytes) written
+	returned.  The type of string written will be determined by `encoding`, just as the return value is when not
+	writing to a file-like object.  The `errors` argument is passed through when encoding.
+	
+	We can highly recommend using the various stremaing IO containers available in the
+	[`io`](https://docs.python.org/3/library/io.html) module, though
+	[`tempfile`](https://docs.python.org/3/library/tempfile.html) classes are also quite useful.
+	"""
+	
+	input = stream(input, encoding, errors)
+	
+	if file is None:  # Exit early if we're not writing to a file.
+		return b''.join(input) if encoding else ''.join(input)
+	
+	counter = 0
+	
+	for chunk in input:
+		file.write(chunk)
+		counter += len(chunk)
+	
+	return counter
+
+
+def fragment(string, name="anonymous", **context):
+	"""Translate a template fragment into a callable function.
+	
+	**Note:** Use of this function is discouraged everywhere except tests, as no caching is implemented at this time.
+	
+	Only one function may be declared, either manually, or automatically. If automatic defintition is chosen the
+	resulting function takes no arguments.  Additional keyword arguments are passed through as global variables.
+	"""
+	
+	if ": def" in string or ":def" in string:
+		code = string.encode('utf8').decode('cinje')
+		name = None
+	else:
+		code = ": def {name}\n\n{string}\n\n: end".format(
+				name = name,
+				string = string,
+			).encode('utf8').decode('cinje')
+	
+	environ = dict(context)
+	
+	exec(code, environ)
+	
+	if name is None:  # We need to dig it out of the `___tmpl__` list.
+		return environ[environ['__tmpl__'][-1]]  # Super secret sauce: you _can_ define more than one function...
+	
+	return environ[name]
 
 
 def interruptable(iterable):
@@ -73,6 +175,10 @@ def iterate(obj):
 	track state.  Use `enumerate()` elsewhere.
 	"""
 	
+	global next, Iteration
+	next = next
+	Iteration = Iteration
+	
 	total = len(obj) if isinstance(obj, Sized) else None
 	iterator = iter(obj)
 	first = True
@@ -101,7 +207,15 @@ def iterate(obj):
 def xmlargs(_source=None, **values):
 	from cinje.helpers import bless
 	
+	# Optimize by binding these names to the local scope, saving a lookup on each call.
+	global str, Iterable, stringy
+	str = str
+	Iterable = Iterable
+	stringy = stringy
+	ejoin = " ".join
+	
 	parts = []
+	pappend = parts.append
 	
 	# If a data source is provided it overrides the keyword arguments which are treated as defaults.
 	if _source:
@@ -117,19 +231,19 @@ def xmlargs(_source=None, **values):
 			continue
 		
 		if value is True:  # For explicitly True values, we don't have a value for the attribute.
-			parts.append(key)
+			pappend(key)
 			continue
 		
 		# Non-string iterables (such as lists, sets, tuples, etc.) are treated as space-separated strings.
 		if isinstance(value, Iterable) and not isinstance(value, stringy):
-			value = " ".join(str(i) for i in value)
+			value = ejoin(str(i) for i in value)
 		
-		parts.append(key + "=" + quoteattr(str(value)))
+		pappend(key + "=" + quoteattr(str(value)))
 	
-	return bless(" " + " ".join(parts)) if parts else ''
+	return bless(" " + ejoin(parts)) if parts else ''
 
 
-def chunk(text, delim=('', '${', '#{', '&{', '%{'), tag=('text', '_escape', '_bless', '_args', 'format')):
+def chunk(text, mapping={None: 'text', '${': '_escape', '#{': '_bless', '&{': '_args', '%{': 'format', '@{': '_json'}):
 	"""Chunkify and "tag" a block of text into plain text and code sections.
 	
 	The first delimeter is blank to represent text sections, and keep the indexes aligned with the tags.
@@ -152,14 +266,14 @@ def chunk(text, delim=('', '${', '#{', '&{', '%{'), tag=('text', '_escape', '_bl
 				if skipping:
 					skipping -= 1
 				else:
-					yield tag[delim.index(text[start-2:start])], text[start:i]
+					yield mapping[text[start-2:start]], text[start:i]
 					start = None
 					last = i = i + 1
 					continue
 		
-		elif text[i:i+2] in delim:
+		elif text[i:i+2] in mapping:
 			if last is not None and last != i:
-				yield tag[0], text[last:i]
+				yield mapping[None], text[last:i]
 				last = None
 			
 			start = i = i + 2
@@ -168,7 +282,7 @@ def chunk(text, delim=('', '${', '#{', '&{', '%{'), tag=('text', '_escape', '_bl
 		i += 1
 	
 	if last < len(text):
-		yield tag[0], text[last:]
+		yield mapping[None], text[last:]
 
 
 def ensure_buffer(context):
@@ -179,7 +293,7 @@ def ensure_buffer(context):
 	
 	yield Line(0, "")
 	yield Line(0, "_buffer = []")
-	yield Line(0, "__w = _buffer.extend")
+	yield Line(0, "__w, __ws = _buffer.extend, _buffer.append")
 	yield Line(0, "")
 	
 	context.flag.add('text')
@@ -320,28 +434,21 @@ class Context(object):
 	This is the primary entry point for translation.
 	"""
 	
-	__slots__ = ('input', 'scope', 'flag', '_handler')
-	
-	handlers = []
+	__slots__ = ('input', 'scope', 'flag', '_handler', 'templates', 'handlers')
 	
 	def __init__(self, input):
-		self.input = Lines(input.decode('utf8') if hasattr(input, 'decode') else input)
+		self.input = Lines(input.decode('utf8') if isinstance(input, bytes) else input)
 		self.scope = 0
 		self.flag = set()
 		self._handler = []
+		self.handlers = []
+		self.templates = []
+		
+		for translator in map(methodcaller('load'), iter_entry_points('cinje.translator')):
+			self.handlers.append(translator)
 	
 	def __repr__(self):
 		return "Context({!r}, {}, {})".format(self.input, self.scope, self.flag)
-	
-	@classmethod
-	def register(cls, handler):
-		"""Register a line transformer class with the processing context."""
-		
-		assert isclass(handler), "Must supply handler class for registration, not instance."
-		
-		cls.handlers.append(handler)
-		
-		return handler  # Allow certain types of chaining, i.e. use as a decorator.
 	
 	def prepare(self):
 		"""Prepare the ordered list of transformers and reset context state to initial."""
@@ -380,8 +487,6 @@ class Context(object):
 		for handler in self._handler:
 			if handler.match(self, line):
 				return handler
-		
-		return None
 
 
 class Pipe(object):
@@ -404,6 +509,13 @@ class Pipe(object):
 		self.args = args if args else ()
 		self.kwargs = kw if kw else {}
 	
+	def __repr__(self):
+		return "Pipe({self.callable!r}{0}{1})".format(
+				(', ' + ', '.join(repr(i) for i in self.args)) if self.args else '',
+				(', ' + ', '.join("{0}={1!r}".format(i, j) for i, j in self.kwargs.items())) if self.kwargs else '',
+				self = self,
+			)
+	
 	def __ror__(self, other):
 		"""The main machinery of the Pipe, calling the chosen callable with the recorded arguments."""
 		
@@ -423,3 +535,26 @@ class Pipe(object):
 		"""
 		
 		return self.__class__(self.callable, *args, **kw)
+
+
+# ## Tag Stripper
+
+class MLStripper(HTMLParser):
+	def __init__(self):
+		self.reset()
+		self.strict = False
+		self.convert_charrefs = True
+		self.fed = []
+	
+	def handle_data(self, d):
+		self.fed.append(d)
+	
+	def get_data(self):
+		return ''.join(self.fed)
+
+
+def strip_tags(html):
+	s = MLStripper()
+	s.feed(html)
+	return s.get_data()
+

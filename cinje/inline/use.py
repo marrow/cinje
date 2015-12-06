@@ -1,9 +1,8 @@
 # encoding: utf-8
 
-from ..util import Context, ensure_buffer
+from ..util import ensure_buffer
 
 
-@Context.register
 class Use(object):
 	"""Consume the result of calling another template function, extending the local buffer.
 	
