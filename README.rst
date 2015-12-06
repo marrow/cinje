@@ -96,9 +96,10 @@ cinje from the competition:
   almost all generate Python code in the end, why not treat the templates as Python modules to start with and let the
   language, which already has all of this machinery, do what it was designed to do?  This is what cinje does.
 
-* Virtually all perform low-level parsing, lexing, and AST manipulation.  These things are difficult for developers
-  new to the language to understand.  Additionally, many manually orchestrate Python's own parsing and compilation
-  phases, and some even manually manage the bytecode cache.  This greatly increases the complexity of the engine itself.
+* Virtually all perform low-level parsing, lexing, and Abstract Syntax Tree (AST) manipulation.  These things are
+  difficult for developers new to the language to understand.  Additionally, many manually orchestrate Python's own
+  parsing and compilation phases, and some even manually manage the bytecode cache.  This greatly increases the
+  complexity of the engine itself.
 
 * Only a small minority of engines offer extensible syntax which allows for the creation of new directives.
 
