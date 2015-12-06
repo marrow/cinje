@@ -10,8 +10,7 @@ cinje
 
 ..
 
-    |latestversion| |downloads| |masterstatus| |mastercover| |issuecount|
-
+    |latestversion| |ghtag| |downloads| |masterstatus| |mastercover| |masterreq| |ghwatch| |ghstar|
 
 
 Contents
@@ -134,7 +133,7 @@ functionality.
 Development Version
 -------------------
 
-    |developstatus| |developcover|
+    |developstatus| |developcover| |ghsince| |issuecount| |ghfork|
 
 Development takes place on `GitHub <https://github.com/>`_ in the
 `cinje <https://github.com/marrow/cinje/>`_ project.  Issue tracking, documentation, and downloads
@@ -562,33 +561,60 @@ WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGE
 COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+.. |ghwatch| image:: https://img.shields.io/github/watchers/badges/shields.svg?style=social&label=Watch
+    :target: https://github.com/marrow/cinje/subscription
+    :alt: Subscribe to project activity on Github.
+
+.. |ghstar| image:: https://img.shields.io/github/followers/espadrine.svg?style=social&label=Follow
+    :target: https://github.com/marrow/cinje/subscription
+    :alt: Star this project on Github.
+
+.. |ghfork| image:: https://img.shields.io/github/forks/badges/shields.svg?style=social&label=Fork
+    :target: https://github.com/marrow/cinje/fork
+    :alt: Fork this project on Github.
 
 .. |masterstatus| image:: http://img.shields.io/travis/marrow/cinje/master.svg?style=flat
-    :target: https://travis-ci.org/marrow/cinje
-    :alt: Release Build Status
-
-.. |developstatus| image:: http://img.shields.io/travis/marrow/cinje/develop.svg?style=flat
-    :target: https://travis-ci.org/marrow/cinje
-    :alt: Development Build Status
-
-.. |latestversion| image:: http://img.shields.io/pypi/v/cinje.svg?style=flat
-    :target: https://pypi.python.org/pypi/cinje
-    :alt: Latest Version
-
-.. |downloads| image:: http://img.shields.io/pypi/dw/cinje.svg?style=flat
-    :target: https://pypi.python.org/pypi/cinje
-    :alt: Downloads per Week
+    :target: https://travis-ci.org/marrow/cinje/branches
+    :alt: Release build status.
 
 .. |mastercover| image:: http://img.shields.io/codecov/c/github/marrow/cinje/master.svg?style=flat
     :target: https://codecov.io/github/marrow/cinje?branch=master
-    :alt: Release Test Coverage
+    :alt: Release test coverage.
+
+.. |masterreq| image:: https://img.shields.io/requires/github/marrow/cinje.svg
+    :target: https://requires.io/github/marrow/cinje/requirements/?branch=master
+    :alt: Status of release dependencies.
+
+.. |developstatus| image:: http://img.shields.io/travis/marrow/cinje/develop.svg?style=flat
+    :target: https://travis-ci.org/marrow/cinje/branches
+    :alt: Development build status.
 
 .. |developcover| image:: http://img.shields.io/codecov/c/github/marrow/cinje/develop.svg?style=flat
     :target: https://codecov.io/github/marrow/cinje?branch=develop
-    :alt: Development Test Coverage
+    :alt: Development test coverage.
+
+.. |developreq| image:: https://img.shields.io/requires/github/marrow/cinje.svg
+    :target: https://requires.io/github/marrow/cinje/requirements/?branch=develop
+    :alt: Status of development dependencies.
 
 .. |issuecount| image:: http://img.shields.io/github/issues/marrow/cinje.svg?style=flat
     :target: https://github.com/marrow/cinje/issues
     :alt: Github Issues
+
+.. |ghsince| image:: https://img.shields.io/github/commits-since/marrow/cinje/1.0.svg
+    :target: 
+    :alt: Changes since last release.
+
+.. |ghtag| image:: https://img.shields.io/github/tag/marrow/cinje.svg
+    :target: https://github.com/marrow/cinje/tree/1.0
+    :alt: Latest Github tagged release.
+
+.. |latestversion| image:: http://img.shields.io/pypi/v/cinje.svg?style=flat
+    :target: https://pypi.python.org/pypi/cinje
+    :alt: Latest released version.
+
+.. |downloads| image:: http://img.shields.io/pypi/dw/cinje.svg?style=flat
+    :target: https://pypi.python.org/pypi/cinje
+    :alt: Downloads per week.
 
 .. |cake| image:: http://img.shields.io/badge/cake-lie-1b87fb.svg?style=flat
