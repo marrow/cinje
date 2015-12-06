@@ -237,7 +237,9 @@ HTML/XML Escaped Replacement
 The default replacement operator is a Python expression surrounded by ``${`` and ``}``.  In the generated code your
 expression will be wrapped in a call to ``_escape()`` which defaults to the ``escape`` function imported from the
 ``cinje.helpers`` module.  If ``markupsafe`` is installed its escaping function will be used, otherwise the Python-
-standard ``html.escape`` function will be used.  The result is appended to the current buffer.
+standard ``html.escape`` function will be used.  Please see the
+`MarkupSafe <https://pypi.python.org/pypi/MarkupSafe>`_ documentation for a full description of the additional
+capabilities it offers.  The result is appended to the current buffer.
 
 ============================= ================================ ================================
 cinje                         Python                           Result
@@ -245,10 +247,6 @@ cinje                         Python                           Result
 ``${2+2}``                    ``_escape(2+2)``                 ``"4"``
 ``${"<i>Hi.</i>"}``           ``_escape("<i>Hi.</i>")``        ``"&lt;i&gt;Hi.&lt;/i&gt;"``
 ============================= ================================ ================================
-
-This will utilize MarkupSafe if installed, to both provide highly efficient C implementations as well as to offer
-extended features.  Please see the `MarkupSafe <https://pypi.python.org/pypi/MarkupSafe>`_ documentation for a full
-description of the additional capabilities.
 
 Unescaped Replacement
 ~~~~~~~~~~~~~~~~~~~~~
