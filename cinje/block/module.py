@@ -2,7 +2,7 @@
 
 from __future__ import unicode_literals
 
-from gzip import compress, decompress
+from zlib import compress, decompress
 from base64 import b85encode, b85decode
 from pprint import pformat
 from collections import deque
