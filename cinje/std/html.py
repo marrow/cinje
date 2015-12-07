@@ -18,7 +18,7 @@
 		
 	: for data in metadata
 		: if isinstance(data, Iterator)
-			: __w(data)
+			: _buffer.extend(data)
 		: elif isinstance(data, Mapping)
 		<meta&{data}>
 		: else
@@ -62,13 +62,17 @@
 <!DOCTYPE html>
 <html&{lang=attributes.pop('lang', 'en')}>
 	<head>
-		: __w(header(title, metadata=metadata, styles=styles, scripts=[]) if header else ())
+		: if header
+			: use header title, metadata=metadata, styles=styles, scripts=[]
+		: end
 	</head>
 	
 	<body&{attributes, role='document'}>
 		: yield
 		
-		: __w(footer(styles=[], scripts=scripts) if footer else ())
+		: if footer
+			: use footer styles=[], scripts=scripts
+		: end
 	</body>
 </html>
 : end
@@ -95,7 +99,7 @@
 	: """Generic HTML5 inline element."""
 <span&{kwargs}>\
 	: if isinstance(content, Iterator)
-		: __w(content)
+		: _buffer.extend(content)
 	: else
 ${content}\
 	: end
@@ -107,7 +111,7 @@ ${content}\
 	: """Standard level-specific HTML5 heading."""
 <h${level}&{kwargs}>\
 	: if isinstance(content, Iterator)
-		: __w(content)
+		: _buffer.extend(content)
 	: else
 ${content}\
 	: end

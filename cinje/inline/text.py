@@ -5,7 +5,7 @@ import ast  # Tighten your belts...
 from itertools import chain
 from pprint import pformat
 
-from ..util import iterate, chunk, Line, ensure_buffer
+from ..util import pypy, iterate, chunk, Line, ensure_buffer
 
 
 def gather(input):
@@ -48,8 +48,10 @@ class Text(object):
 	"""Identify and process contiguous blocks of template text."""
 	
 	priority = -25
-	PREFIX = '__w(('
+	PREFIX = '_buffer.extend((' if pypy else '__w(('
+	PREFIX_SINGLE = '_buffer.append(' if pypy else '__ws('
 	SUFFIX = '))'
+	SUFFIX_SINGLE = ')'
 	
 	def match(self, context, line):
 		return line.kind == 'text'
@@ -80,12 +82,12 @@ class Text(object):
 			dirty = True
 			
 			if first and last:  # Optimize the single invocation case.
-				prefix = '__ws('
-				suffix = ')'
+				prefix = self.PREFIX_SINGLE
+				suffix = self.SUFFIX_SINGLE
 				scope = context.scope
 			
 			elif first:
-				yield Line(lineno, '__w((')
+				yield Line(lineno, self.PREFIX)
 			
 			if not last:
 				suffix += ','
@@ -109,7 +111,7 @@ class Text(object):
 					yield Line(lineno, value, scope)
 				
 				if last and not first:
-					yield Line(lineno, '))', scope - 1)  # End the call to _buffer.extend()
+					yield Line(lineno, self.SUFFIX, scope - 1)  # End the call to _buffer.extend()
 				
 				continue
 			
@@ -130,7 +132,7 @@ class Text(object):
 			yield Line(lineno, prefix + token + '(' + chunk_ + ')' + suffix, scope)
 			
 			if last and not first:
-				yield Line(lineno, '))', scope - 1)  # End the call to _buffer.extend()
+				yield Line(lineno, self.SUFFIX, scope - 1)  # End the call to _buffer.extend()
 		
 		# Track that the buffer will have content moving forward.
 		if dirty and 'dirty' not in context.flag:

@@ -289,11 +289,12 @@ def ensure_buffer(context):
 	if 'text' in context.flag:
 		return
 	
-	# TODO: Determine if the Python 2-required approach (reassignment) is faster than the .clear() approach.
-	
 	yield Line(0, "")
 	yield Line(0, "_buffer = []")
-	yield Line(0, "__w, __ws = _buffer.extend, _buffer.append")
+	
+	if not pypy:
+		yield Line(0, "__w, __ws = _buffer.extend, _buffer.append")
+	
 	yield Line(0, "")
 	
 	context.flag.add('text')

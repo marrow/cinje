@@ -1,6 +1,8 @@
 # encoding: utf-8
 
-from ..util import ensure_buffer
+from ..util import pypy, ensure_buffer
+
+PREFIX = '_buffer.extend(' if pypy else '__w(' 
 
 
 class Use(object):
@@ -34,6 +36,6 @@ class Use(object):
 		for i in ensure_buffer(context):
 			yield i
 		
-		yield declaration.clone(line="__w(" + name.rstrip() + "(" + args.lstrip() + "))")
+		yield declaration.clone(line=PREFIX + name.rstrip() + "(" + args.lstrip() + "))")
 		
 		context.flag.add('dirty')
