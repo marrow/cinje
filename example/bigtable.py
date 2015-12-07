@@ -436,31 +436,6 @@ else:
         return bottle_template.render(**ctx)
 
 
-def run(number=100):
-    import profile
-    from timeit import Timer
-    from pstats import Stats
-    names = globals().keys()
-    names = sorted([(name, globals()[name])
-                    for name in names if name.startswith('test_')])
-    print("                     msec    rps  tcalls  funcs")
-    for name, test in names:
-        if test:
-            assert isinstance(test(), s)
-            t = Timer(setup='from __main__ import %s as t' % name,
-                      stmt='t()')
-            t = t.timeit(number=number)
-            st = Stats(profile.Profile().runctx(
-                'test()', globals(), locals()))
-            print('%-17s %7.2f %6.2f %7d %6d' % (name[5:],
-                                                 1000 * t / number,
-                                                 number / t,
-                                                 st.total_calls,
-                                                 len(st.stats)))
-        else:
-            print('%-26s not installed' % name[5:])
-
-
 # region: cinje
 
 try:

@@ -75,7 +75,7 @@ setup(
 		],
 	
 	packages = find_packages(exclude=['test', 'example', 'benchmark']),
-	include_package_data = True,
+	include_package_data = False,
 	
 	# ## Dependency Declaration
 	
