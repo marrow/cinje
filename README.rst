@@ -457,7 +457,7 @@ on method calls, the following::
 
 Is transformed, roughly, into the following single outer call and three nested calls::
 
-	__w((
+	_buffer.extend((
 		_bless('<meta'),
 		_args(name=name, content=content),
 		_bless('>')
@@ -524,7 +524,7 @@ Lastly, there is a quick shortcut for consuming a template function and injectin
 
 And directly transforms to::
 
-	__w(<expr>(<argspec>))
+	_buffer.extend(<expr>(<argspec>))
 
 Just like with ``using``, the result of the expression must be a callable generator function.
 
