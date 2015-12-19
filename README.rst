@@ -532,6 +532,12 @@ Just like with ``using``, the result of the expression must be a callable genera
 Version History
 ===============
 
+Version 1.1
+-----------
+
+* *Enhanced Pypy support.* Pypy does not require optimizations which potentially obfuscate the resulting code.
+  So we don't do them.
+
 Version 1.0
 -----------
 
