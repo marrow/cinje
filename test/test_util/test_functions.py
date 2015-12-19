@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-from cinje.util import interruptable, iterate, xmlargs, chunk, ensure_buffer, Line, strip_tags
+from cinje.util import interruptable, iterate, xmlargs, splitexpr, chunk, ensure_buffer, Line, strip_tags
 
 # Note: ensure_buffer is tested indirectly via template conformance testing.
 
@@ -106,6 +106,17 @@ class TestXMLArgs(object):
 				dict(_source=dict(placeholder="Placeholder value."), placeholder="Bob Dole"),
 				' placeholder="Placeholder value."'
 			))
+
+
+class TestExpressionSplit(object):
+	def test_object_quote_single(self):
+		assert splitexpr("foo 'Hello world!'") == ['foo', "'Hello world!'"]
+	
+	def test_object_quote_double(self):
+		assert splitexpr('bar "Farewell cruel world!"') == ['bar', '"Farewell cruel world!"']
+	
+	def test_call_then_argspec(self):
+		assert splitexpr('baz(diz, "thing") 27, 42') == ['baz(diz, "thing")', '27, 42']
 
 
 class TestChunker(object):
