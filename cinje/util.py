@@ -250,7 +250,6 @@ def splitexpr(text):
 	# This is rather nasty, so we've isolated it here.
 	
 	parts = []
-	offset = 0 if pypy else 1
 	
 	while text:
 		split = -1
@@ -258,7 +257,10 @@ def splitexpr(text):
 		try:
 			ast.parse(text)
 		except SyntaxError as e:  # We expect this, and catch it.  It'll have exploded after the first expr.
-			split = text.rfind(text[e.offset-offset] if text[e.offset-offset] in "'\"" else ' ', 0, e.offset-offset)
+			if pypy:
+				split = e.offset
+			else:
+				split = text.rfind(text[e.offset - 1] if text[e.offset - 1] in "'\"" else ' ', 0, e.offset - 1)
 		
 		if split < 0:
 			parts.append(text)
