@@ -117,6 +117,9 @@ class TestExpressionSplit(object):
 	
 	def test_call_then_argspec(self):
 		assert splitexpr('baz(diz, "thing") 27, 42') == ['baz(diz, "thing")', '27, 42']
+	
+	def test_partial_expression(self):
+		assert splitexpr('asdf 24 asdf"') == ['asdf', '24', 'asdf"']
 
 
 class TestChunker(object):

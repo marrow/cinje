@@ -244,7 +244,7 @@ def xmlargs(_source=None, **values):
 	return bless(" " + ejoin(parts)) if parts else ''
 
 
-def splitexpr(text):
+def splitexpr(text, limit=0):
 	"""Split a given line of text into constituent expressions."""
 	
 	# This is rather nasty, so we've isolated it here.
@@ -269,14 +269,14 @@ def splitexpr(text):
 		chunk = text[:split].rstrip()
 		
 		# Verify this is a good split.
-		try:
-			ast.parse(chunk)
-		except SyntaxError as e:
-			parts.append(text)
-			break
+		ast.parse(chunk)  # We want this to explode if invalid.
 		
 		parts.append(chunk)
 		text = text[split:].lstrip()
+		
+		if limit and len(parts) == limit:
+			parts.append(text)
+			break
 	
 	return parts
 
