@@ -2,6 +2,13 @@
 
 import sys
 
+try:
+	import pygments
+	import pygments.lexers
+	import pygments.formatters
+except ImportError:
+	pygments = None
+
 
 class CommandLineInterface(object):
 	def __init__(self, arguments):
@@ -20,15 +27,25 @@ class CommandLineInterface(object):
 			print(result)
 	
 	def source(self, file):
+		result = None
+		
 		if file == '-':
-			return self._source_string(sys.stdin.read())
+			result = self._source_string(sys.stdin.read())
+		else:
+			try:
+				result = self._source_reference(file)
+			except ImportError:
+				result = self._source_path(file)
 		
-		try:
-			return self._source_reference(file)
-		except ImportError:
-			pass
+		if pygments and (sys.stdout.isatty() or 'c' in self.flags) and 'C' not in self.flags:
+			language = pygments.lexers.get_lexer_by_name('python')
+			language.add_filter('highlight', names=[
+					'__w', '__ws', '_bless', '_escape', '_args',
+				])
+			formatter = pygments.formatters.get_formatter_by_name('256')
+			return pygments.highlight(result, language, formatter)
 		
-		return self._source_path(file)
+		return result
 	
 	def _source_reference(self, reference):
 		parts = reference.split('.')[1:]
