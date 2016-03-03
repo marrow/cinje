@@ -10,6 +10,9 @@ except ImportError:
 	pygments = None
 
 
+from cinje import flatten
+
+
 class CommandLineInterface(object):
 	def __init__(self, arguments):
 		remainder = list(arguments)
@@ -25,6 +28,27 @@ class CommandLineInterface(object):
 			sys.exit(result)
 		if result:
 			print(result)
+	
+	def render(self, reference, *args, **kw):
+		output = kw.pop('out', None)
+		encoding = kw.pop('encoding', 'utf8')
+		
+		module, _, function = reference.partition(':')
+		module = __import__(module, fromlist=(function, ))
+		template = getattr(module, function)(*args, **kw)
+		
+		if output and output != '-':
+			with open(output, 'wb') as fh:
+				flatten(template, fh, encoding=encoding)
+			
+			return '' if 'q' in self.flags else ("Template result written to: " + output)
+		
+		if pygments and (sys.stdout.isatty() or 'c' in self.flags) and 'C' not in self.flags:
+			language = pygments.lexers.get_lexer_by_name('html')
+			formatter = pygments.formatters.get_formatter_by_name('256')
+			return pygments.highlight(flatten(template), language, formatter)
+		
+		flatten(template, sys.stdout)
 	
 	def source(self, file):
 		result = None
