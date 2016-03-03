@@ -5,7 +5,7 @@ import ast  # Tighten your belts...
 from itertools import chain
 from pprint import pformat
 
-from ..util import pypy, iterate, chunk, Line, ensure_buffer
+from ..util import pypy, iterate, splitexpr, chunk, Line, ensure_buffer
 
 
 def gather(input):
@@ -116,18 +116,8 @@ class Text(object):
 				continue
 			
 			if token == 'format':
-				# We need to split the expression defining the format string from the values to pass when formatting.
-				# We want to allow any Python expression, so we'll need to piggyback on Python's own parser in order
-				# to exploit the currently available syntax.  Apologies, this is probably the scariest thing in here.
-				split = -1
-				
-				try:
-					ast.parse(chunk_)
-				except SyntaxError as e:  # We expect this, and catch it.  It'll have exploded after the first expr.
-					split = chunk_.rfind(' ', 0, e.offset)
-				
-				token = '_bless(' + chunk_[:split].rstrip() + ').format'
-				chunk_ = chunk_[split:].lstrip()
+				token, chunk_ = splitexpr(chunk_, 1)
+				token = '_bless(' + token + ').format'
 			
 			yield Line(lineno, prefix + token + '(' + chunk_ + ')' + suffix, scope)
 			

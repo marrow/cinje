@@ -7,6 +7,7 @@ from __future__ import unicode_literals
 # ## Imports
 
 import sys
+import ast
 
 from codecs import iterencode
 from inspect import isfunction, isclass
@@ -241,6 +242,43 @@ def xmlargs(_source=None, **values):
 		pappend(key + "=" + quoteattr(str(value)))
 	
 	return bless(" " + ejoin(parts)) if parts else ''
+
+
+def splitexpr(text, limit=0):
+	"""Split a given line of text into constituent expressions."""
+	
+	# This is rather nasty, so we've isolated it here.
+	
+	parts = []
+	
+	while text:
+		split = -1
+		
+		try:
+			ast.parse(text)
+		except SyntaxError as e:  # We expect this, and catch it.  It'll have exploded after the first expr.
+			if pypy:
+				split = e.offset
+			else:
+				split = text.rfind(text[e.offset - 1] if text[e.offset - 1] in "'\"" else ' ', 0, e.offset - 1)
+		
+		if split < 0:
+			parts.append(text)
+			break
+		
+		chunk = text[:split].rstrip()
+		
+		# Verify this is a good split.
+		ast.parse(chunk)  # We want this to explode if invalid.
+		
+		parts.append(chunk)
+		text = text[split:].lstrip()
+		
+		if limit and len(parts) == limit:
+			parts.append(text)
+			break
+	
+	return parts
 
 
 def chunk(text, mapping={None: 'text', '${': '_escape', '#{': '_bless', '&{': '_args', '%{': 'format', '@{': '_json'}):
