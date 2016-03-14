@@ -35,7 +35,7 @@ class PyTest(TestCommand):
 
 here = os.path.abspath(os.path.dirname(__file__))
 
-tests_require = ['pytest', 'pytest-cov', 'pytest-spec', 'pytest-flakes', 'pytest-cagoule']
+tests_require = ['pytest', 'pytest-cov', 'pytest-spec', 'pytest-flakes']
 
 if 'ACCELERATED' not in os.environ or os.environ.get('ACCELERATED', '1') != '0':
 	tests_require.append('markupsafe')
@@ -75,7 +75,8 @@ setup(
 		],
 	
 	packages = find_packages(exclude=['test', 'example', 'benchmark']),
-	include_package_data = False,
+	include_package_data = True,
+	package_data = {'': ['README.rst', 'LICENSE.txt']},
 	
 	# ## Dependency Declaration
 	
