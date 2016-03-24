@@ -285,11 +285,11 @@ def chunk(text, mapping={None: 'text', '${': '_escape', '#{': '_bless', '&{': '_
 		yield mapping[None], text[last:]
 
 
-def ensure_buffer(context):
+def ensure_buffer(context, separate=True):
 	if 'text' in context.flag:
 		return
 	
-	yield Line(0, "")
+	if separate: yield Line(0, "")
 	yield Line(0, "_buffer = []")
 	
 	if not pypy:
