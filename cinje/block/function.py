@@ -104,7 +104,7 @@ class Function(object):
 		if 'using' in context.flag:  # Clean up that we were using things.
 			context.flag.remove('using')
 		
-		for i in flush_template(context):  # Handle the final buffer yield if any content was generated.
+		for i in flush_template(context, reconstruct=False):  # Handle the final buffer yield if any content was generated.
 			yield i
 		
 		context.scope -= 1
