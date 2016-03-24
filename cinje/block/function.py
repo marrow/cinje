@@ -2,7 +2,7 @@
 
 import re
 
-from ..util import Line, py, pypy
+from ..util import py, pypy, ensure_buffer
 from ..inline.flush import flush_template
 
 

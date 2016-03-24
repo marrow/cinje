@@ -2,7 +2,6 @@
 
 import ast  # Tighten your belts...
 
-from itertools import chain
 from pprint import pformat
 
 from ..util import pypy, iterate, chunk, Line, ensure_buffer
@@ -60,7 +59,6 @@ class Text(object):
 		dirty = False  # Used for conditional flushing.
 		prefix = ''  # Prepend to the source line emitted.
 		suffix = ''   # Append to the source line emitted.
-		input = context.input
 		
 		# Make sure we have a buffer to write to.
 		for i in ensure_buffer(context):

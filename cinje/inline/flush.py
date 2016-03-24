@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-from ..util import Line, ensure_buffer, py
+from ..util import Line, ensure_buffer
 
 
 def flush_template(context, declaration=None):

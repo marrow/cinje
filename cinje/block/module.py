@@ -2,12 +2,11 @@
 
 from __future__ import unicode_literals
 
-from zlib import compress, decompress
-from base64 import b64encode, b64decode
-from pprint import pformat
+from zlib import compress
+from base64 import b64encode
 from collections import deque
 
-from ..util import py, Line, iterate
+from ..util import py, Line
 
 
 def red(numbers):
