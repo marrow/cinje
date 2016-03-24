@@ -133,7 +133,11 @@ def fragment(string, name="anonymous", **context):
 	
 	exec(code, environ)
 	
-	if name is None:  # We need to dig it out of the `___tmpl__` list.
+	if name is None:  # We need to dig it out of the `__tmpl__` list.
+		if __debug__ and not environ.get('__tmpl__', None):
+			raise RuntimeError("Template fragment does not contain a function: " + repr(environ.get('__tmpl__', None)) + \
+					"\n\n" + code)
+		
 		return environ[environ['__tmpl__'][-1]]  # Super secret sauce: you _can_ define more than one function...
 	
 	return environ[name]
