@@ -3,7 +3,7 @@
 from ..util import Line, ensure_buffer
 
 
-def flush_template(context, declaration=None):
+def flush_template(context, declaration=None, reconstruct=True):
 	"""Emit the code needed to flush the buffer.
 		
 	Will only emit the yield and clear if the buffer is known to be dirty.
@@ -18,8 +18,9 @@ def flush_template(context, declaration=None):
 		context.flag.remove('text')  # This will force a new buffer to be constructed.
 		context.flag.remove('dirty')
 		
-		for i in ensure_buffer(context, ):
-			yield i
+		if reconstruct:
+			for i in ensure_buffer(context):
+				yield i
 	
 	if declaration.stripped == 'yield':
 		yield declaration
