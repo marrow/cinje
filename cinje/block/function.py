@@ -98,6 +98,9 @@ class Function(object):
 		
 		context.scope += 1
 		
+		for i in ensure_buffer(context):
+			yield i
+		
 		for i in context.stream:
 			yield i
 		
