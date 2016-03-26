@@ -22,7 +22,7 @@ class Pragma(object):
 	
 		`init`: The module scope has been prepared. Unsetting this is unwise.
 		
-		`text`: Text fragments have been utilized within the curren function scope.
+		`text`: Text fragments have been utilized within the current function scope.
 		
 		`dirty`: It is known to the engine that the current buffer contains content which will need to be flushed.
 		
