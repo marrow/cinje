@@ -1,7 +1,7 @@
 # encoding: utf-8
 
 
-class Flush(object):
+class Pragma(object):
 	"""Allow the addition and removal of translation flags during the translation process.
 	
 	Usage is straightforward; to add "flag" to the current set of flags:

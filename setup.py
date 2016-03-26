@@ -106,6 +106,7 @@ setup(
 						'require = cinje.inline.require:Require',
 						'text = cinje.inline.text:Text',
 						'use = cinje.inline.use:Use',
+						'pragma = cinje.inline.pragma:Pragma',
 					]
 			},
 	
