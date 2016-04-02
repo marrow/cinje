@@ -346,6 +346,8 @@ Module Scope
 This is an automatic transformer triggered by the start of a source file.  It automatically adds a few imports to the
 top of your file to import the required helpers from cinje.
 
+By default the ``buffer`` flag is enabled in all modules.
+
 Function Declaration
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -368,6 +370,21 @@ You do not need the extraneous trailing colon to denote the end of the declarati
 parenthesis around the argument specification.  The optimization keyword-only arguments will be added automatically to
 the argument specification you give on non-Pypy Python 3 versions.  It will gracefully handle integration into your
 arglist even if your arglist already includes the keyword-only marker, or combinations of ``*args`` or ``**kw``.
+
+You can specify flags to enable or disable within the context of a specific function using Python 3 function
+annotations. These annotations will work for setting and unsetting flags across both Python 2 and Python 3 runtimes.
+
+The most common use of per-function flags is to disable buffering, or enable whitespace stripping::
+
+	: def anotherfunction -> !buffer strip
+		This won't have a trailing newline, and will be immediately yielded.
+
+The result of this would be::
+
+	def anotherfucntion(...):
+		yield "This won't have a trailing newline, and will be immediately yielded."
+
+Flags declared in this way will have their effect reversed automatically at the close of the function scope.
 
 Flow Control
 ~~~~~~~~~~~~
@@ -464,6 +481,35 @@ Is transformed, roughly, into the following single outer call and three nested c
 	))
 
 See the Variable Replacement section for details on the replacement options that are available and how they operate.
+
+Pragma
+~~~~~~
+
+The ``: pragma <flag>[ <flag>][...]`` directive allows you to enable or disable one or more processing flags. Usage is
+straightforward; to add a falg to the current set of flags::
+
+	: pragma flag
+
+To subsequently remove a flag::
+
+	: pragma !flag
+
+Multiple flags may be whitespace separated and can mix addition and removal::
+
+	: pragma flag !other_flag
+
+No flag may contain whitespace. Built-in flags include:
+
+* ``init``: The module scope has been prpared. Unsetting this is unwise.
+* ``text``: Text fragments have been utilized within the current function, making this a template function.
+* ``dirty``: It is known to the engine that the current buffer contains content which will need to be flushed.
+* ``buffer``: Enabled by default, its presence tells cinje to use a buffer with explicit flushing. When removed,
+  buffering is disabled and every fragment is flushed as it is encountered, and ``: use`` and ``: using`` behaviour
+  is altered to ``yield from`` instead of adding the child template to the buffer.
+  It is potentially very useful to disable this in the context of ``: use`` and ``: using`` to make child template
+  ``: flush`` statements effective.
+* ``using``: Indicates the ``_using_stack`` variable is available at this point in the translated code, i.e. to track
+  nested ``: using`` stateements.
 
 
 Inheritance
