@@ -315,14 +315,14 @@ class Line(object):
 	
 	__slots__ = ('number', 'line', 'scope', 'kind', 'continued')
 	
-	def __init__(self, number, line, scope=None):
+	def __init__(self, number, line, scope=None, kind=None):
 		self.number = number
 		self.line = line
 		self.scope = scope
-		self.kind = None
+		self.kind = kind
 		self.continued = self.stripped.endswith('\\')
 		
-		self.process()
+		if not kind: self.process()
 		
 		super(Line, self).__init__()
 	
@@ -366,6 +366,7 @@ class Line(object):
 				number = self.number,
 				line = self.line,
 				scope = self.scope,
+				kind = self.kind,
 			)
 		
 		values.update(kw)
