@@ -60,12 +60,12 @@ class Pragma(object):
 			if flag[0] == '!':
 				flag = flag[1:]
 				
-				if flag in context.flags:
+				if flag in context.flag:
 					context.flag.remove(flag)
 				
 				continue
 			
-			if flag not in context.flags:
+			if flag not in context.flag:
 				context.flag.add(flag)
 		
 		if False:  # We need to be a generator, but we don't generate anything.
