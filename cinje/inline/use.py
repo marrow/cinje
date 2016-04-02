@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-from ..util import pypy, ensure_buffer
+from ..util import py, pypy, ensure_buffer
 
 PREFIX = '_buffer.extend(' if pypy else '__w(' 
 
@@ -36,6 +36,17 @@ class Use(object):
 		for i in ensure_buffer(context):
 			yield i
 		
-		yield declaration.clone(line=PREFIX + name.rstrip() + "(" + args.lstrip() + "))")
+		name = name.rstrip()
+		args = args.lstrip()
 		
-		context.flag.add('dirty')
+		if 'buffer' in context.flag:
+			yield declaration.clone(line=PREFIX + name + "(" + args + "))")
+			context.flag.add('dirty')
+			return
+		
+		if py == 3:  # We can use the more efficient "yield from" syntax. Wewt!
+			yield declaration.clone(line="yield from " + name + "(" + args + ")")
+		else:
+			yield declaration.clone(line="for _chunk in " + name + "(" + args + "):")
+			yield declaration.clone(line="yield _chunk", scope=context.scope + 1)
+
