@@ -124,7 +124,7 @@ def fragment(string, name="anonymous", **context):
 		code = string.encode('utf8').decode('cinje')
 		name = None
 	else:
-		code = ": def {name}\n\n{string}\n\n: end".format(
+		code = ": def {name}\n\n{string}".format(
 				name = name,
 				string = string,
 			).encode('utf8').decode('cinje')
