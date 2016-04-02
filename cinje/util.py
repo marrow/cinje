@@ -247,7 +247,7 @@ def xmlargs(_source=None, **values):
 	return bless(" " + ejoin(parts)) if parts else ''
 
 
-def chunk(text, mapping={None: 'text', '${': '_escape', '#{': '_bless', '&{': '_args', '%{': 'format', '@{': '_json'}):
+def chunk(line, mapping={None: 'text', '${': 'escape', '#{': 'bless', '&{': 'args', '%{': 'format', '@{': 'json'}):
 	"""Chunkify and "tag" a block of text into plain text and code sections.
 	
 	The first delimeter is blank to represent text sections, and keep the indexes aligned with the tags.
@@ -261,6 +261,8 @@ def chunk(text, mapping={None: 'text', '${': '_escape', '#{': '_bless', '&{': '_
 	
 	i = 0
 	
+	text = line.line
+	
 	while i < len(text):
 		if start is not None:
 			if text[i] == '{':
@@ -270,14 +272,14 @@ def chunk(text, mapping={None: 'text', '${': '_escape', '#{': '_bless', '&{': '_
 				if skipping:
 					skipping -= 1
 				else:
-					yield mapping[text[start-2:start]], text[start:i]
+					yield line.clone(kind=mapping[text[start-2:start]], line=text[start:i])
 					start = None
 					last = i = i + 1
 					continue
 		
 		elif text[i:i+2] in mapping:
 			if last is not None and last != i:
-				yield mapping[None], text[last:i]
+				yield line.clone(kind=mapping[None], line=text[last:i])
 				last = None
 			
 			start = i = i + 2
@@ -286,7 +288,7 @@ def chunk(text, mapping={None: 'text', '${': '_escape', '#{': '_bless', '&{': '_
 		i += 1
 	
 	if last < len(text):
-		yield mapping[None], text[last:]
+		yield line.clone(kind=mapping[None], line=text[last:])
 
 
 def ensure_buffer(context, separate=True):
