@@ -38,6 +38,7 @@ class Module(object):
 		input = context.input
 		
 		context.flag.add('init')
+		context.flag.add('buffer')
 		
 		imported = False
 		
