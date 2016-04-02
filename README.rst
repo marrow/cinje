@@ -486,7 +486,7 @@ Pragma
 ~~~~~~
 
 The ``: pragma <flag>[ <flag>][...]`` directive allows you to enable or disable one or more processing flags. Usage is
-straightforward; to add a falg to the current set of flags::
+straightforward; to add a flag to the current set of flags::
 
 	: pragma flag
 
