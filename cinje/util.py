@@ -292,7 +292,7 @@ def chunk(line, mapping={None: 'text', '${': 'escape', '#{': 'bless', '&{': 'arg
 
 
 def ensure_buffer(context, separate=True):
-	if 'text' in context.flag:
+	if 'text' in context.flag or 'buffer' not in context.flag:
 		return
 	
 	if separate: yield Line(0, "")
