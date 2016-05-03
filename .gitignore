@@ -1,19 +1,18 @@
 *.py[co]
 
-# Packages
+# Package Management
 *.egg
 *.egg-info
 dist
 build
 eggs
+.eggs
 parts
 bin
 var
 sdist
 develop-eggs
 .installed.cfg
-
-# Installer logs
 pip-log.txt
 
 # Unit test / coverage reports
@@ -21,6 +20,7 @@ pip-log.txt
 .tox
 .cache
 htmlcov
+coverage.xml
 
 # Translations
 *.mo
@@ -28,4 +28,6 @@ htmlcov
 # Mac
 .DS_Store
 
-coverage.xml
+# Vim
+.ropeproject
+tags

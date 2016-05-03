@@ -124,7 +124,7 @@ def fragment(string, name="anonymous", **context):
 		code = string.encode('utf8').decode('cinje')
 		name = None
 	else:
-		code = ": def {name}\n\n{string}\n\n: end".format(
+		code = ": def {name}\n\n{string}".format(
 				name = name,
 				string = string,
 			).encode('utf8').decode('cinje')
@@ -133,7 +133,11 @@ def fragment(string, name="anonymous", **context):
 	
 	exec(code, environ)
 	
-	if name is None:  # We need to dig it out of the `___tmpl__` list.
+	if name is None:  # We need to dig it out of the `__tmpl__` list.
+		if __debug__ and not environ.get('__tmpl__', None):
+			raise RuntimeError("Template fragment does not contain a function: " + repr(environ.get('__tmpl__', None)) + \
+					"\n\n" + code)
+		
 		return environ[environ['__tmpl__'][-1]]  # Super secret sauce: you _can_ define more than one function...
 	
 	return environ[name]
@@ -243,7 +247,7 @@ def xmlargs(_source=None, **values):
 	return bless(" " + ejoin(parts)) if parts else ''
 
 
-def chunk(text, mapping={None: 'text', '${': '_escape', '#{': '_bless', '&{': '_args', '%{': 'format', '@{': '_json'}):
+def chunk(line, mapping={None: 'text', '${': 'escape', '#{': 'bless', '&{': 'args', '%{': 'format', '@{': 'json'}):
 	"""Chunkify and "tag" a block of text into plain text and code sections.
 	
 	The first delimeter is blank to represent text sections, and keep the indexes aligned with the tags.
@@ -257,6 +261,8 @@ def chunk(text, mapping={None: 'text', '${': '_escape', '#{': '_bless', '&{': '_
 	
 	i = 0
 	
+	text = line.line
+	
 	while i < len(text):
 		if start is not None:
 			if text[i] == '{':
@@ -266,14 +272,14 @@ def chunk(text, mapping={None: 'text', '${': '_escape', '#{': '_bless', '&{': '_
 				if skipping:
 					skipping -= 1
 				else:
-					yield mapping[text[start-2:start]], text[start:i]
+					yield line.clone(kind=mapping[text[start-2:start]], line=text[start:i])
 					start = None
 					last = i = i + 1
 					continue
 		
 		elif text[i:i+2] in mapping:
 			if last is not None and last != i:
-				yield mapping[None], text[last:i]
+				yield line.clone(kind=mapping[None], line=text[last:i])
 				last = None
 			
 			start = i = i + 2
@@ -282,18 +288,19 @@ def chunk(text, mapping={None: 'text', '${': '_escape', '#{': '_bless', '&{': '_
 		i += 1
 	
 	if last < len(text):
-		yield mapping[None], text[last:]
+		yield line.clone(kind=mapping[None], line=text[last:])
 
 
-def ensure_buffer(context):
-	if 'text' in context.flag:
+def ensure_buffer(context, separate=True):
+	if 'text' in context.flag or 'buffer' not in context.flag:
 		return
 	
-	# TODO: Determine if the Python 2-required approach (reassignment) is faster than the .clear() approach.
-	
-	yield Line(0, "")
+	if separate: yield Line(0, "")
 	yield Line(0, "_buffer = []")
-	yield Line(0, "__w, __ws = _buffer.extend, _buffer.append")
+	
+	if not pypy:
+		yield Line(0, "__w, __ws = _buffer.extend, _buffer.append")
+	
 	yield Line(0, "")
 	
 	context.flag.add('text')
@@ -308,19 +315,19 @@ class Line(object):
 	
 	__slots__ = ('number', 'line', 'scope', 'kind', 'continued')
 	
-	def __init__(self, number, line, scope=None):
+	def __init__(self, number, line, scope=None, kind=None):
 		self.number = number
 		self.line = line
 		self.scope = scope
-		self.kind = None
+		self.kind = kind
 		self.continued = self.stripped.endswith('\\')
 		
-		self.process()
+		if not kind: self.process()
 		
 		super(Line, self).__init__()
 	
 	def process(self):
-		if self.stripped.startswith('#'):
+		if self.stripped.startswith('#') and not self.stripped.startswith('#{'):
 			self.kind = 'comment'
 		elif self.stripped.startswith(':'):
 			self.kind = 'code'
@@ -359,6 +366,7 @@ class Line(object):
 				number = self.number,
 				line = self.line,
 				scope = self.scope,
+				kind = self.kind,
 			)
 		
 		values.update(kw)
@@ -434,7 +442,7 @@ class Context(object):
 	This is the primary entry point for translation.
 	"""
 	
-	__slots__ = ('input', 'scope', 'flag', '_handler', 'templates', 'handlers')
+	__slots__ = ('input', 'scope', 'flag', '_handler', 'templates', 'handlers', 'mapping')
 	
 	def __init__(self, input):
 		self.input = Lines(input.decode('utf8') if isinstance(input, bytes) else input)
@@ -443,6 +451,7 @@ class Context(object):
 		self._handler = []
 		self.handlers = []
 		self.templates = []
+		self.mapping = None
 		
 		for translator in map(methodcaller('load'), iter_entry_points('cinje.translator')):
 			self.handlers.append(translator)
@@ -453,6 +462,7 @@ class Context(object):
 	def prepare(self):
 		"""Prepare the ordered list of transformers and reset context state to initial."""
 		self.scope = 0
+		self.mapping = deque([0])
 		self._handler = [i() for i in sorted(self.handlers, key=lambda handler: handler.priority)]
 	
 	@property
@@ -463,7 +473,18 @@ class Context(object):
 		"""
 		
 		if 'init' not in self.flag:
+			root = True
 			self.prepare()
+		else:
+			root = False
+		
+		# Track which lines were generated in response to which lines of source code.
+		# The end result is that there is one entry here for every line emitted, each integer representing the source
+		# line number that triggered it.  If any lines are returned with missing line numbers, they're inferred from
+		# the last entry already in the list.
+		# Fun fact: this list is backwards; we optimize by using a deque and appending to the left edge. this updates
+		# the head of a linked list; the whole thing needs to be reversed to make sense.
+		mapping = self.mapping
 		
 		for line in self.input:
 			handler = self.classify(line)
@@ -476,6 +497,8 @@ class Context(object):
 			self.input.push(line)  # Put it back so it can be consumed by the handler.
 			
 			for line in handler(self):  # This re-indents the code to match, if missing explicit scope.
+				if root: mapping.appendleft(line.number or mapping[0])  # Track source line number.
+				
 				if line.scope is None:
 					line = line.clone(scope=self.scope)
 				

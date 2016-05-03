@@ -2,7 +2,8 @@
 
 from __future__ import print_function, unicode_literals
 
-from cinje import transform
+import cinje
+import cinje.std.html
 
 from pygments import highlight
 from pygments.lexers import PythonLexer
@@ -10,8 +11,9 @@ from pygments.formatters import Terminal256Formatter
 
 
 def main():
-	with open('../cinje/std/html.py', 'rb') as fh:
-		lines = transform(fh.read().decode('utf8'))
+	print("Translated source code:\n")
+	
+	lines = open(cinje.std.html.__file__.replace('.pyc', '.py'), 'rb').read().decode('cinje')
 	
 	print(highlight(lines, PythonLexer(), Terminal256Formatter()))
 

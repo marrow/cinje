@@ -2,7 +2,7 @@
 
 import re
 
-from ..util import Line, py, pypy
+from ..util import py, pypy, ensure_buffer
 from ..inline.flush import flush_template
 
 
@@ -80,11 +80,36 @@ class Function(object):
 		
 		declaration = input.next()
 		line = declaration.partitioned[1]  # We don't care about the "def".
+		line, _, annotation = line.rpartition('->')
+		
+		if annotation and not line:  # Swap the values back.
+			line = annotation
+			annotation = ''
+		
 		name, _, line = line.partition(' ')  # Split the function name.
 		
-		argspec = line
-		
+		argspec = line.rstrip()
 		name = name.strip()
+		annotation = annotation.lstrip()
+		added_flags = []
+		removed_flags = []
+		
+		if annotation:
+			for flag in (i.lower().strip() for i in annotation.split()):
+				if not flag.strip('!'): continue  # Handle standalone exclamation marks.
+				
+				if flag[0] == '!':
+					flag = flag[1:]
+					
+					if flag in context.flag:
+						context.flag.remove(flag)
+						removed_flags.append(flag)
+					
+					continue
+				
+				if flag not in context.flag:
+					context.flag.add(flag)
+					added_flags.append(flag)
 		
 		if py == 3 and not pypy:
 			argspec = self._optimize(context, argspec)
@@ -98,17 +123,31 @@ class Function(object):
 		
 		context.scope += 1
 		
+		for i in ensure_buffer(context, False):
+			yield i
+		
 		for i in context.stream:
 			yield i
 		
 		if 'using' in context.flag:  # Clean up that we were using things.
 			context.flag.remove('using')
 		
-		for i in flush_template(context):  # Handle the final buffer yield if any content was generated.
-			yield i
-		
-		context.scope -= 1
-		
 		if 'text' in context.flag:
 			context.templates.append(name)
+		
+		for i in flush_template(context, reconstruct=False):  # Handle the final buffer yield if any content was generated.
+			yield i
+		
+		if 'text' in context.flag:
 			context.flag.remove('text')
+		
+		for flag in added_flags:
+			if flag in context.flag:
+				context.flag.remove(flag)
+		
+		for flag in removed_flags:
+			if flag not in context.flag:
+				context.flag.add(flag)
+		
+		context.scope -= 1
+

@@ -35,7 +35,7 @@ class PyTest(TestCommand):
 
 here = os.path.abspath(os.path.dirname(__file__))
 
-tests_require = ['pytest', 'pytest-cov', 'pytest-spec', 'pytest-flakes', 'pytest-cagoule']
+tests_require = ['pytest', 'pytest-cov', 'pytest-spec', 'pytest-flakes']
 
 if 'ACCELERATED' not in os.environ or os.environ.get('ACCELERATED', '1') != '0':
 	tests_require.append('markupsafe')
@@ -55,7 +55,7 @@ setup(
 	author_email = author.email,
 	
 	license = 'MIT',
-	keywords = '',
+	keywords = ['template', 'source translation', 'dsl', 'streaming', 'chunked'],
 	classifiers = [
 			"Development Status :: 5 - Production/Stable",
 			"Intended Audience :: Developers",
@@ -65,6 +65,7 @@ setup(
 			"Programming Language :: Python :: 2",
 			"Programming Language :: Python :: 2.7",
 			"Programming Language :: Python :: 3",
+			"Programming Language :: Python :: 3.2",
 			"Programming Language :: Python :: 3.3",
 			"Programming Language :: Python :: 3.4",
 			"Programming Language :: Python :: 3.5",
@@ -76,6 +77,7 @@ setup(
 	
 	packages = find_packages(exclude=['test', 'example', 'benchmark']),
 	include_package_data = True,
+	package_data = {'': ['README.rst', 'LICENSE.txt']},
 	
 	# ## Dependency Declaration
 	
@@ -105,6 +107,7 @@ setup(
 						'require = cinje.inline.require:Require',
 						'text = cinje.inline.text:Text',
 						'use = cinje.inline.use:Use',
+						'pragma = cinje.inline.pragma:Pragma',
 					]
 			},
 	

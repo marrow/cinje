@@ -1,6 +1,26 @@
 # encoding: utf-8
 
+from __future__ import unicode_literals
+
+from zlib import compress
+from base64 import b64encode
+from collections import deque
+
 from ..util import py, Line
+
+
+def red(numbers):
+	"""Encode the deltas to reduce entropy."""
+	
+	line = 0
+	deltas = []
+	
+	for value in numbers:
+		deltas.append(value - line)
+		line = value
+	
+	return b64encode(compress(b''.join(chr(i).encode('latin1') for i in deltas))).decode('latin1')
+
 
 
 class Module(object):
@@ -18,6 +38,7 @@ class Module(object):
 		input = context.input
 		
 		context.flag.add('init')
+		context.flag.add('buffer')
 		
 		imported = False
 		
@@ -50,5 +71,16 @@ class Module(object):
 			yield Line(0, '')
 			yield Line(0, '__tmpl__.extend(["' + '", "'.join(context.templates) + '"])')
 			context.templates = []
+		
+		# Snapshot the line number mapping.
+		mapping = deque(context.mapping)
+		mapping.reverse()
+		
+		yield Line(0, '')
+		
+		if __debug__:
+			yield Line(0, '__mapping__ = [' + ','.join(str(i) for i in mapping) + ']')
+		
+		yield Line(0, '__gzmapping__ = b"' + red(mapping).replace('"', '\"') + '"')
 		
 		context.flag.remove('init')

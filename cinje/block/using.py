@@ -12,7 +12,7 @@ class Using(object):
 	def __call__(self, context):
 		input = context.input
 		
-		declaration = _declaration = input.next()
+		declaration = input.next()
 		
 		_, _, declaration = declaration.stripped.partition(' ')
 		name, _, args = declaration.partition(' ')

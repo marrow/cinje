@@ -19,9 +19,9 @@ class TestBasicFormatters(object):
 		assert flatten(fragment('${"27"}')()) == "27\n"
 		assert flatten(fragment('${"<html>"}')()) == "&lt;html&gt;\n"
 		
-	def test_blessed_text(self):  # FIXME: These can't start at the beginning of lines due to priority...
-		assert flatten(fragment('text #{"42"}')()) == "text 42\n"
-		assert flatten(fragment('text #{"<html>"}')()) == "text <html>\n"
+	def test_blessed_text(self):
+		assert flatten(fragment('#{"42"}')()) == "42\n"
+		assert flatten(fragment('#{"<html>"}')()) == "<html>\n"
 	
 	def test_json_object(self):
 		assert flatten(fragment('@{[27,42]}')()) == "[27, 42]\n"

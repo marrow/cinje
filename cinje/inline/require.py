@@ -2,8 +2,6 @@
 
 from importlib import import_module
 
-from ..util import ensure_buffer
-
 
 class Require(object):
 	"""Include reusable components from other modules.

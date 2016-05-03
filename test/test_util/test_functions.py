@@ -23,7 +23,7 @@ def test_iterruptable():
 
 def test_ensure_buffer():
 	class context(object):
-		flag = set()
+		flag = {'buffer'}
 	
 	assert 'text' not in context.flag
 	result = list(ensure_buffer(context))
@@ -113,7 +113,10 @@ class TestChunker(object):
 		token, kind, value = value
 		phrase = value if not token else (token + '{' + value + '}')
 		
-		assert list(chunk(phrase)) == [(kind, value)]
+		result = next(chunk(Line(0, phrase)))
+		assert result.number == 0
+		assert result.line == value
+		assert result.kind == kind
 	
 	def test_plain_text_chunk(self):
 		self._do(('', 'text', "This is some text."))
@@ -122,23 +125,27 @@ class TestChunker(object):
 		self._do(('', 'text', "Some text with {matched braces}."))
 	
 	def test_escaped_text_chunk(self):
-		self._do(('$', '_escape', "Escaped text."))
+		self._do(('$', 'escape', "Escaped text."))
 	
 	def test_excaped_text_matched_braces(self):
-		self._do(('$', '_escape', "Escaped text with {matched brackets}."))
+		self._do(('$', 'escape', "Escaped text with {matched brackets}."))
 	
 	def test_blessed_text_chunk(self):
-		self._do(('#', '_bless', "Blessed text."))
+		self._do(('#', 'bless', "Blessed text."))
 	
 	def test_argument_chunk(self):
-		self._do(('&', '_args', "Arguments."))
+		self._do(('&', 'args', "Arguments."))
 	
 	def test_formatted_chunk(self):
 		self._do(('%', 'format', "Formatted text."))
 	
 	def test_multiple_chunks(self):
-		assert list(chunk("Test ${phrase}.")) == [
-				('text', "Test "),
-				('_escape', "phrase"),
-				('text', ".")
-			]
+		parts = list(chunk(Line(0, "Test ${phrase}.")))
+		
+		assert parts[0].kind == 'text'
+		assert parts[0].line == 'Test '
+		assert parts[1].kind == 'escape'
+		assert parts[1].line == 'phrase'
+		assert parts[2].kind == 'text'
+		assert parts[2].line == '.'
+

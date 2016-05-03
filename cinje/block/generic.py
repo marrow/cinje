@@ -1,7 +1,5 @@
 # encoding: utf-8
 
-from ..util import Line, Context
-
 
 class Generic(object):
 	"""Block-level passthrough.  Blocks must be terminated by ": end" markers.

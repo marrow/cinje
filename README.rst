@@ -2,7 +2,7 @@
 cinje
 =====
 
-    © 2015 Alice Bevan-McGregor and contributors.
+    © 2015-2016 Alice Bevan-McGregor and contributors.
 
 ..
 
@@ -10,8 +10,7 @@ cinje
 
 ..
 
-    |latestversion| |downloads| |masterstatus| |mastercover| |issuecount|
-
+    |latestversion| |ghtag| |downloads| |masterstatus| |mastercover| |masterreq| |ghwatch| |ghstar|
 
 
 Contents
@@ -134,7 +133,7 @@ functionality.
 Development Version
 -------------------
 
-    |developstatus| |developcover|
+    |developstatus| |developcover| |ghsince| |issuecount| |ghfork|
 
 Development takes place on `GitHub <https://github.com/>`_ in the
 `cinje <https://github.com/marrow/cinje/>`_ project.  Issue tracking, documentation, and downloads
@@ -347,6 +346,8 @@ Module Scope
 This is an automatic transformer triggered by the start of a source file.  It automatically adds a few imports to the
 top of your file to import the required helpers from cinje.
 
+By default the ``buffer`` flag is enabled in all modules.
+
 Function Declaration
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -369,6 +370,21 @@ You do not need the extraneous trailing colon to denote the end of the declarati
 parenthesis around the argument specification.  The optimization keyword-only arguments will be added automatically to
 the argument specification you give on non-Pypy Python 3 versions.  It will gracefully handle integration into your
 arglist even if your arglist already includes the keyword-only marker, or combinations of ``*args`` or ``**kw``.
+
+You can specify flags to enable or disable within the context of a specific function using Python 3 function
+annotations. These annotations will work for setting and unsetting flags across both Python 2 and Python 3 runtimes.
+
+The most common use of per-function flags is to disable buffering, or enable whitespace stripping::
+
+	: def anotherfunction -> !buffer strip
+		This won't have a trailing newline, and will be immediately yielded.
+
+The result of this would be::
+
+	def anotherfucntion(...):
+		yield "This won't have a trailing newline, and will be immediately yielded."
+
+Flags declared in this way will have their effect reversed automatically at the close of the function scope.
 
 Flow Control
 ~~~~~~~~~~~~
@@ -458,13 +474,44 @@ on method calls, the following::
 
 Is transformed, roughly, into the following single outer call and three nested calls::
 
-	__w((
+	_buffer.extend((
 		_bless('<meta'),
 		_args(name=name, content=content),
 		_bless('>')
 	))
 
 See the Variable Replacement section for details on the replacement options that are available and how they operate.
+
+Pragma
+~~~~~~
+
+*New in Version 1.1*
+
+The ``: pragma <flag>[ <flag>][...]`` directive allows you to enable or disable one or more processing flags. Usage is
+straightforward; to add a flag to the current set of flags::
+
+	: pragma flag
+
+To subsequently remove a flag::
+
+	: pragma !flag
+
+Multiple flags may be whitespace separated and can mix addition and removal::
+
+	: pragma flag !other_flag
+
+No flag may contain whitespace. Built-in flags include:
+
+* ``init``: The module scope has been prpared. Unsetting this is unwise.
+* ``text``: Text fragments have been utilized within the current function, making this a template function.
+* ``dirty``: It is known to the engine that the current buffer contains content which will need to be flushed.
+* ``buffer``: Enabled by default, its presence tells cinje to use a buffer with explicit flushing. When removed,
+  buffering is disabled and every fragment is flushed as it is encountered, and ``: use`` and ``: using`` behaviour
+  is altered to ``yield from`` instead of adding the child template to the buffer.
+  It is potentially very useful to disable this in the context of ``: use`` and ``: using`` to make child template
+  ``: flush`` statements effective.
+* ``using``: Indicates the ``_using_stack`` variable is available at this point in the translated code, i.e. to track
+  nested ``: using`` stateements.
 
 
 Inheritance
@@ -525,13 +572,34 @@ Lastly, there is a quick shortcut for consuming a template function and injectin
 
 And directly transforms to::
 
-	__w(<expr>(<argspec>))
+	_buffer.extend(<expr>(<argspec>))
 
 Just like with ``using``, the result of the expression must be a callable generator function.
 
 
 Version History
 ===============
+
+Version 1.1
+-----------
+
+* *Enhanced Pypy support.* Pypy does not require optimizations which potentially obfuscate the resulting code.
+  So we don't do them.
+
+* *Fixed* incorrect `#{}` handling when it was the first non-whitepsace on a line. (#22)
+
+* *Fixed* buffer iteration edge case if the first template text in a function is deeper than the function scope. (#21)
+
+* *Python 3-style function annotations* can now be used to define function-wide "pragma" additions and removals, even
+  on Python 2. (#8)
+
+* *Pragma processing directives.* Processing flags can be set and unset during the translation process using
+  `: pragma`.
+
+* *Unbuffered mode.* Cinje can now operate in unbuffered mode. Each contiguous chunk is individually yielded. (#8)
+
+* *Secret feature.* Have a cinje template? Want to more easily peek behind the curtain? (Sssh, it's a completely
+  unsupported feature that even syntax colors if `pygments` is installed.) `python -m cinje source file.py`
 
 Version 1.0
 -----------
@@ -547,7 +615,7 @@ cinje has been released under the MIT Open Source license.
 The MIT License
 ---------------
 
-Copyright © 2015 Alice Bevan-McGregor and contributors.
+Copyright © 2015-2016 Alice Bevan-McGregor and contributors.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 documentation files (the “Software”), to deal in the Software without restriction, including without limitation the
@@ -562,33 +630,60 @@ WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGE
 COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+.. |ghwatch| image:: https://img.shields.io/github/watchers/marrow/cinje.svg?style=social&label=Watch
+    :target: https://github.com/marrow/cinje/subscription
+    :alt: Subscribe to project activity on Github.
+
+.. |ghstar| image:: https://img.shields.io/github/stars/marrow/cinje.svg?style=social&label=Star
+    :target: https://github.com/marrow/cinje/subscription
+    :alt: Star this project on Github.
+
+.. |ghfork| image:: https://img.shields.io/github/forks/marrow/cinje.svg?style=social&label=Fork
+    :target: https://github.com/marrow/cinje/fork
+    :alt: Fork this project on Github.
 
 .. |masterstatus| image:: http://img.shields.io/travis/marrow/cinje/master.svg?style=flat
-    :target: https://travis-ci.org/marrow/cinje
-    :alt: Release Build Status
-
-.. |developstatus| image:: http://img.shields.io/travis/marrow/cinje/develop.svg?style=flat
-    :target: https://travis-ci.org/marrow/cinje
-    :alt: Development Build Status
-
-.. |latestversion| image:: http://img.shields.io/pypi/v/cinje.svg?style=flat
-    :target: https://pypi.python.org/pypi/cinje
-    :alt: Latest Version
-
-.. |downloads| image:: http://img.shields.io/pypi/dw/cinje.svg?style=flat
-    :target: https://pypi.python.org/pypi/cinje
-    :alt: Downloads per Week
+    :target: https://travis-ci.org/marrow/cinje/branches
+    :alt: Release build status.
 
 .. |mastercover| image:: http://img.shields.io/codecov/c/github/marrow/cinje/master.svg?style=flat
     :target: https://codecov.io/github/marrow/cinje?branch=master
-    :alt: Release Test Coverage
+    :alt: Release test coverage.
+
+.. |masterreq| image:: https://img.shields.io/requires/github/marrow/cinje.svg
+    :target: https://requires.io/github/marrow/cinje/requirements/?branch=master
+    :alt: Status of release dependencies.
+
+.. |developstatus| image:: http://img.shields.io/travis/marrow/cinje/develop.svg?style=flat
+    :target: https://travis-ci.org/marrow/cinje/branches
+    :alt: Development build status.
 
 .. |developcover| image:: http://img.shields.io/codecov/c/github/marrow/cinje/develop.svg?style=flat
     :target: https://codecov.io/github/marrow/cinje?branch=develop
-    :alt: Development Test Coverage
+    :alt: Development test coverage.
 
-.. |issuecount| image:: http://img.shields.io/github/issues/marrow/cinje.svg?style=flat
+.. |developreq| image:: https://img.shields.io/requires/github/marrow/cinje.svg
+    :target: https://requires.io/github/marrow/cinje/requirements/?branch=develop
+    :alt: Status of development dependencies.
+
+.. |issuecount| image:: http://img.shields.io/github/issues-raw/marrow/cinje.svg?style=flat
     :target: https://github.com/marrow/cinje/issues
     :alt: Github Issues
+
+.. |ghsince| image:: https://img.shields.io/github/commits-since/marrow/cinje/1.1.0.svg
+    :target: https://github.com/marrow/cinje/commits/develop
+    :alt: Changes since last release.
+
+.. |ghtag| image:: https://img.shields.io/github/tag/marrow/cinje.svg
+    :target: https://github.com/marrow/cinje/tree/1.1.0
+    :alt: Latest Github tagged release.
+
+.. |latestversion| image:: http://img.shields.io/pypi/v/cinje.svg?style=flat
+    :target: https://pypi.python.org/pypi/cinje
+    :alt: Latest released version.
+
+.. |downloads| image:: http://img.shields.io/pypi/dw/cinje.svg?style=flat
+    :target: https://pypi.python.org/pypi/cinje
+    :alt: Downloads per week.
 
 .. |cake| image:: http://img.shields.io/badge/cake-lie-1b87fb.svg?style=flat

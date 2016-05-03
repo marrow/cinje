@@ -1,6 +1,10 @@
 language: python
 sudo: false
 
+branches:
+  except:
+    - /^feature/.*$/
+
 python:
   - pypy
   - pypy3
@@ -23,3 +27,8 @@ notifications:
       - 'irc.freenode.org#webcore'
     use_notice: true
     skip_join: true
+    on_success: change
+    on_failure: always
+    template:
+      - "%{repository_slug}:%{branch}@%{commit} %{message}"
+      - "Duration: %{duration} - Details: %{build_url}"
