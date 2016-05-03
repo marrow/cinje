@@ -32,7 +32,7 @@ def process(sample):
 def test_function_flag_addition():
 	result = process(""": emit\n\n: def foo -> example\n\n: emit\n\n: end\n\n: emit""")
 	pre, mid, post = result
-
+	
 	assert str(pre).strip() == 'flags: buffer, init'
 	assert str(mid).strip() == 'flags: buffer, example, init, text'
 	assert str(post).strip() == 'flags: buffer, init'
@@ -41,11 +41,15 @@ def test_function_flag_addition():
 def test_function_flag_removal():
 	result = process(""": emit\n\n: def foo -> !buffer\n\n: emit\n\n: end\n\n: emit""")
 	pre, mid, post = result
-
+	
 	assert str(pre).strip() == 'flags: buffer, init'
 	assert str(mid).strip() == 'flags: init'
 	assert str(post).strip() == 'flags: buffer, init'
 
 
-
+def test_buffer_aware_use():
+	result = b": def foo -> !buffer\n\n: use bar args".decode('cinje')
+	
+	assert 'bar(args)' in result
+	assert 'yield from' in result or 'for _chunk in' in result
 
