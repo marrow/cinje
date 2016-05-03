@@ -51,7 +51,7 @@ class Pragma(object):
 	
 	def __call__(self, context):
 		# Pull out the flags from the pragma line, ignoring the initial "pragma" that will be present.
-		flags = [i.lower().strip() for i in context.input.next().split()][1:]
+		flags = [i.lower().strip() for i in context.input.next().stripped.split()][1:]
 		
 		# Iterate through the flags and set or unset them as appropriate:
 		for flag in flags:

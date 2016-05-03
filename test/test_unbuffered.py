@@ -53,3 +53,19 @@ def test_buffer_aware_use():
 	assert 'bar(args)' in result
 	assert 'yield from' in result or 'for _chunk in' in result
 
+
+def test_pragma_additions():
+	result = process(""": emit\n\n: pragma foo\n\n: emit""")
+	
+	first, second = result
+	assert str(first).strip() == 'flags: buffer, init'
+	assert str(second).strip() == 'flags: buffer, foo, init'
+
+
+def test_pragma_removal():
+	result = process(""": emit\n\n: pragma !buffer\n\n: emit""")
+	
+	first, second = result
+	assert str(first).strip() == 'flags: buffer, init'
+	assert str(second).strip() == 'flags: init'
+
