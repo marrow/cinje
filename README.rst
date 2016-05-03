@@ -122,7 +122,7 @@ robust as `Vagrant <http://www.vagrantup.com>`_.
 If you add ``cinje`` to the ``install_requires`` argument of the call to ``setup()`` in your application's
 ``setup.py`` file, cinje will be automatically installed and made available when your own application or
 library is installed.  We recommend using "less than" version numbers to ensure there are no unintentional
-side-effects when updating.  Use ``cinje<1.1`` to get all bugfixes for the current release, and
+side-effects when updating.  Use ``cinje<1.2`` to get all bugfixes for the current release, and
 ``cinje<2.0`` to get bugfixes and feature updates while ensuring that large breaking changes are not installed.
 
 While cinje does not have any hard dependencies on any other package, it is **strongly** recommended that applications
