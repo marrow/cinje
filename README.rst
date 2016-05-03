@@ -2,7 +2,7 @@
 cinje
 =====
 
-    © 2015 Alice Bevan-McGregor and contributors.
+    © 2015-2016 Alice Bevan-McGregor and contributors.
 
 ..
 
@@ -485,6 +485,8 @@ See the Variable Replacement section for details on the replacement options that
 Pragma
 ~~~~~~
 
+*New in Version 1.1*
+
 The ``: pragma <flag>[ <flag>][...]`` directive allows you to enable or disable one or more processing flags. Usage is
 straightforward; to add a flag to the current set of flags::
 
@@ -584,6 +586,21 @@ Version 1.1
 * *Enhanced Pypy support.* Pypy does not require optimizations which potentially obfuscate the resulting code.
   So we don't do them.
 
+* *Fixed* incorrect `#{}` handling when it was the first non-whitepsace on a line. (#22)
+
+* *Fixed* buffer iteration edge case if the first template text in a function is deeper than the function scope. (#21)
+
+* *Python 3-style function annotations* can now be used to define function-wide "pragma" additions and removals, even
+  on Python 2. (#8)
+
+* *Pragma processing directives.* Processing flags can be set and unset during the translation process using
+  `: pragma`.
+
+* *Unbuffered mode.* Cinje can now operate in unbuffered mode. Each contiguous chunk is individually yielded. (#8)
+
+* *Secret feature.* Have a cinje template? Want to more easily peek behind the curtain? (Sssh, it's a completely
+  unsupported feature that even syntax colors if `pygments` is installed.) `python -m cinje source file.py`
+
 Version 1.0
 -----------
 
@@ -598,7 +615,7 @@ cinje has been released under the MIT Open Source license.
 The MIT License
 ---------------
 
-Copyright © 2015 Alice Bevan-McGregor and contributors.
+Copyright © 2015-2016 Alice Bevan-McGregor and contributors.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 documentation files (the “Software”), to deal in the Software without restriction, including without limitation the
@@ -653,12 +670,12 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
     :target: https://github.com/marrow/cinje/issues
     :alt: Github Issues
 
-.. |ghsince| image:: https://img.shields.io/github/commits-since/marrow/cinje/1.0.svg
+.. |ghsince| image:: https://img.shields.io/github/commits-since/marrow/cinje/1.1.0.svg
     :target: https://github.com/marrow/cinje/commits/develop
     :alt: Changes since last release.
 
 .. |ghtag| image:: https://img.shields.io/github/tag/marrow/cinje.svg
-    :target: https://github.com/marrow/cinje/tree/1.0
+    :target: https://github.com/marrow/cinje/tree/1.1.0
     :alt: Latest Github tagged release.
 
 .. |latestversion| image:: http://img.shields.io/pypi/v/cinje.svg?style=flat
