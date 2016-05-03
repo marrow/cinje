@@ -80,11 +80,13 @@ class Function(object):
 		
 		declaration = input.next()
 		line = declaration.partitioned[1]  # We don't care about the "def".
-		name, _, line = line.partition(' ')  # Split the function name.
 		line, _, annotation = line.rpartition('->')
+		
 		if annotation and not line:  # Swap the values back.
 			line = annotation
 			annotation = ''
+		
+		name, _, line = line.partition(' ')  # Split the function name.
 		
 		argspec = line.rstrip()
 		name = name.strip()
