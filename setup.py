@@ -85,6 +85,7 @@ setup(
 	
 	extras_require = dict(
 			development = tests_require,
+			asphalt = ['asphalt', 'asphalt-templating', 'typeguard'],
 		),
 	
 	tests_require = tests_require,
@@ -108,7 +109,10 @@ setup(
 						'text = cinje.inline.text:Text',
 						'use = cinje.inline.use:Use',
 						'pragma = cinje.inline.pragma:Pragma',
-					]
+					],
+				'asphalt.templating.renderers': [
+						'cinje = cinje.atr:CinjeRenderer[asphalt]',
+					],
 			},
 	
 	zip_safe = False,
