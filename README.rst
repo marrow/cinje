@@ -511,7 +511,7 @@ No flag may contain whitespace. Built-in flags include:
   It is potentially very useful to disable this in the context of ``: use`` and ``: using`` to make child template
   ``: flush`` statements effective.
 * ``using``: Indicates the ``_using_stack`` variable is available at this point in the translated code, i.e. to track
-  nested ``: using`` stateements.
+  nested ``: using`` statements.
 
 
 Inheritance
