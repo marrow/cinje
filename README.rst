@@ -502,7 +502,7 @@ Multiple flags may be whitespace separated and can mix addition and removal::
 
 No flag may contain whitespace. Built-in flags include:
 
-* ``init``: The module scope has been prpared. Unsetting this is unwise.
+* ``init``: The module scope has been prepared. Unsetting this is unwise.
 * ``text``: Text fragments have been utilized within the current function, making this a template function.
 * ``dirty``: It is known to the engine that the current buffer contains content which will need to be flushed.
 * ``buffer``: Enabled by default, its presence tells cinje to use a buffer with explicit flushing. When removed,
