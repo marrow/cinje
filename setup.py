@@ -18,6 +18,7 @@ if sys.version_info < (2, 6):
 elif sys.version_info > (3, 0) and sys.version_info < (3, 2):
 	raise SystemExit("Python 3.2 or later is required.")
 
+version = description = url = author = None  # Satisfy static analysis, these are defined on the next line.
 exec(open(os.path.join("cinje", "release.py")).read())
 
 
