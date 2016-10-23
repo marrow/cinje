@@ -12,3 +12,4 @@ author = namedtuple('Author', ['name', 'email'])("Alice Bevan-McGregor", 'alice@
 
 description = "A Pythonic and ultra fast template engine DSL."
 url = 'https://github.com/marrow/cinje/'
+
