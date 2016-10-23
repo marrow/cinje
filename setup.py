@@ -102,8 +102,7 @@ setup(
 	install_requires = [],
 	tests_require = tests_require,
 	extras_require = {
-			'development': tests_require,  # Development requirements are the testing requirements.
+			'development': tests_require + ['pre-commit'],  # Development requirements are the testing requirements.
 			'safe': ['webob'],  # String safety.
 		},
 )
-

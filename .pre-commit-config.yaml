@@ -6,7 +6,6 @@
     -   id: check-byte-order-marker
     -   id: check-merge-conflict
     -   id: check-symlinks
-    -   id: flake8
     -   id: debug-statements
     -   id: detect-private-key
     -   id: end-of-file-fixer
