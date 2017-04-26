@@ -74,7 +74,7 @@ setup(
 	packages = find_packages(exclude=['bench', 'docs', 'example', 'test', 'htmlcov']),
 	include_package_data = True,
 	package_data = {'': ['README.rst', 'LICENSE.txt']},
-	namespace_packages = ['marrow'],
+	namespace_packages = [],
 	zip_safe = True,
 	
 	entry_points = {
