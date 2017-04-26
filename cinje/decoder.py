@@ -23,4 +23,5 @@ class CinjeDecoder(GalfiDecoder):
 			'nomap',  # do not emit line number mappings
 			'raw',  # make no effort to sanitize output; implies free
 			'unbuffered',  # do not construct buffers and instead yield fragments as generated
+			'wsgi',  # generate WSGI compatible template functions; incompatible with unbuffered and free
 		}
