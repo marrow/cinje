@@ -78,7 +78,11 @@ setup(
 	zip_safe = True,
 	
 	entry_points = {
-			'marrow.dsl.cinje': [
+			'marrow.dsl': [
+					'cinje = cinje.decoder:CinjeDecoder',
+				],
+			
+			'marrow.dsl.cinje': [  # Core namespace.
 					# Cinje Line Classifiers
 					'scope = cinje.classify:CinjeScopeClassifier',
 					'line = cinje.classify:CinjeLineClassifier',
@@ -97,12 +101,13 @@ setup(
 					#'require = cinje.inline.require:Require',
 					#'use = cinje.inline.use:Use',
 					#'pragma = cinje.inline.pragma:Pragma',
-					#'text = cinje.inline.text:CinjeTextTransformer',
 				],
-			'marrow.dsl.cinje.html': [
+			
+			'marrow.dsl.cinje.html': [  # HTML-specific string safety helpers and adaptions.
 					# 'text = cinje.inline.text:CinjeHTMLTransformer',
 				],
-			'marrow.dsl.cinje.xml': [
+			
+			'marrow.dsl.cinje.xml': [  # XML-specific string safety helpers and adaptions.
 					# 'text = cinje.inline.text:CinjeXMLTransformer',
 				],
 		},
