@@ -87,9 +87,10 @@ setup(
 					'line = cinje.classify:CinjeLineClassifier',
 					
 					# Block Transformers
-					'module = cinje.block.module:CinjeModuleTransformer',
-					#'function = cinje.block.function:CinjeFunctionTransformer',
+					'function = cinje.block.function:CinjeFunctionTransformer',
 					#'generic = cinje.block.generic:Generic',
+					#'iterate = cinje.block.iterate:Iterate',
+					'module = cinje.block.module:CinjeModuleTransformer',
 					#'using = cinje.block.using:Using',
 					
 					# Inline Transformers
