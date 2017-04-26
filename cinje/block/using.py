@@ -2,6 +2,8 @@
 
 from ..util import Line, ensure_buffer
 
+# TODO: Implement https://github.com/marrow/cinje/issues/20
+
 
 class Using(object):
 	priority = 25

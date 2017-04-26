@@ -91,5 +91,12 @@ def _cmd(template, argv=None):
 	return method_name, args, kwargs
 
 
+# Backwards compatibility, to be removed in 2.0.
 
-__all__ = ['str', '_bless', '_escape', '_iterate', '_xmlargs', '_interrupt', 'pipe']
+bless = _bless
+escape = _escape
+iterate = _iterate
+xmlargs = _xmlargs
+
+
+__all__ = ['str', '_bless', '_escape', '_iterate', '_xmlargs', '_interrupt', 'pipe', '_json']

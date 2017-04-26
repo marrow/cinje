@@ -4,6 +4,8 @@ from ..util import py, pypy, ensure_buffer
 
 PREFIX = '_buffer.extend(' if pypy else '__w(' 
 
+# TODO: Implement https://github.com/marrow/cinje/issues/20
+
 
 class Use(object):
 	"""Consume the result of calling another template function, extending the local buffer.
@@ -49,4 +51,3 @@ class Use(object):
 		else:
 			yield declaration.clone(line="for _chunk in " + name + "(" + args + "):")
 			yield declaration.clone(line="yield _chunk", scope=context.scope + 1)
-
