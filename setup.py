@@ -16,8 +16,8 @@ except ImportError:
 
 if sys.version_info < (2, 7):
 	raise SystemExit("Python 2.7 or later is required.")
-elif sys.version_info > (3, 0) and sys.version_info < (3, 2):
-	raise SystemExit("CPython 3.3 or Pypy 3 (3.2) or later is required.")
+elif sys.version_info > (3, 0) and sys.version_info < (3, 3):
+	raise SystemExit("CPython 3.3 or compatible Pypy or later is required.")
 
 version = description = url = author = author_email = ""  # Silence linter warnings.
 exec(open(os.path.join("cinje", "release.py")).read())  # Actually populate those values.
@@ -60,6 +60,7 @@ setup(
 			"Programming Language :: Python :: 3.3",
 			"Programming Language :: Python :: 3.4",
 			"Programming Language :: Python :: 3.5",
+			"Programming Language :: Python :: 3.6",
 			"Programming Language :: Python :: Implementation :: CPython",
 			"Programming Language :: Python :: Implementation :: PyPy",
 			"Programming Language :: Python",
@@ -73,26 +74,36 @@ setup(
 	packages = find_packages(exclude=['bench', 'docs', 'example', 'test', 'htmlcov']),
 	include_package_data = True,
 	package_data = {'': ['README.rst', 'LICENSE.txt']},
-	namespace_packages = [],
+	namespace_packages = ['marrow'],
 	zip_safe = True,
 	
 	entry_points = {
-			'cinje.translator': [
-					# Block Translators
-					'function = cinje.block.function:Function',
-					'generic = cinje.block.generic:Generic',
-					'module = cinje.block.module:Module',
-					'using = cinje.block.using:Using',
+			'marrow.dsl.cinje': [
+					# Cinje Line Classifiers
+					'scope = cinje.classify:CinjeScopeClassifier',
+					'line = cinje.classify:CinjeLineClassifier',
 					
-					# Inline Translators
-					'blank = cinje.inline.blank:Blank',
-					'code = cinje.inline.code:Code',
-					'comment = cinje.inline.comment:Comment',
-					'flush = cinje.inline.flush:Flush',
-					'require = cinje.inline.require:Require',
-					'text = cinje.inline.text:Text',
-					'use = cinje.inline.use:Use',
-					'pragma = cinje.inline.pragma:Pragma',
+					# Block Transformers
+					'module = cinje.block.module:CinjeModuleTransformer',
+					#'function = cinje.block.function:CinjeFunctionTransformer',
+					#'generic = cinje.block.generic:Generic',
+					#'using = cinje.block.using:Using',
+					
+					# Inline Transformers
+					#'blank = cinje.inline.blank:Blank',
+					#'code = cinje.inline.code:Code',
+					#'comment = cinje.inline.comment:Comment',  # see TODO from cinje.classify
+					#'flush = cinje.inline.flush:Flush',
+					#'require = cinje.inline.require:Require',
+					#'use = cinje.inline.use:Use',
+					#'pragma = cinje.inline.pragma:Pragma',
+					#'text = cinje.inline.text:CinjeTextTransformer',
+				],
+			'marrow.dsl.cinje.html': [
+					# 'text = cinje.inline.text:CinjeHTMLTransformer',
+				],
+			'marrow.dsl.cinje.xml': [
+					# 'text = cinje.inline.text:CinjeXMLTransformer',
 				],
 		},
 	
@@ -103,6 +114,6 @@ setup(
 	tests_require = tests_require,
 	extras_require = {
 			'development': tests_require + ['pre-commit'],  # Development requirements are the testing requirements.
-			'safe': ['webob'],  # String safety.
+			'safe': ['markupsafe'],  # String safety.
 		},
 )
