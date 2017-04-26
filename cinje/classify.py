@@ -62,7 +62,7 @@ class CinjeLineClassifier(Classifier):
 			elif identifier in ('def', ):  # TODO: Query valid block handlers.
 				line.tag.add(identifier)
 		
-		# TODO: Extract relevant parts as "CommentClassifier", add to cinje namespace.
+		# TODO: Extract relevant parts as "GalfiCommentClassifier", add to cinje namespace.
 		elif text[0] == '#' and not text.startswith("#{"):
 			line.line = text  # Eliminate extraneous whitespace and match overall scope.
 			line.tag.add('code')
