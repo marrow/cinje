@@ -27,6 +27,13 @@ class CinjeModuleTransformer(ModuleTransformer):
 	**Note:** The `raw` flag is **insecure**, but blazingly fast -- use with trusted or pre-sanitized input only!
 	All text replacements are cast to unicode without error handling.
 	
+	Utilizes flags:
+	
+	* free
+	* nomap
+	* raw
+	* unbuffered
+	
 	Inherits:
 	
 	* `buffer` - the named collection of buffers
@@ -48,13 +55,6 @@ class CinjeModuleTransformer(ModuleTransformer):
 	"""
 	
 	__slots__ = ('templates', 'helpers')  # Additional data tracked by our specialization.
-	
-	FLAGS = {  # Global processing flags.
-			'free',
-			'nomap',
-			'raw',
-			'unbuffered',
-		}
 	
 	# Line templates for easy re-use later.
 	TEMPLATES = Line('__tmpl__ = ["{}"]')

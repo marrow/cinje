@@ -18,7 +18,7 @@ class CinjeFunctionTransformer(FunctionTransformer):
 	
 	Syntax:
 	
-		: def <name> <arguments>
+		: def <name> <arguments>[ -> flag[, ...]]
 		: end
 	
 	Inherits:
@@ -34,10 +34,10 @@ class CinjeFunctionTransformer(FunctionTransformer):
 	
 	As a reminder, functions are divided into:
 	
-	* `decorator`
-	* `declaration`
-	* `docstring`
-	* `prefix`
+	* `decorator` - any leading `@decorator` invocations prior to the declaration
+	* `declaration` - the function declaration itself as transformed by `process_declaration`
+	* `docstring` - the initial documentation string, if present
+	* `prefix` - any
 	* `function`
 	* `suffix`
 	* `trailer`
