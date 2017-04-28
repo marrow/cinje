@@ -16,57 +16,51 @@ class CinjeModuleTransformer(ModuleTransformer):
 	environments, this specialization adds template function name tracking, automatic importing of helpers, and
 	in-development command-line interface `__main__` handler.
 	
-	Flags:
+	Because cinje modules are so similar to standard Python modules, we don't actually have much work to do.
 	
-	* `free` - ensure no runtime dependency on cinje
-	* `nomap` - do not emit line number mappings
-	* `raw` - implies `free`; make no effort to sanitize output
+	Global processing flags:
+	
+	* `free` - If defined the resulting bytecode will have no runtime dependnecy on cinje itself.
+	* `nomap` - Define to disable emission of line number mappings; this can speed up translation and reduce resulting
+		bytecode size at the cost of increased debugging difficulty.
+	* `raw` - Implies `free`; make no effort to sanitize output. This is **insecure**, but blazingly fast -- use with
+		trusted or pre-sanitized input only!
 	* `unbuffered` - utilize unbuffered output; fragments will be yielded as generated, buffer construction prefixes
-		will not be generated, 
-	
-	**Note:** The `raw` flag is **insecure**, but blazingly fast -- use with trusted or pre-sanitized input only!
-	All text replacements are cast to unicode without error handling.
-	
-	Utilizes flags:
-	
-	* free
-	* nomap
-	* raw
-	* unbuffered
+		will not be generated
 	
 	Inherits:
 	
-	* `buffer` - the named collection of buffers
+	* `buffer` - The named collection of buffers.
 	
 	Tracks:
 	
-	* `templates` - a set of registered template names
-	* `helpers` - a set of declared used helpers, a shortcut for other transformers
-	* `_imports` - a mapping of packages to the set of objects acquired from within, from parent class
+	* `templates` - The names of all module scoped template functions, as a set.
+	* `helpers` - A set of declared used helpers, a shortcut for other transformers.
+	* `_imports` - A mapping of packages to the set of objects acquired from within, from parent class.
 	
 	For reference, the buffers of a module are divided into:
 	
-	* `comment' - shbang, encoding declaration, any additional leading comments and whitespace
-	* `docstring` - the docstring of the module, if present
-	* `imports` - the initial block of imports, including whitespace
-	* `prefix` - any code to be inserted between imports and first non-import line
-	* `module` - the contents of the module proper
-	* `suffix` - any code to be appended to the module, prior to the line mapping
+	* `comment' - Shbang, encoding declaration, any additional leading comments and whitespace.
+	* `docstring` - the docstring of the module, if present.
+	* `imports` - the initial block of imports, including whitespace.
+	* `prefix` - Any code to be inserted between imports and first non-import line.
+	* `module` - The contents of the module proper.
+	* `suffix` - Any code to be appended to the module, prior to the line mapping.
 	"""
 	
 	__slots__ = ('templates', 'helpers')  # Additional data tracked by our specialization.
 	
 	# Line templates for easy re-use later.
-	TEMPLATES = Line('__tmpl__ = ["{}"]')
-	MAIN = Line('if __name__ == "__main__":')
-	SINGLE = Line('_cli({})', scope=1)
+	TEMPLATES = Line('__tmpl__ = ["{}"]')  # Used to record template functions at the module scope.
+	MAIN = Line('if __name__ == "__main__":')  # Used with one of the following.
+	SINGLE = Line('_cli({})', scope=1)  # There is only one template, so this is easy mode vs. the next.
 	MULTI = Line('_cli({_tmpl: _tmpl_fn for _tmpl, _tmpl_fn in locals().items() if _tmpl in __tmpl__})', scope=1)
 	
 	def __init__(self, decoder):
 		super(CinjeModuleTransformer, self).__init__(decoder)
 		
-		self.templates = set()
-		self.helpers = {'str'} if py2 else set()
+		self.templates = set()  # The names of all module scoped template functions, as a set.
+		self.helpers = {'str'} if py2 else set()  # Helpers to import 
 	
 	def egress(self, context):
 		capable = not context.flag & {'free', 'raw'}
@@ -86,6 +80,6 @@ class CinjeModuleTransformer(ModuleTransformer):
 					suffix.append(self.MULTI)
 		
 		if capable:
-			self._imports['cinje.helpers'].update(self.helpers)
+			self._imports['cinje.helper'].update(self.helpers)
 		
 		super(CinjeModuleTransformer, self).egress(context)
