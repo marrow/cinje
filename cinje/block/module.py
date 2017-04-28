@@ -2,10 +2,8 @@
 
 from __future__ import unicode_literals
 
-from collections import defaultdict as ddict
-
 from marrow.dsl.block.module import ModuleTransformer
-from marrow.dsl.compat import py2, str
+from marrow.dsl.compat import py2
 from marrow.dsl.core import Line
 
 
@@ -57,26 +55,32 @@ class CinjeModuleTransformer(ModuleTransformer):
 	MULTI = Line('_cli({_tmpl: _tmpl_fn for _tmpl, _tmpl_fn in locals().items() if _tmpl in __tmpl__})', scope=1)
 	
 	def __init__(self, decoder):
+		"""Construct a new module scope."""
+		
 		super(CinjeModuleTransformer, self).__init__(decoder)
 		
 		self.templates = set()  # The names of all module scoped template functions, as a set.
 		self.helpers = {'str'} if py2 else set()  # Helpers to import 
 	
 	def egress(self, context):
-		capable = not context.flag & {'free', 'raw'}
+		"""Executed when exiting the buffered module scope, prior to emitting collapsed lines."""
+		
+		capable = not context.flag & {'free', 'raw'}  # Able to utilize helpers.
 		
 		if self.templates:
 			suffix = self.suffix
-			suffix.append('', self.TEMPLATES.format('", "'.join(self.templates)))
+			
+			if 'nomap' not in context.flag:  # If mappings are enabled.
+				suffix.append('', self.TEMPLATES.format('", "'.join(self.templates)))
 			
 			if __debug__ and capable:
 				self.helpers.add('_cli')
 				suffix.append('', self.MAIN)
 				
-				if len(self.templates) == 1:
+				if len(self.templates) == 1:  # Fast path for modules containing a single template function.
 					tmpl, = self.templates
 					suffix.append(self.SINGLE.format(tmpl))
-				else:
+				elif 'nomap' not in context.flag:  # This requires the mapping be present.
 					suffix.append(self.MULTI)
 		
 		if capable:
