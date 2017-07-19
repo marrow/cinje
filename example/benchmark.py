@@ -144,8 +144,20 @@ else:
 </table>
 """))
 
-    def test_jinja2():
+    def test_jinja2_render():
         return jinja2_template.render(ctx)
+
+    def test_jinja2_generate():
+        list(jinja2_template.generate(ctx))
+        return ''
+    
+    def test_jinja2_generate_first():
+        return next(jinja2_template.generate(ctx))
+
+    def test_jinja2_stream():
+        jinja2_template.stream(ctx).dump('/tmp/jinja-stream-test.html')
+        return ''
+
 
 
 # region: tornado

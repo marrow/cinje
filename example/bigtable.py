@@ -55,6 +55,24 @@
 : end
 
 
+: def bigtable_nobuffer table=table, frequency=100 -> unbuffered
+
+<table>
+    : for i, row in enumerate(table)
+    <tr>
+        : for key, value in row
+        <td>${ key }</td><td>#{ value }</td>
+        : end
+        : if not (i % frequency)
+            : flush
+        : end
+    </tr>
+    : end
+</table>
+
+: end
+
+
 : def bigtable_fancy table=table, frequency=100
 
 <table>

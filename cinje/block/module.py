@@ -2,85 +2,88 @@
 
 from __future__ import unicode_literals
 
-from zlib import compress
-from base64 import b64encode
-from collections import deque
-
-from ..util import py, Line
+from marrow.dsl.block.module import ModuleTransformer
+from marrow.dsl.compat import py2
+from marrow.dsl.core import Line
 
 
-def red(numbers):
-	"""Encode the deltas to reduce entropy."""
+class CinjeModuleTransformer(ModuleTransformer):
+	"""A cinje module.
 	
-	line = 0
-	deltas = []
+	Where the base `ModuleTransformer` class handles line number mapping and `__futures__` imports for Python 2
+	environments, this specialization adds template function name tracking, automatic importing of helpers, and
+	in-development command-line interface `__main__` handler.
 	
-	for value in numbers:
-		deltas.append(value - line)
-		line = value
+	Because cinje modules are so similar to standard Python modules, we don't actually have much work to do.
 	
-	return b64encode(compress(b''.join(chr(i).encode('latin1') for i in deltas))).decode('latin1')
-
-
-
-class Module(object):
-	"""Module handler.
+	Global processing flags:
 	
-	This is the initial scope, and the highest priority to ensure its processing of the preamble happens first.
+	* `free` - If defined the resulting bytecode will have no runtime dependnecy on cinje itself.
+	* `nomap` - Define to disable emission of line number mappings; this can speed up translation and reduce resulting
+		bytecode size at the cost of increased debugging difficulty.
+	* `raw` - Implies `free`; make no effort to sanitize output. This is **insecure**, but blazingly fast -- use with
+		trusted or pre-sanitized input only!
+	* `unbuffered` - utilize unbuffered output; fragments will be yielded as generated, buffer construction prefixes
+		will not be generated
+	
+	Inherits:
+	
+	* `buffer` - The named collection of buffers.
+	
+	Tracks:
+	
+	* `templates` - The names of all module scoped template functions, as a set.
+	* `helpers` - A set of declared used helpers, a shortcut for other transformers.
+	* `_imports` - A mapping of packages to the set of objects acquired from within, from parent class.
+	
+	For reference, the buffers of a module are divided into:
+	
+	* `comment' - Shbang, encoding declaration, any additional leading comments and whitespace.
+	* `docstring` - the docstring of the module, if present.
+	* `imports` - the initial block of imports, including whitespace.
+	* `prefix` - Any code to be inserted between imports and first non-import line.
+	* `module` - The contents of the module proper.
+	* `suffix` - Any code to be appended to the module, prior to the line mapping.
 	"""
 	
-	priority = -100
+	__slots__ = ('templates', 'helpers')  # Additional data tracked by our specialization.
 	
-	def match(self, context, line):
-		return 'init' not in context.flag
+	# Line templates for easy re-use later.
+	TEMPLATES = Line('__tmpl__ = ["{}"]')  # Used to record template functions at the module scope.
+	MAIN = Line('if __name__ == "__main__":')  # Used with one of the following.
+	SINGLE = Line('_cli({})', scope=1)  # There is only one template, so this is easy mode vs. the next.
+	MULTI = Line('_cli({_tmpl: _tmpl_fn for _tmpl, _tmpl_fn in locals().items() if _tmpl in __tmpl__})', scope=1)
 	
-	def __call__(self, context):
-		input = context.input
+	def __init__(self, decoder):
+		"""Construct a new module scope."""
 		
-		context.flag.add('init')
-		context.flag.add('buffer')
+		super(CinjeModuleTransformer, self).__init__(decoder)
 		
-		imported = False
+		self.templates = set()  # The names of all module scoped template functions, as a set.
+		self.helpers = {'str'} if py2 else set()  # Helpers to import 
+	
+	def egress(self, context):
+		"""Executed when exiting the buffered module scope, prior to emitting collapsed lines."""
 		
-		for line in input:
-			if not line.stripped or line.stripped[0] == '#':
-				if not line.stripped.startswith('##') and 'coding:' not in line.stripped:
-					yield line
-				continue
+		capable = not context.flag & {'free', 'raw'}  # Able to utilize helpers.
+		
+		if self.templates:
+			suffix = self.suffix
 			
-			input.push(line)  # We're out of the preamble, so put that line back and stop.
-			break
+			if 'nomap' not in context.flag:  # If mappings are enabled.
+				suffix.append('', self.TEMPLATES.format('", "'.join(self.templates)))
+			
+			if __debug__ and capable:
+				self.helpers.add('_cli')
+				suffix.append('', self.MAIN)
+				
+				if len(self.templates) == 1:  # Fast path for modules containing a single template function.
+					tmpl, = self.templates
+					suffix.append(self.SINGLE.format(tmpl))
+				elif 'nomap' not in context.flag:  # This requires the mapping be present.
+					suffix.append(self.MULTI)
 		
-		# After any existing preamble, but before other imports, we inject our own.
+		if capable:
+			self._imports['cinje.helper'].update(self.helpers)
 		
-		if py == 2:
-			yield Line(0, 'from __future__ import unicode_literals')
-			yield Line(0, '')
-		
-		yield Line(0, 'import cinje')
-		yield Line(0, 'from cinje.helpers import escape as _escape, bless as _bless, iterate, xmlargs as _args, _interrupt, _json')
-		yield Line(0, '')
-		yield Line(0, '')
-		yield Line(0, '__tmpl__ = []  # Exported template functions.')
-		yield Line(0, '')
-		
-		for i in context.stream:
-			yield i
-		
-		if context.templates:
-			yield Line(0, '')
-			yield Line(0, '__tmpl__.extend(["' + '", "'.join(context.templates) + '"])')
-			context.templates = []
-		
-		# Snapshot the line number mapping.
-		mapping = deque(context.mapping)
-		mapping.reverse()
-		
-		yield Line(0, '')
-		
-		if __debug__:
-			yield Line(0, '__mapping__ = [' + ','.join(str(i) for i in mapping) + ']')
-		
-		yield Line(0, '__gzmapping__ = b"' + red(mapping).replace('"', '\"') + '"')
-		
-		context.flag.remove('init')
+		super(CinjeModuleTransformer, self).egress(context)
