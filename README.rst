@@ -580,6 +580,11 @@ Just like with ``using``, the result of the expression must be a callable genera
 Version History
 ===============
 
+Version 1.1.1
+-------------
+
+* *Fixed* incorrect double-decoding of UTF-8 that was preventing use of templates containing non-ASCII.
+
 Version 1.1
 -----------
 
