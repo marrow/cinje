@@ -127,7 +127,7 @@ side-effects when updating.  Use ``cinje<1.2`` to get all bugfixes for the curre
 
 While cinje does not have any hard dependencies on any other package, it is **strongly** recommended that applications
 using cinje also install the ``markupsafe`` package to provide more efficient string escaping and some additional
-functionality.
+functionality such as object protocol support for markup generation.
 
 
 Development Version
@@ -583,7 +583,15 @@ Version History
 Version 1.1.1
 -------------
 
-* *Fixed* incorrect double-decoding of UTF-8 that was preventing use of templates containing non-ASCII.
+* *Fixed* `incorrect double-decoding (#25) <https://github.com/marrow/cinje/issues/25>`_ of UTF-8 that was preventing
+  use of templates containing non-ASCII text.
+
+* *Fixed* incorrect variable reference in the built-in (`cinje.std.html`) list helper.
+
+* *Added* Python 3.6 testing, pre-commit hooks, and Makefile-based automation.
+
+* *Removed* Python 3.3 testing and support, `flake8` enforcement, and `tox` build/test automation.
+
 
 Version 1.1
 -----------
@@ -675,12 +683,12 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
     :target: https://github.com/marrow/cinje/issues
     :alt: Github Issues
 
-.. |ghsince| image:: https://img.shields.io/github/commits-since/marrow/cinje/1.1.0.svg
+.. |ghsince| image:: https://img.shields.io/github/commits-since/marrow/cinje/1.1.1.svg
     :target: https://github.com/marrow/cinje/commits/develop
     :alt: Changes since last release.
 
 .. |ghtag| image:: https://img.shields.io/github/tag/marrow/cinje.svg
-    :target: https://github.com/marrow/cinje/tree/1.1.0
+    :target: https://github.com/marrow/cinje/tree/1.1.1
     :alt: Latest Github tagged release.
 
 .. |latestversion| image:: http://img.shields.io/pypi/v/cinje.svg?style=flat
