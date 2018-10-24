@@ -10,7 +10,6 @@ from cinje.util import flatten
 
 @pytest.fixture
 def tmpl():
-	__import__('pudb').set_trace()
 	return fragment("Epic Template™".encode('utf-8'), name="tmpl")
 
 
