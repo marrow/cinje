@@ -28,7 +28,6 @@ tests_require = [
 		'pytest',  # test collector and extensible runner
 		'pytest-cov',  # coverage reporting
 		'pytest-flakes',  # syntax validation
-		'pytest-capturelog',  # log capture
 	]
 
 if 'ACCELERATED' not in os.environ or os.environ.get('ACCELERATED', '1') != '0':
