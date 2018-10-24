@@ -316,6 +316,9 @@ class Line(object):
 	__slots__ = ('number', 'line', 'scope', 'kind', 'continued')
 	
 	def __init__(self, number, line, scope=None, kind=None):
+		if isinstance(line, bytes):
+			line = line.decode('utf-8')
+		
 		self.number = number
 		self.line = line
 		self.scope = scope
