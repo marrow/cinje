@@ -381,7 +381,7 @@ The most common use of per-function flags is to disable buffering, or enable whi
 
 The result of this would be::
 
-	def anotherfucntion(...):
+	def anotherfunction(...):
 		yield "This won't have a trailing newline, and will be immediately yielded."
 
 Flags declared in this way will have their effect reversed automatically at the close of the function scope.
