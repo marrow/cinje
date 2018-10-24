@@ -1,33 +1,40 @@
-*.py[co]
+# Python Bytecode
+*.py[cod]
 
-# Package Management
-*.egg
+# C Extensions
+*.so
+
+# Packaging
 *.egg-info
-dist
-build
-eggs
 .eggs
-parts
-bin
-var
-sdist
-develop-eggs
-.installed.cfg
-pip-log.txt
+.packaging
 
-# Unit test / coverage reports
+# Virtual Environment Pseudo-Chroot
+bin
+include
+lib
+share
+tmp
+usr
+var
+
+# Unit Test / Coverage Reports
+.cache
+.cagoule.db
 .coverage
 .tox
-.cache
-htmlcov
+.pytest_cache
 coverage.xml
+htmlcov
 
 # Translations
 *.mo
+*.pot
 
 # Mac
 .DS_Store
 
-# Vim
+# Completion Integration
 .ropeproject
 tags
+

@@ -1,25 +1,28 @@
 language: python
 sudo: false
+cache: pip
 
 branches:
   except:
-    - /^feature/.*$/
+      - /^[^/]+/.+$/
 
 python:
-  - pypy
-  - pypy3
   - "2.7"
-  - "3.3"
+  - "pypy"
+  - "pypy3"
   - "3.4"
   - "3.5"
+  - "3.6"
 
-env:
-  - ACCELERATED=0
-  - ACCELERATED=1
+install:
+  - travis_retry pip install --upgrade setuptools pip codecov
+  - pip install -e '.[development]'
 
-install: travis_retry .travis/install.sh
+script:
+    python setup.py test
 
-script: tox
+after_script:
+    bash <(curl -s https://codecov.io/bash)
 
 notifications:
   irc:
@@ -32,3 +35,4 @@ notifications:
     template:
       - "%{repository_slug}:%{branch}@%{commit} %{message}"
       - "Duration: %{duration} - Details: %{build_url}"
+

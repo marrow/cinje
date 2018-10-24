@@ -2,7 +2,7 @@
 cinje
 =====
 
-    © 2015-2016 Alice Bevan-McGregor and contributors.
+    © 2015-2017 Alice Bevan-McGregor and contributors.
 
 ..
 
@@ -122,12 +122,12 @@ robust as `Vagrant <http://www.vagrantup.com>`_.
 If you add ``cinje`` to the ``install_requires`` argument of the call to ``setup()`` in your application's
 ``setup.py`` file, cinje will be automatically installed and made available when your own application or
 library is installed.  We recommend using "less than" version numbers to ensure there are no unintentional
-side-effects when updating.  Use ``cinje<1.1`` to get all bugfixes for the current release, and
+side-effects when updating.  Use ``cinje<1.2`` to get all bugfixes for the current release, and
 ``cinje<2.0`` to get bugfixes and feature updates while ensuring that large breaking changes are not installed.
 
 While cinje does not have any hard dependencies on any other package, it is **strongly** recommended that applications
 using cinje also install the ``markupsafe`` package to provide more efficient string escaping and some additional
-functionality.
+functionality such as object protocol support for markup generation.
 
 
 Development Version
@@ -381,7 +381,7 @@ The most common use of per-function flags is to disable buffering, or enable whi
 
 The result of this would be::
 
-	def anotherfucntion(...):
+	def anotherfunction(...):
 		yield "This won't have a trailing newline, and will be immediately yielded."
 
 Flags declared in this way will have their effect reversed automatically at the close of the function scope.
@@ -502,7 +502,7 @@ Multiple flags may be whitespace separated and can mix addition and removal::
 
 No flag may contain whitespace. Built-in flags include:
 
-* ``init``: The module scope has been prpared. Unsetting this is unwise.
+* ``init``: The module scope has been prepared. Unsetting this is unwise.
 * ``text``: Text fragments have been utilized within the current function, making this a template function.
 * ``dirty``: It is known to the engine that the current buffer contains content which will need to be flushed.
 * ``buffer``: Enabled by default, its presence tells cinje to use a buffer with explicit flushing. When removed,
@@ -511,7 +511,7 @@ No flag may contain whitespace. Built-in flags include:
   It is potentially very useful to disable this in the context of ``: use`` and ``: using`` to make child template
   ``: flush`` statements effective.
 * ``using``: Indicates the ``_using_stack`` variable is available at this point in the translated code, i.e. to track
-  nested ``: using`` stateements.
+  nested ``: using`` statements.
 
 
 Inheritance
@@ -580,6 +580,19 @@ Just like with ``using``, the result of the expression must be a callable genera
 Version History
 ===============
 
+Version 1.1.1
+-------------
+
+* *Fixed* `incorrect double-decoding (#25) <https://github.com/marrow/cinje/issues/25>`_ of UTF-8 that was preventing
+  use of templates containing non-ASCII text.
+
+* *Fixed* incorrect variable reference in the built-in (`cinje.std.html`) list helper.
+
+* *Added* Python 3.6 testing, pre-commit hooks, and Makefile-based automation.
+
+* *Removed* Python 3.3 testing and support, `flake8` enforcement, and `tox` build/test automation.
+
+
 Version 1.1
 -----------
 
@@ -615,7 +628,7 @@ cinje has been released under the MIT Open Source license.
 The MIT License
 ---------------
 
-Copyright © 2015-2016 Alice Bevan-McGregor and contributors.
+Copyright © 2015-2017 Alice Bevan-McGregor and contributors.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 documentation files (the “Software”), to deal in the Software without restriction, including without limitation the
@@ -670,12 +683,12 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
     :target: https://github.com/marrow/cinje/issues
     :alt: Github Issues
 
-.. |ghsince| image:: https://img.shields.io/github/commits-since/marrow/cinje/1.1.0.svg
+.. |ghsince| image:: https://img.shields.io/github/commits-since/marrow/cinje/1.1.1.svg
     :target: https://github.com/marrow/cinje/commits/develop
     :alt: Changes since last release.
 
 .. |ghtag| image:: https://img.shields.io/github/tag/marrow/cinje.svg
-    :target: https://github.com/marrow/cinje/tree/1.1.0
+    :target: https://github.com/marrow/cinje/tree/1.1.1
     :alt: Latest Github tagged release.
 
 .. |latestversion| image:: http://img.shields.io/pypi/v/cinje.svg?style=flat

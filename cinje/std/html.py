@@ -135,7 +135,7 @@ ${content}\
 		: end
 	: end
 	
-	<${kind}&{kwargs}>
+	<${kind}&{attributes}>
 		: if kind == 'dl'
 			: for key in obj
 		<dt>${key}</dt>

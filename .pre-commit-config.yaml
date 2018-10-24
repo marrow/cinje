@@ -1,0 +1,14 @@
+-   repo: https://github.com/pre-commit/pre-commit-hooks.git
+    sha: c8a1c91c762b8e24fdc5a33455ec10662f523328
+    hooks:
+    -   id: check-added-large-files
+    -   id: check-ast
+    -   id: check-byte-order-marker
+    -   id: check-merge-conflict
+    -   id: check-symlinks
+    -   id: debug-statements
+    -   id: detect-private-key
+    -   id: end-of-file-fixer
+    -   id: check-json
+    -   id: check-xml
+    -   id: check-yaml

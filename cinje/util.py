@@ -120,6 +120,9 @@ def fragment(string, name="anonymous", **context):
 	resulting function takes no arguments.  Additional keyword arguments are passed through as global variables.
 	"""
 	
+	if isinstance(string, bytes):
+		string = string.decode('utf-8')
+	
 	if ": def" in string or ":def" in string:
 		code = string.encode('utf8').decode('cinje')
 		name = None
@@ -316,6 +319,9 @@ class Line(object):
 	__slots__ = ('number', 'line', 'scope', 'kind', 'continued')
 	
 	def __init__(self, number, line, scope=None, kind=None):
+		if isinstance(line, bytes):
+			line = line.decode('utf-8')
+		
 		self.number = number
 		self.line = line
 		self.scope = scope
