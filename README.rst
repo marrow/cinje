@@ -2,7 +2,7 @@
 cinje
 =====
 
-    © 2015-2016 Alice Bevan-McGregor and contributors.
+    © 2015-2017 Alice Bevan-McGregor and contributors.
 
 ..
 
@@ -615,7 +615,7 @@ cinje has been released under the MIT Open Source license.
 The MIT License
 ---------------
 
-Copyright © 2015-2016 Alice Bevan-McGregor and contributors.
+Copyright © 2015-2017 Alice Bevan-McGregor and contributors.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 documentation files (the “Software”), to deal in the Software without restriction, including without limitation the
