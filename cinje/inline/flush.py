@@ -51,4 +51,9 @@ class Flush(object):
 		return line.kind == 'code' and line.stripped in ("flush", "yield")
 	
 	def __call__(self, context):
-		return flush_template(context, context.input.next())
+		try:
+			line = context.input.next()
+		except StopIteration:
+			return
+		
+		return flush_template(context, line)

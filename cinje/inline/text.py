@@ -73,7 +73,11 @@ class Text(object):
 	def gather(input):
 		"""Collect contiguous lines of text, preserving line numbers."""
 		
-		line = input.next()
+		try:
+			line = input.next()
+		except StopIteration:
+			return
+		
 		lead = True
 		buffer = []
 		
@@ -137,7 +141,10 @@ class Text(object):
 					handler = getattr(self, 'process_' + chunk.kind, self.process_generic)(chunk.kind, context)
 					handler = (chunk.kind, handler)
 					
-					next(handler[1])  # We fast-forward to the first yield.
+					try:
+						next(handler[1])  # We fast-forward to the first yield.
+					except StopIteration:
+						return
 				
 				result = handler[1].send(chunk)  # Send the handler the next contiguous chunk.
 				if result: yield result
@@ -147,7 +154,11 @@ class Text(object):
 		
 		# Clean up the final iteration.
 		if handler:
-			result = next(handler[1])
+			try:
+				result = next(handler[1])
+			except StopIteration:
+				return
+			
 			if result: yield result
 	
 	def process_text(self, kind, context):

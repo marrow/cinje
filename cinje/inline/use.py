@@ -29,7 +29,11 @@ class Use(object):
 		
 		input = context.input
 		
-		declaration = input.next()
+		try:
+			declaration = input.next()
+		except StopIteration:
+			return
+		
 		parts = declaration.partitioned[1]  # Ignore the "use" part, we care about the name and arguments.
 		name, _, args = parts.partition(' ')
 		

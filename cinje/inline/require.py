@@ -26,7 +26,11 @@ class Require(object):
 		
 		input = context.input
 		
-		declaration = input.next()
+		try:
+			declaration = input.next()
+		except StopIteration:
+			return
+		
 		namespace = declaration.partitioned[1]  # Ignore the "require" part, we care about the namepsace.
 		
 		module = import_module(namespace)
