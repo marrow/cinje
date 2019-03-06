@@ -2,7 +2,7 @@
 cinje
 =====
 
-    © 2015-2017 Alice Bevan-McGregor and contributors.
+    © 2015-2019 Alice Bevan-McGregor and contributors.
 
 ..
 
@@ -580,6 +580,15 @@ Just like with ``using``, the result of the expression must be a callable genera
 Version History
 ===============
 
+Version 1.1.2
+-------------
+
+* *Fixed* `Python 3.7 exception use within generators. <https://github.com/marrow/cinje/issues/28>`_
+
+* *Added* Genshi to the `benchmark comparison suite <https://github.com/marrow/cinje/wiki/Benchmarks#python-37>`_.
+
+* *Fixed* minor docstring typo.
+
 Version 1.1.1
 -------------
 
@@ -628,7 +637,7 @@ cinje has been released under the MIT Open Source license.
 The MIT License
 ---------------
 
-Copyright © 2015-2017 Alice Bevan-McGregor and contributors.
+Copyright © 2015-2019 Alice Bevan-McGregor and contributors.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 documentation files (the “Software”), to deal in the Software without restriction, including without limitation the
@@ -642,6 +651,7 @@ THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR I
 WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
 COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 
 .. |ghwatch| image:: https://img.shields.io/github/watchers/marrow/cinje.svg?style=social&label=Watch
     :target: https://github.com/marrow/cinje/subscription
@@ -683,12 +693,12 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
     :target: https://github.com/marrow/cinje/issues
     :alt: Github Issues
 
-.. |ghsince| image:: https://img.shields.io/github/commits-since/marrow/cinje/1.1.1.svg
+.. |ghsince| image:: https://img.shields.io/github/commits-since/marrow/cinje/1.1.2.svg
     :target: https://github.com/marrow/cinje/commits/develop
     :alt: Changes since last release.
 
 .. |ghtag| image:: https://img.shields.io/github/tag/marrow/cinje.svg
-    :target: https://github.com/marrow/cinje/tree/1.1.1
+    :target: https://github.com/marrow/cinje/tree/1.1.2
     :alt: Latest Github tagged release.
 
 .. |latestversion| image:: http://img.shields.io/pypi/v/cinje.svg?style=flat
