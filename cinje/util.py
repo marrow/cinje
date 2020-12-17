@@ -11,7 +11,8 @@ import sys
 from codecs import iterencode
 from inspect import isfunction, isclass
 from operator import methodcaller
-from collections import deque, namedtuple, Sized, Iterable
+from collections import deque, namedtuple
+from collections.abc import Sized, Iterable
 from pkg_resources import iter_entry_points
 from xml.sax.saxutils import quoteattr
 
