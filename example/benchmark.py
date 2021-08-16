@@ -9,8 +9,7 @@ import sys
 try:
 	from wheezy.html.utils import escape_html as escape
 except ImportError:
-	import cgi
-	escape = cgi.escape
+	from html import escape
 
 PY3 = sys.version_info[0] >= 3
 s = PY3 and str or unicode
@@ -328,12 +327,12 @@ except ImportError:
 else:
 	cheetah_ctx = {}
 	cheetah_template = Template(s("""\
-#import cgi
+#import html
 <table>
 	#for $row in $table
 	<tr>
 		#for $key, $value in $row.items
-		<td>$cgi.escape($key)</td><td>$value</td>
+		<td>$html.escape($key)</td><td>$value</td>
 		#end for
 	</tr>
 	#end for
@@ -355,7 +354,7 @@ except ImportError:
 	test_spitfire = None
 else:
 	spitfire_template = spitfire.compiler.util.load_template(s("""\
-#from cgi import escape
+#from html import escape
 <table>
 	#for $row in $table
 	<tr>
@@ -480,6 +479,12 @@ else:
 		return str(result)
 
 
+import json
+
+def test_json_dumps():
+	return json.dumps(ctx['table'])
+
+
 def run(number=100):
 	import profile
 	from timeit import Timer
@@ -490,7 +495,7 @@ def run(number=100):
 	print("						msec	rps  tcalls  funcs")
 	for name, test in names:
 		if test:
-			assert isinstance(test(), s)
+			assert isinstance(test(), s), "Response is of type: " + repr(type(s))
 			t = Timer(setup='from __main__ import %s as t' % name,
 					stmt='t()')
 			t = t.timeit(number=number)
