@@ -1,17 +1,10 @@
-#!/usr/bin/env python
-# encoding: utf-8
-
-from __future__ import print_function
+#!/usr/bin/env python3
 
 import os
 import sys
 import codecs
 
-
-try:
-	from setuptools.core import setup, find_packages
-except ImportError:
-	from setuptools import setup, find_packages
+from setuptools import setup
 
 
 if sys.version_info < (2, 7):
@@ -52,15 +45,10 @@ setup(
 			"Intended Audience :: Developers",
 			"License :: OSI Approved :: MIT License",
 			"Operating System :: OS Independent",
-			"Programming Language :: Python :: 2",
-			"Programming Language :: Python :: 2.7",
 			"Programming Language :: Python :: 3",
-			"Programming Language :: Python :: 3.2",
-			"Programming Language :: Python :: 3.3",
-			"Programming Language :: Python :: 3.4",
-			"Programming Language :: Python :: 3.5",
-			"Programming Language :: Python :: 3.6",
-			"Programming Language :: Python :: 3.7",
+			"Programming Language :: Python :: 3.8",
+			"Programming Language :: Python :: 3.9",
+			"Programming Language :: Python :: 3.10",
 			"Programming Language :: Python :: Implementation :: CPython",
 			"Programming Language :: Python :: Implementation :: PyPy",
 			"Programming Language :: Python",
@@ -71,7 +59,7 @@ setup(
 			"Topic :: Utilities",
 		],
 	
-	packages = find_packages(exclude=['bench', 'docs', 'example', 'test', 'htmlcov']),
+	packages = ['cinje'],
 	include_package_data = True,
 	package_data = {'': ['README.rst', 'LICENSE.txt']},
 	namespace_packages = [],
@@ -104,6 +92,7 @@ setup(
 	tests_require = tests_require,
 	extras_require = {
 			'development': tests_require + ['pre-commit'],  # Development requirements are the testing requirements.
-			'safe': ['webob'],  # String safety.
+			'safe': ['markupsafe'],  # String safety.
 		},
 )
+
