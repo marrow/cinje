@@ -2,7 +2,7 @@
 cinje
 =====
 
-    © 2015-2019 Alice Bevan-McGregor and contributors.
+    © 2015-2022 Alice Bevan-McGregor and contributors.
 
 ..
 
@@ -580,6 +580,16 @@ Just like with ``using``, the result of the expression must be a callable genera
 Version History
 ===============
 
+Version 1.2.0
+-------------
+
+* *Fixed* Python 3.9 compatibility by importing ABCs from the correct location.
+
+* Added Genshi and "raw JSON" to the benchmark suite.
+
+* Moved test automation from Travis-CI to GitHub Actions.
+
+
 Version 1.1.2
 -------------
 
@@ -600,7 +610,6 @@ Version 1.1.1
 * *Added* Python 3.6 testing, pre-commit hooks, and Makefile-based automation.
 
 * *Removed* Python 3.3 testing and support, `flake8` enforcement, and `tox` build/test automation.
-
 
 Version 1.1
 -----------
@@ -637,7 +646,7 @@ cinje has been released under the MIT Open Source license.
 The MIT License
 ---------------
 
-Copyright © 2015-2019 Alice Bevan-McGregor and contributors.
+Copyright © 2015-2022 Alice Bevan-McGregor and contributors.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 documentation files (the “Software”), to deal in the Software without restriction, including without limitation the
