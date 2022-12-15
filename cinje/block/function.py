@@ -78,7 +78,11 @@ class Function(object):
 	def __call__(self, context):
 		input = context.input
 		
-		declaration = input.next()
+		try:
+			declaration = input.next()
+		except StopIteration:
+			return
+		
 		line = declaration.partitioned[1]  # We don't care about the "def".
 		line, _, annotation = line.rpartition('->')
 		

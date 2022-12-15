@@ -18,4 +18,7 @@ class Code(object):
 		return line.kind == 'code'
 	
 	def __call__(self, context):
-		yield context.input.next()  # Pass through.
+		try:
+			yield context.input.next()  # Pass through.
+		except StopIteration:
+			return

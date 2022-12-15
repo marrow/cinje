@@ -63,7 +63,11 @@ class Generic(object):
 		
 		input = context.input
 		
-		declaration = input.next()
+		try:
+			declaration = input.next()
+		except StopIteration:
+			return
+		
 		stripped = declaration.stripped
 		prefix, _ = declaration.partitioned
 		

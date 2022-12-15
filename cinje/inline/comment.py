@@ -23,7 +23,10 @@ class Comment(object):
 	def __call__(self, context):
 		"""Emit comments into the final code that aren't marked as hidden/private."""
 		
-		line = context.input.next()
+		try:
+			line = context.input.next()
+		except StopIteration:
+			return
 		
 		if not line.stripped.startswith('##'):
 			yield line

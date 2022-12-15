@@ -2,23 +2,20 @@
 
 from __future__ import unicode_literals
 
-"""Convienent utilities."""
+"""Convenient utilities."""
 
 # ## Imports
 
 import sys
 
 from codecs import iterencode
+from collections import deque, namedtuple
+from collections.abc import Sized, Iterable
+from html.parser import HTMLParser
 from inspect import isfunction, isclass
 from operator import methodcaller
-from collections import deque, namedtuple, Sized, Iterable
 from pkg_resources import iter_entry_points
 from xml.sax.saxutils import quoteattr
-
-try:  # pragma: no cover
-	from html.parser import HTMLParser
-except ImportError:  # pragma: no cover
-	from HTMLParser import HTMLParser
 
 
 # ## Python Cross-Compatibility
@@ -87,12 +84,12 @@ def flatten(input, file=None, encoding=None, errors='strict'):
 	
 	This has several modes of operation.  If no `file` argument is given, output will be returned as a string.
 	The type of string will be determined by the presence of an `encoding`; if one is given the returned value is a
-	binary string, otherwise the native unicode representation.  If a `file` is present, chunks will be written
+	binary string, otherwise the native Unicode representation.  If a `file` is present, chunks will be written
 	iteratively through repeated calls to `file.write()`, and the amount of data (characters or bytes) written
 	returned.  The type of string written will be determined by `encoding`, just as the return value is when not
 	writing to a file-like object.  The `errors` argument is passed through when encoding.
 	
-	We can highly recommend using the various stremaing IO containers available in the
+	We can highly recommend using the various streaming IO containers available in the
 	[`io`](https://docs.python.org/3/library/io.html) module, though
 	[`tempfile`](https://docs.python.org/3/library/tempfile.html) classes are also quite useful.
 	"""
@@ -116,7 +113,7 @@ def fragment(string, name="anonymous", **context):
 	
 	**Note:** Use of this function is discouraged everywhere except tests, as no caching is implemented at this time.
 	
-	Only one function may be declared, either manually, or automatically. If automatic defintition is chosen the
+	Only one function may be declared, either manually, or automatically. If automatic definition is chosen the
 	resulting function takes no arguments.  Additional keyword arguments are passed through as global variables.
 	"""
 	
@@ -253,7 +250,7 @@ def xmlargs(_source=None, **values):
 def chunk(line, mapping={None: 'text', '${': 'escape', '#{': 'bless', '&{': 'args', '%{': 'format', '@{': 'json'}):
 	"""Chunkify and "tag" a block of text into plain text and code sections.
 	
-	The first delimeter is blank to represent text sections, and keep the indexes aligned with the tags.
+	The first delimiter is blank to represent text sections, and keep the indexes aligned with the tags.
 	
 	Values are yielded in the form (tag, text).
 	"""
@@ -521,7 +518,7 @@ class Context(object):
 class Pipe(object):
 	"""An object representing a pipe-able callable, optionally with preserved arguments.
 	
-	Using this you can custruct custom subclasses (define a method named "callable") or use it as a decorator:
+	Using this you can construct custom subclasses (define a method named "callable") or use it as a decorator:
 	
 		@Pipe
 		def s(text):

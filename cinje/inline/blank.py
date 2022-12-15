@@ -10,4 +10,7 @@ class Blank(object):
 		return not line.stripped
 	
 	def __call__(self, context):
-		yield context.input.next()
+		try:
+			yield context.input.next()
+		except StopIteration:
+			return
